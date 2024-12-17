@@ -9,7 +9,7 @@ export default class Prophet
         this.client = client;
     }
 
-    async describeScreenshot(screenshot: string)
+    async describeScreenshot(screenshotUrl: string)
     {
         const completion = await this.client.chat.completions.create({
             messages: [{
@@ -21,7 +21,7 @@ export default class Prophet
                     }, {
                         type: 'image_url',
                         image_url: {
-                            url: `data:image/jpeg;base64,${screenshot}`,
+                            url: screenshotUrl,
                         },
                     },
                 ],

@@ -1,7 +1,7 @@
 import {Builder, Browser} from "selenium-webdriver";
-import * as fs from "node:fs";
 import OpenAI from "openai";
 import Prophet from "./Prophet";
+import Breadcrumbs from "./Breadcrumbs";
 
 const test = async () => {
     console.log("Hello, world!");
@@ -16,16 +16,17 @@ const test = async () => {
     await driver.sleep(1000);
 
     const screenshot = await driver.takeScreenshot();
+    const breadcrumbs = new Breadcrumbs();
+    const screenshotId = await breadcrumbs.addScreenshot(Buffer.from(screenshot, 'base64'));
+    const screenshotUrl = `https://breadcrumbs.agxmeister.services/screenshots/${screenshotId}`;
 
-    fs.writeFile('screenshot.png', screenshot, 'base64', () => {
-        console.log('Screenshot was taken!');
-    });
+    console.log(`Screenshot URL: ${screenshotUrl}`);
 
     const prophet = new Prophet(new OpenAI({
         apiKey: process.env.OPENAI_API_KEY
     }));
 
-    await prophet.describeScreenshot(screenshot);
+    await prophet.describeScreenshot(screenshotUrl);
 
     console.log('Click!');
 
