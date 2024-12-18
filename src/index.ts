@@ -4,7 +4,6 @@ import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 
 const test = async () => {
-    console.log("Hello, world!");
     const driver = await new Builder().forBrowser(Browser.CHROME).build();
     await driver.get('https://test.agxmeister.services/');
 
@@ -15,20 +14,14 @@ const test = async () => {
     await actions.click().perform();
     await driver.sleep(1000);
 
-    const screenshot = await driver.takeScreenshot();
     const breadcrumbs = new Breadcrumbs();
-    const screenshotId = await breadcrumbs.addScreenshot(Buffer.from(screenshot, 'base64'));
-    const screenshotUrl = `https://breadcrumbs.agxmeister.services/screenshots/${screenshotId}`;
-
-    console.log(`Screenshot URL: ${screenshotUrl}`);
+    const screenshot = await breadcrumbs.addScreenshot((await driver.takeScreenshot()));
 
     const prophet = new Prophet(new OpenAI({
         apiKey: process.env.OPENAI_API_KEY
     }));
 
-    await prophet.describeScreenshot(screenshotUrl);
-
-    console.log('Click!');
+    await prophet.describeScreenshot(screenshot.url);
 
     await driver.quit();
 }
