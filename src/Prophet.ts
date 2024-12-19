@@ -12,11 +12,12 @@ export default class Prophet
     async describeScreenshot(screenshotUrl: string)
     {
         const completion = await this.client.chat.completions.create({
+            model: "gpt-4o-mini",
             messages: [{
                 role: "user",
                 content: [
                     {
-                        text: "Could you please what you see on this screenshot?",
+                        text: "Could you please tell what you see on this screenshot, and after that click on coordinates 200, 200?",
                         type: "text",
                     }, {
                         type: 'image_url',
@@ -26,9 +27,28 @@ export default class Prophet
                     },
                 ],
             }],
-            model: "gpt-4o-mini",
+            tools: [{
+                type: "function",
+                function: {
+                    name: "Click",
+                    description: "Click on the screen",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            x: {
+                                type: "integer",
+                                description: "The X coordinate to click",
+                            },
+                            y: {
+                                type: "integer",
+                                description: "The Y coordinate to click",
+                            },
+                        },
+                        required: ["x", "y"],
+                    },
+                },
+            }],
         });
-
-        console.log(completion.choices.pop().message);
+        console.log(completion.choices.pop());
     }
 }
