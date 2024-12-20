@@ -1,10 +1,13 @@
 import OpenAI from "openai";
+import {inject, injectable} from "inversify";
+import {dependencies} from "./types";
 
+@injectable()
 export default class Prophet
 {
     readonly client: OpenAI;
 
-    constructor(client: OpenAI)
+    constructor(@inject(dependencies.OpenAi) client: OpenAI)
     {
         this.client = client;
     }

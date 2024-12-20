@@ -1,9 +1,11 @@
-import {Screenshot} from "./types";
+import {dependencies, Screenshot} from "./types";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export default class Breadcrumbs
 {
     readonly baseUrl: string;
-    constructor(baseUrl = process.env.BREADCRUMBS_BASE_URL) {
+    constructor(@inject(dependencies.BreadcrumbsBaseUrl) baseUrl: string) {
         this.baseUrl = baseUrl;
     }
 
