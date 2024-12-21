@@ -1,5 +1,5 @@
-import {dependencies} from "./types";
 import {inject, injectable} from "inversify";
+import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {WebDriver} from "selenium-webdriver";
@@ -7,9 +7,13 @@ import {WebDriver} from "selenium-webdriver";
 @injectable()
 export default class Actor
 {
-    @inject(dependencies.WebDriver) private driver: WebDriver;
-    @inject(dependencies.Prophet) private prophet: Prophet;
-    @inject(dependencies.Breadcrumbs) private breadcrumbs: Breadcrumbs;
+    constructor(
+        @inject(dependencies.WebDriver) private driver: WebDriver,
+        @inject(dependencies.Prophet) private prophet: Prophet,
+        @inject(dependencies.Breadcrumbs) private breadcrumbs: Breadcrumbs,
+    )
+    {
+    }
 
     public async act(): Promise<void>
     {

@@ -1,12 +1,12 @@
-import {dependencies, Screenshot} from "./types";
 import {inject, injectable} from "inversify";
+import {dependencies} from "./dependencies";
+import {Screenshot} from "./types";
 
 @injectable()
 export default class Breadcrumbs
 {
-    readonly baseUrl: string;
-    constructor(@inject(dependencies.BreadcrumbsBaseUrl) baseUrl: string) {
-        this.baseUrl = baseUrl;
+    constructor(@inject(dependencies.BreadcrumbsBaseUrl) readonly baseUrl: string)
+    {
     }
 
     async addScreenshot(screenshot: string): Promise<Screenshot>
