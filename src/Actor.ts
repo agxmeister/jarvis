@@ -3,6 +3,7 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {WebDriver} from "selenium-webdriver";
+import {Screenshot} from "./types";
 
 @injectable()
 export default class Actor
@@ -17,7 +18,7 @@ export default class Actor
 
     public async act(): Promise<void>
     {
-        await this.driver.get('https://test.agxmeister.services/');
+        /*await this.driver.get('https://test.agxmeister.services/');
 
         const actions = this.driver.actions({async: true});
 
@@ -26,10 +27,38 @@ export default class Actor
         await actions.click().perform();
         await this.driver.sleep(1000);
 
-        const screenshot = await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));
+        const screenshot = await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));*/
 
-        await this.prophet.describeScreenshot(screenshot.url);
+        const url = "https://test.agxmeister.services";
+        const instruction = `Your task is to open "${url}" in browser and then click on coordinates (100, 150)`;
 
+        const tools = {
+            open: (url: string) => this.open(url),
+            close: () => this.close(),
+            click: (x: number, y: number) => this.click(x, y),
+        };
+
+        await this.prophet.act(instruction, tools);
+
+        //await this.driver.quit();
+    }
+
+    public async open(url: string): Promise<Screenshot>
+    {
+        await this.driver.get('https://test.agxmeister.services/');
+        return await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));
+    }
+
+    public async click(x: number, y: number): Promise<Screenshot>
+    {
+        const actions = this.driver.actions({async: true});
+        await actions.move({x: x, y: y}).perform();
+        await actions.click().perform();
+        return await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));
+    }
+
+    public async close(): Promise<void>
+    {
         await this.driver.quit();
     }
 }
