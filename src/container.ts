@@ -9,20 +9,20 @@ import Dumper from "./Dumper";
 
 const container = new Container();
 
-container.bind<Prophet>(dependencies.Prophet).to(Prophet);
-container.bind<Breadcrumbs>(dependencies.Breadcrumbs).to(Breadcrumbs);
 container.bind<Actor>(dependencies.Actor).to(Actor);
 container.bind<WebDriver>(dependencies.WebDriver).toDynamicValue(
     async () => await new Builder()
         .forBrowser(Browser.CHROME)
         .build()
 );
+container.bind<Prophet>(dependencies.Prophet).to(Prophet);
 container.bind<OpenAI>(dependencies.OpenAi).toDynamicValue(
     () => new OpenAI({
         apiKey: process.env.OPENAI_API_KEY
     }));
-container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.env.BREADCRUMBS_BASE_URL)
 container.bind<Dumper>(dependencies.Dumper).to(Dumper);
-container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.env.DUMPER_STORAGE_PATH)
+container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.env.DUMPER_STORAGE_PATH);
+container.bind<Breadcrumbs>(dependencies.Breadcrumbs).to(Breadcrumbs);
+container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.env.BREADCRUMBS_BASE_URL)
 
 export {container};

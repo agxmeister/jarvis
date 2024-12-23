@@ -14,7 +14,7 @@ export default class Prophet
     {
     }
 
-    async act(instruction: string, tools, steps: string[] = [], screenshotUrl: string|null = null)
+    async appeal(instruction: string, steps: string[] = [], screenshotUrl: string|null = null): Promise<ChatCompletionMessage>
     {
         const messages = [];
 
@@ -92,17 +92,6 @@ export default class Prophet
 
         this.dumper.add(completion);
 
-        await this.handle(completion.choices.pop().message, tools);
-    }
-
-    async handle(reply: ChatCompletionMessage, tools)
-    {
-        if (!reply.tool_calls) {
-            return;
-        }
-        const call = reply.tool_calls.pop();
-        if (call.function.name === "open") {
-            tools.open(call.function.arguments["url"]);
-        }
+        return completion.choices.pop().message;
     }
 }

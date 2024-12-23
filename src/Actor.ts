@@ -4,6 +4,7 @@ import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {WebDriver} from "selenium-webdriver";
 import {Screenshot} from "./types";
+import {ChatCompletionMessage} from "openai/resources/chat/completions";
 
 @injectable()
 export default class Actor
@@ -38,18 +39,31 @@ export default class Actor
             click: (x: number, y: number) => this.click(x, y),
         };
 
-        await this.prophet.act(instruction, tools);
+        const message = await this.prophet.appeal(instruction);
+
+        await this.handle(message);
 
         //await this.driver.quit();
     }
 
-    public async open(url: string): Promise<Screenshot>
+    private async handle(reply: ChatCompletionMessage)
+    {
+        if (!reply.tool_calls) {
+            return;
+        }
+        const call = reply.tool_calls.pop();
+        if (call.function.name === "open") {
+            await this.open(call.function.arguments["url"]);
+        }
+    }
+
+    private async open(url: string): Promise<Screenshot>
     {
         await this.driver.get('https://test.agxmeister.services/');
         return await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));
     }
 
-    public async click(x: number, y: number): Promise<Screenshot>
+    private async click(x: number, y: number): Promise<Screenshot>
     {
         const actions = this.driver.actions({async: true});
         await actions.move({x: x, y: y}).perform();
@@ -57,7 +71,7 @@ export default class Actor
         return await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));
     }
 
-    public async close(): Promise<void>
+    private async close(): Promise<void>
     {
         await this.driver.quit();
     }
