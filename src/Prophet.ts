@@ -2,12 +2,15 @@ import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import OpenAI from "openai";
 import {ChatCompletionMessage} from "openai/resources/chat/completions";
-import * as fs from "node:fs";
+import Dumper from "./Dumper";
 
 @injectable()
 export default class Prophet
 {
-    constructor(@inject(dependencies.OpenAi) readonly client: OpenAI)
+    constructor(
+        @inject(dependencies.OpenAi) readonly client: OpenAI,
+        @inject(dependencies.Dumper) readonly dumper: Dumper,
+    )
     {
     }
 
@@ -87,11 +90,7 @@ export default class Prophet
             }],
         });
 
-        fs.writeFile(
-            `./logs/${Date.now()}.json`,
-            JSON.stringify(completion, null, 4),
-            () => {},
-        );
+        this.dumper.add(completion);
 
         await this.handle(completion.choices.pop().message, tools);
     }

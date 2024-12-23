@@ -5,6 +5,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import Actor from "./Actor";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import OpenAI from "openai";
+import Dumper from "./Dumper";
 
 const container = new Container();
 
@@ -21,5 +22,7 @@ container.bind<OpenAI>(dependencies.OpenAi).toDynamicValue(
         apiKey: process.env.OPENAI_API_KEY
     }));
 container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.env.BREADCRUMBS_BASE_URL)
+container.bind<Dumper>(dependencies.Dumper).to(Dumper);
+container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.env.DUMPER_STORAGE_PATH)
 
 export {container};

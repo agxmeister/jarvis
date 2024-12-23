@@ -5,4 +5,6 @@ export const dependencies = {
     WebDriver: Symbol.for("WebDriver"),
     OpenAi: Symbol.for("OpenAi"),
     BreadcrumbsBaseUrl: Symbol.for("BreadcrumbsBaseUrl"),
+    Dumper: Symbol.for("Dumper"),
+    DumperStoragePath: Symbol.for("DumperStoragePath"),
 };
