@@ -3,31 +3,44 @@ import {dependencies} from "./dependencies";
 import OpenAI from "openai";
 import {ChatCompletionMessage} from "openai/resources/chat/completions";
 import Dumper from "./Dumper";
+import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
 
 @injectable()
 export default class Prophet
 {
+    private messages: ChatCompletionMessageParam[];
+
     constructor(
         @inject(dependencies.OpenAi) readonly client: OpenAI,
         @inject(dependencies.Dumper) readonly dumper: Dumper,
     )
     {
+        this.messages = [];
     }
 
-    async appeal(instruction: string, steps: string[] = [], screenshotUrl: string|null = null): Promise<ChatCompletionMessage>
+    addDungeonMasterMessage(message:string)
     {
-        const messages = [];
-
-        messages.push({
+        this.messages.push({
             role: "system",
-            name: "Boss",
-            content: instruction,
+            content: message,
         });
+    }
 
-        messages.push({
-            role: "system",
+    addMessengerMessage(message: string)
+    {
+        this.messages.push({
+            role: "user",
+            name: "Messenger",
+            content: message,
+        });
+    }
+
+    addNarratorMessage(screenshot: string|null = null)
+    {
+        this.messages.push({
+            role: "user",
             name: "Narrator",
-            content: screenshotUrl
+            content: screenshot
                 ? [
                     {
                         text: "This is what you see on the browser's screen now.",
@@ -35,16 +48,41 @@ export default class Prophet
                     }, {
                         type: 'image_url',
                         image_url: {
-                            url: screenshotUrl,
+                            url: screenshot,
                         },
                     }
                 ]
                 : "Browser's screen is closed now.",
         });
+    }
 
+    async appeal(): Promise<ChatCompletionMessage>
+    {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
-            messages: messages,
+            messages: this.messages,
+            response_format: {
+                type: "json_schema",
+                json_schema: {
+                    name: "response",
+                    strict: true,
+                    schema: {
+                        type: "object",
+                        properties: {
+                            status: {
+                                description: "Current state of scenario.",
+                                enum: ["progress", "succeed", "failed"]
+                            },
+                            comment: {
+                                description: "Comment to the current state of scenario.",
+                                type: "string",
+                            }
+                        },
+                        required: ["status", "comment"],
+                        additionalProperties: false,
+                    },
+                },
+            },
             tools: [{
                 type: "function",
                 function: {
@@ -75,7 +113,7 @@ export default class Prophet
                         properties: {
                             url: {
                                 type: "string",
-                                description: "URL to open",
+                                description: "URL to open in browser.",
                             },
                         },
                         required: ["url"],

@@ -5,6 +5,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import {WebDriver} from "selenium-webdriver";
 import {Screenshot} from "./types";
 import {ChatCompletionMessage} from "openai/resources/chat/completions";
+import * as fs from "node:fs";
 
 @injectable()
 export default class Actor
@@ -17,8 +18,21 @@ export default class Actor
     {
     }
 
+    async observe()
+    {
+
+    }
+
+    async decide()
+    {
+
+    }
+
     public async act(): Promise<void>
     {
+        const instruction = fs.readFileSync("./data/instruction.md", {encoding: "utf-8"});
+        const scenario = fs.readFileSync("./data/scenario.md", {encoding: "utf-8"});
+
         /*await this.driver.get('https://test.agxmeister.services/');
 
         const actions = this.driver.actions({async: true});
@@ -30,16 +44,12 @@ export default class Actor
 
         const screenshot = await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));*/
 
-        const url = "https://test.agxmeister.services";
-        const instruction = `Your task is to open "${url}" in browser and then click on coordinates (100, 150)`;
+        this.prophet.addDungeonMasterMessage(instruction);
+        this.prophet.addMessengerMessage(scenario);
 
-        const tools = {
-            open: (url: string) => this.open(url),
-            close: () => this.close(),
-            click: (x: number, y: number) => this.click(x, y),
-        };
+        this.prophet.addNarratorMessage();
 
-        const message = await this.prophet.appeal(instruction);
+        const message = await this.prophet.appeal();
 
         await this.handle(message);
 
@@ -51,15 +61,17 @@ export default class Actor
         if (!reply.tool_calls) {
             return;
         }
-        const call = reply.tool_calls.pop();
-        if (call.function.name === "open") {
-            await this.open(call.function.arguments["url"]);
+        for (const call of reply.tool_calls) {
+            if (call.function.name === "open") {
+                const parameters: {url: string} = JSON.parse(call.function.arguments);
+                await this.open(parameters.url);
+            }
         }
     }
 
     private async open(url: string): Promise<Screenshot>
     {
-        await this.driver.get('https://test.agxmeister.services/');
+        await this.driver.get(url);
         return await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));
     }
 
