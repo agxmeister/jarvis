@@ -20,15 +20,22 @@ export default class Actor
 
     async observe()
     {
+        this.prophet.addNarratorMessage();
+    }
 
+    async orient()
+    {
+        const message = await this.prophet.think();
+        this.prophet.addAssistantMessage(message.content);
     }
 
     async decide()
     {
-
+        const message = await this.prophet.act();
+        await this.handle(message);
     }
 
-    public async act(): Promise<void>
+    public async process(): Promise<void>
     {
         const instruction = fs.readFileSync("./data/instruction.md", {encoding: "utf-8"});
         const scenario = fs.readFileSync("./data/scenario.md", {encoding: "utf-8"});
@@ -47,11 +54,9 @@ export default class Actor
         this.prophet.addDungeonMasterMessage(instruction);
         this.prophet.addMessengerMessage(scenario);
 
-        this.prophet.addNarratorMessage();
-
-        const message = await this.prophet.appeal();
-
-        await this.handle(message);
+        await this.observe();
+        await this.orient();
+        await this.decide();
 
         //await this.driver.quit();
     }

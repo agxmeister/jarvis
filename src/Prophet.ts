@@ -35,6 +35,14 @@ export default class Prophet
         });
     }
 
+    addAssistantMessage(message: string)
+    {
+        this.messages.push({
+            role: "assistant",
+            content: message,
+        });
+    }
+
     addNarratorMessage(screenshot: string|null = null)
     {
         this.messages.push({
@@ -56,7 +64,7 @@ export default class Prophet
         });
     }
 
-    async appeal(): Promise<ChatCompletionMessage>
+    async think(): Promise<ChatCompletionMessage>
     {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
@@ -74,7 +82,7 @@ export default class Prophet
                                 enum: ["progress", "succeed", "failed"]
                             },
                             comment: {
-                                description: "Comment to the current state of scenario.",
+                                description: "Comment to the current state of scenario. ",
                                 type: "string",
                             }
                         },
@@ -83,6 +91,19 @@ export default class Prophet
                     },
                 },
             },
+        });
+
+        this.dumper.add(completion);
+
+        return completion.choices.pop().message;
+    }
+
+    async act(): Promise<ChatCompletionMessage>
+    {
+        const completion = await this.client.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: this.messages,
+            tool_choice: "required",
             tools: [{
                 type: "function",
                 function: {
