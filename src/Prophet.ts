@@ -1,9 +1,9 @@
 import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import OpenAI from "openai";
-import {ChatCompletionMessage} from "openai/resources/chat/completions";
 import Dumper from "./Dumper";
 import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
+import {Tool} from "./types";
 
 @injectable()
 export default class Prophet
@@ -64,7 +64,7 @@ export default class Prophet
         });
     }
 
-    async think(): Promise<ChatCompletionMessage>
+    async think(): Promise<string>
     {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
@@ -95,10 +95,10 @@ export default class Prophet
 
         this.dumper.add(completion);
 
-        return completion.choices.pop().message;
+        return completion.choices.pop().message.content;
     }
 
-    async act(): Promise<ChatCompletionMessage>
+    async act(): Promise<Tool[]>
     {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
@@ -151,6 +151,9 @@ export default class Prophet
 
         this.dumper.add(completion);
 
-        return completion.choices.pop().message;
+        return completion.choices.pop().message.tool_calls.map(call => ({
+            name: call.function.name,
+            parameters: JSON.parse(call.function.arguments),
+        }));
     }
 }

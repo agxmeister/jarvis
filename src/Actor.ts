@@ -3,7 +3,7 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {WebDriver} from "selenium-webdriver";
-import {Screenshot} from "./types";
+import {Screenshot, Tool} from "./types";
 import {ChatCompletionMessage} from "openai/resources/chat/completions";
 import * as fs from "node:fs";
 
@@ -26,13 +26,12 @@ export default class Actor
     async orient()
     {
         const message = await this.prophet.think();
-        this.prophet.addAssistantMessage(message.content);
+        this.prophet.addAssistantMessage(message);
     }
 
-    async decide()
+    async decide(): Promise<Tool[]>
     {
-        const message = await this.prophet.act();
-        await this.handle(message);
+        return await this.prophet.act();
     }
 
     public async process(): Promise<void>
@@ -56,19 +55,17 @@ export default class Actor
 
         await this.observe();
         await this.orient();
-        await this.decide();
+        const tools = await this.decide();
+        await this.act(tools);
 
         //await this.driver.quit();
     }
 
-    private async handle(reply: ChatCompletionMessage)
+    async act(tools: Tool[])
     {
-        if (!reply.tool_calls) {
-            return;
-        }
-        for (const call of reply.tool_calls) {
-            if (call.function.name === "open") {
-                const parameters: {url: string} = JSON.parse(call.function.arguments);
+        for (const tool of tools) {
+            if (tool.name === "open") {
+                const parameters: {url: string} = tool.parameters;
                 await this.open(parameters.url);
             }
         }
