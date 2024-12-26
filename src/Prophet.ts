@@ -43,24 +43,22 @@ export default class Prophet
         });
     }
 
-    addNarratorMessage(screenshot: string|null = null)
+    addNarratorMessage(currentUrl: string, screenshotUrl: string)
     {
         this.messages.push({
             role: "user",
             name: "Narrator",
-            content: screenshot
-                ? [
-                    {
-                        text: "This is what you see on the browser's screen now.",
-                        type: "text",
-                    }, {
-                        type: 'image_url',
-                        image_url: {
-                            url: screenshot,
-                        },
-                    }
-                ]
-                : "Browser's screen is closed now.",
+            content: [
+                {
+                    text: `Currently, you see "${currentUrl}" in the address bar of your browser. This is what you see on the browser's screen.`,
+                    type: "text",
+                }, {
+                    type: 'image_url',
+                    image_url: {
+                        url: screenshotUrl,
+                    },
+                }
+            ]
         });
     }
 
@@ -82,7 +80,7 @@ export default class Prophet
                                 enum: ["progress", "succeed", "failed"]
                             },
                             comment: {
-                                description: "Comment to the current state of scenario. ",
+                                description: "Describe what you see and think you should do to complete the current step of the scenario and proceed to the next step.",
                                 type: "string",
                             }
                         },

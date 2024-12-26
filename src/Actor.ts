@@ -4,7 +4,6 @@ import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {WebDriver} from "selenium-webdriver";
 import {Screenshot, Tool} from "./types";
-import {ChatCompletionMessage} from "openai/resources/chat/completions";
 import * as fs from "node:fs";
 
 @injectable()
@@ -16,22 +15,6 @@ export default class Actor
         @inject(dependencies.Breadcrumbs) private breadcrumbs: Breadcrumbs,
     )
     {
-    }
-
-    async observe()
-    {
-        this.prophet.addNarratorMessage();
-    }
-
-    async orient()
-    {
-        const message = await this.prophet.think();
-        this.prophet.addAssistantMessage(message);
-    }
-
-    async decide(): Promise<Tool[]>
-    {
-        return await this.prophet.act();
     }
 
     public async process(): Promise<void>
@@ -53,12 +36,30 @@ export default class Actor
         this.prophet.addDungeonMasterMessage(instruction);
         this.prophet.addMessengerMessage(scenario);
 
-        await this.observe();
+        await this.observe(this.driver);
         await this.orient();
         const tools = await this.decide();
         await this.act(tools);
 
         //await this.driver.quit();
+    }
+
+    async observe(driver: WebDriver)
+    {
+        const currentUrl = await driver.getCurrentUrl();
+        const screenshot = await this.breadcrumbs.addScreenshot((await driver.takeScreenshot()));
+        this.prophet.addNarratorMessage(currentUrl, screenshot.url);
+    }
+
+    async orient()
+    {
+        const message = await this.prophet.think();
+        this.prophet.addAssistantMessage(message);
+    }
+
+    async decide(): Promise<Tool[]>
+    {
+        return await this.prophet.act();
     }
 
     async act(tools: Tool[])
