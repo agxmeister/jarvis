@@ -36,10 +36,16 @@ export default class Actor
         this.prophet.addDungeonMasterMessage(instruction);
         this.prophet.addMessengerMessage(scenario);
 
-        await this.observe(this.driver);
-        await this.orient();
-        const tools = await this.decide();
-        await this.act(tools);
+        for (let i = 0; i < 4; i++) {
+            await this.observe(this.driver);
+            const proceed = await this.orient();
+            if (!proceed) {
+                console.log(`Execution finished on the iteration #${i}.`);
+                break;
+            }
+            const tools = await this.decide();
+            await this.act(tools);
+        }
 
         //await this.driver.quit();
     }
@@ -51,10 +57,15 @@ export default class Actor
         this.prophet.addNarratorMessage(currentUrl, screenshot.url);
     }
 
-    async orient()
+    async orient(): Promise<boolean>
     {
         const message = await this.prophet.think();
         this.prophet.addAssistantMessage(message);
+
+        const data: {status: string, comment: string} = JSON.parse(message);
+        console.log(`Comment: ${data.comment}`);
+        console.log(`Status: ${data.status}`);
+        return data.status === 'progress';
     }
 
     async decide(): Promise<Tool[]>
@@ -68,6 +79,9 @@ export default class Actor
             if (tool.name === "open") {
                 const parameters: {url: string} = tool.parameters;
                 await this.open(parameters.url);
+            } else if (tool.name === "click") {
+                const parameters: {x: number, y: number} = tool.parameters;
+                await this.click(parameters.x, parameters.y);
             }
         }
     }
