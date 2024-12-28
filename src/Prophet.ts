@@ -43,12 +43,12 @@ export default class Prophet
         });
     }
 
-    addNarratorMessage(currentUrl: string, screenshotUrl: string)
+    addNarratorMessage(currentUrl: string = null, screenshotUrl: string = null)
     {
         this.messages.push({
             role: "user",
             name: "Narrator",
-            content: [
+            content: currentUrl && screenshotUrl ? [
                 {
                     text: `Currently, you see "${currentUrl}" in the address bar of your browser. This is what you see on the browser's screen.`,
                     type: "text",
@@ -58,7 +58,7 @@ export default class Prophet
                         url: screenshotUrl,
                     },
                 }
-            ]
+            ] : "Currently your browser is closed",
         });
     }
 

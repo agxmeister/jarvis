@@ -2,19 +2,22 @@ import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
-import {WebDriver} from "selenium-webdriver";
+import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import {Screenshot, Tool} from "./types";
 import * as fs from "node:fs";
 
 @injectable()
 export default class Actor
 {
+    private webDriver: WebDriver;
+
     constructor(
-        @inject(dependencies.WebDriver) private driver: WebDriver,
+        @inject(dependencies.WebDriverBuilder) private webDriverBuilder: Builder,
         @inject(dependencies.Prophet) private prophet: Prophet,
         @inject(dependencies.Breadcrumbs) private breadcrumbs: Breadcrumbs,
     )
     {
+        this.webDriver = null;
     }
 
     public async process(): Promise<void>
@@ -22,22 +25,22 @@ export default class Actor
         const instruction = fs.readFileSync("./data/instruction.md", {encoding: "utf-8"});
         const scenario = fs.readFileSync("./data/scenario.md", {encoding: "utf-8"});
 
-        /*await this.driver.get('https://test.agxmeister.services/');
+        /*await this.webDriver.get('https://test.agxmeister.services/');
 
-        const actions = this.driver.actions({async: true});
+        const actions = this.webDriver.actions({async: true});
 
-        await this.driver.sleep(1000);
+        await this.webDriver.sleep(1000);
         await actions.move({x: 100, y: 150}).perform();
         await actions.click().perform();
-        await this.driver.sleep(1000);
+        await this.webDriver.sleep(1000);
 
-        const screenshot = await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));*/
+        const screenshot = await this.breadcrumbs.addScreenshot((await this.webDriver.takeScreenshot()));*/
 
         this.prophet.addDungeonMasterMessage(instruction);
         this.prophet.addMessengerMessage(scenario);
 
         for (let i = 0; i < 4; i++) {
-            await this.observe(this.driver);
+            await this.observe(this.webDriver);
             const proceed = await this.orient();
             if (!proceed) {
                 console.log(`Execution finished on the iteration #${i}.`);
@@ -47,14 +50,14 @@ export default class Actor
             await this.act(tools);
         }
 
-        //await this.driver.quit();
+        //await this.webDriver.quit();
     }
 
     async observe(driver: WebDriver)
     {
-        const currentUrl = await driver.getCurrentUrl();
-        const screenshot = await this.breadcrumbs.addScreenshot((await driver.takeScreenshot()));
-        this.prophet.addNarratorMessage(currentUrl, screenshot.url);
+        const currentUrl = driver ? await driver.getCurrentUrl() : null;
+        const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
+        this.prophet.addNarratorMessage(currentUrl, screenshot?.url);
     }
 
     async orient(): Promise<boolean>
@@ -88,20 +91,29 @@ export default class Actor
 
     private async open(url: string): Promise<Screenshot>
     {
-        await this.driver.get(url);
-        return await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));
+        this.webDriver = await this.webDriverBuilder
+            .forBrowser(Browser.CHROME)
+            .build();
+        await this.webDriver.get('https://example.com');
+        await this.webDriver.manage().window().setRect({
+            width: 800,
+            height: 600,
+        });
+        await this.webDriver.get(url);
+        return await this.breadcrumbs.addScreenshot((await this.webDriver.takeScreenshot()));
     }
 
     private async click(x: number, y: number): Promise<Screenshot>
     {
-        const actions = this.driver.actions({async: true});
+        const actions = this.webDriver.actions({async: true});
         await actions.move({x: x, y: y}).perform();
         await actions.click().perform();
-        return await this.breadcrumbs.addScreenshot((await this.driver.takeScreenshot()));
+        return await this.breadcrumbs.addScreenshot((await this.webDriver.takeScreenshot()));
     }
 
     private async close(): Promise<void>
     {
-        await this.driver.quit();
+        await this.webDriver.quit();
+        this.webDriver = null;
     }
 }
