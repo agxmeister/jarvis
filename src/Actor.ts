@@ -22,8 +22,15 @@ export default class Actor
 
     public async process(): Promise<void>
     {
-        const instruction = fs.readFileSync("./data/instruction.md", {encoding: "utf-8"});
+        const steps = fs.readFileSync("./data/steps.md", {encoding: "utf-8"});
+        this.prophet.addDungeonMasterMessage(steps);
+
         const scenario = fs.readFileSync("./data/scenario.md", {encoding: "utf-8"});
+        this.prophet.addMessengerMessage(scenario);
+
+        const decomposition = await this.prophet.askSteps();
+
+        const instruction = fs.readFileSync("./data/instruction.md", {encoding: "utf-8"});
 
         /*await this.webDriver.get('https://test.agxmeister.services/');
 
@@ -37,7 +44,6 @@ export default class Actor
         const screenshot = await this.breadcrumbs.addScreenshot((await this.webDriver.takeScreenshot()));*/
 
         this.prophet.addDungeonMasterMessage(instruction);
-        this.prophet.addMessengerMessage(scenario);
 
         for (let i = 0; i < 4; i++) {
             await this.observe(this.webDriver);

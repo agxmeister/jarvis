@@ -1,4 +1,4 @@
-Your task is to follow scenario provided to you by the user 'Messenger', one step at once.
+Thank you. Now, please, follow these steps.
 
 Before each step, the user 'Narrator' will inform you about your current state and, if possible,
 provide a screenshot illustrating what you see.
