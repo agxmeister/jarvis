@@ -7,7 +7,7 @@ import {
     ChatCompletionCreateParamsNonStreaming,
     ChatCompletionMessageParam
 } from "openai/src/resources/chat/completions";
-import {Tool} from "./types";
+import {Step, Tool} from "./types";
 
 @injectable()
 export default class Prophet
@@ -66,7 +66,7 @@ export default class Prophet
         });
     }
 
-    async askSteps(): Promise<string>
+    async getSteps(): Promise<Step[]>
     {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
@@ -95,9 +95,14 @@ export default class Prophet
                                         expectation: {
                                             description: "Expectation of what exactly should happen after completion of this step.",
                                             type: "string",
+                                        },
+                                        status: {
+                                            type: "string",
+                                            enum: ["planned", "failed", "completed"],
+                                            description: "Status of the step. It must be one of the following: 'planned' if didn't proceed to this step yet; 'failed' if you already did the action to complete it, but, according to your observation, it didn't help; 'passed' if, according to your observation, the step was already done.",
                                         }
                                     },
-                                    required: ["name", "action", "expectation"],
+                                    required: ["name", "action", "expectation", "status"],
                                     additionalProperties: false,
                                 },
                             },
@@ -110,7 +115,7 @@ export default class Prophet
         });
         this.dumper.add(completion);
 
-        return completion.choices.pop().message.content;
+        return JSON.parse(completion.choices.pop().message.content).steps;
     }
 
     async think(): Promise<string>
@@ -145,16 +150,39 @@ export default class Prophet
                     schema: {
                         type: "object",
                         properties: {
-                            status: {
-                                description: "Current state of scenario.",
-                                enum: ["progress", "succeed", "failed"]
-                            },
                             comment: {
                                 description: "Describe what you see and think you should do to complete the current step of the scenario and proceed to the next step.",
                                 type: "string",
-                            }
+                            },
+                            steps: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        name: {
+                                            description: "Unique and concise name of the step, self-explaining its essence.",
+                                            type: "string",
+                                        },
+                                        action: {
+                                            description: "Explanation of what exactly must be done to complete this step and proceed to the next step.",
+                                            type: "string",
+                                        },
+                                        expectation: {
+                                            description: "Expectation of what exactly should happen after completion of this step.",
+                                            type: "string",
+                                        },
+                                        status: {
+                                            type: "string",
+                                            enum: ["planned", "failed", "completed"],
+                                            description: "Status of the step. It must be one of the following: 'planned' if didn't proceed to this step yet; 'failed' if you already did the action to complete it, but, according to your observation, it didn't help; 'passed' if, according to your observation, the step was already done.",
+                                        }
+                                    },
+                                    required: ["name", "action", "expectation", "status"],
+                                    additionalProperties: false,
+                                },
+                            },
                         },
-                        required: ["status", "comment"],
+                        required: ["comment", "steps"],
                         additionalProperties: false,
                     },
                 },

@@ -3,7 +3,7 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
-import {Screenshot, Tool} from "./types";
+import {Screenshot, Step, Tool} from "./types";
 import * as fs from "node:fs";
 
 @injectable()
@@ -22,13 +22,17 @@ export default class Actor
 
     public async process(): Promise<void>
     {
-        const steps = fs.readFileSync("./data/steps.md", {encoding: "utf-8"});
-        this.prophet.addDungeonMasterMessage(steps);
+        const decomposition = fs.readFileSync("./data/decomposition.md", {encoding: "utf-8"});
+        this.prophet.addDungeonMasterMessage(decomposition);
 
         const scenario = fs.readFileSync("./data/scenario.md", {encoding: "utf-8"});
         this.prophet.addMessengerMessage(scenario);
 
-        const decomposition = await this.prophet.askSteps();
+        const steps = await this.prophet.getSteps();
+
+        for (const step of steps) {
+            console.log(`${step.name} - ${step.status}`);
+        }
 
         const instruction = fs.readFileSync("./data/instruction.md", {encoding: "utf-8"});
 
@@ -71,10 +75,14 @@ export default class Actor
         const message = await this.prophet.think();
         this.prophet.addAssistantMessage(message);
 
-        const data: {status: string, comment: string} = JSON.parse(message);
-        console.log(`Comment: ${data.comment}`);
-        console.log(`Status: ${data.status}`);
-        return data.status === 'progress';
+        const data: {comment: string, steps: Step[]} = JSON.parse(message);
+
+        for (const step of data.steps) {
+            console.log(`${step.name} - ${step.status}`);
+        }
+
+        const plannedSteps = data.steps.filter(step => step.status === "planned");
+        return plannedSteps.length > 0;
     }
 
     async decide(): Promise<Tool[]>
@@ -91,6 +99,8 @@ export default class Actor
             } else if (tool.name === "click") {
                 const parameters: {x: number, y: number} = tool.parameters;
                 await this.click(parameters.x, parameters.y);
+            } else if (tool.name === "close") {
+                await this.close();
             }
         }
     }
