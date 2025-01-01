@@ -29,9 +29,11 @@ export default class Actor
         this.prophet.addMessengerMessage(scenario);
 
         const steps = await this.prophet.getSteps();
+        const stepNames = steps.map(step => step.name);
 
+        console.log("Steps:");
         for (const step of steps) {
-            console.log(`${step.name} - ${step.status}`);
+            console.log(`${step.name}`);
         }
 
         const instruction = fs.readFileSync("./data/instruction.md", {encoding: "utf-8"});
@@ -51,12 +53,12 @@ export default class Actor
 
         for (let i = 0; i < 4; i++) {
             await this.observe(this.webDriver);
-            const proceed = await this.orient();
+            const proceed = await this.orient(stepNames);
             if (!proceed) {
                 console.log(`Execution finished on the iteration #${i}.`);
                 break;
             }
-            const tools = await this.decide();
+            const tools = await this.decide(stepNames);
             await this.act(tools);
         }
 
@@ -70,24 +72,26 @@ export default class Actor
         this.prophet.addNarratorMessage(currentUrl, screenshot?.url);
     }
 
-    async orient(): Promise<boolean>
+    async orient(steps: string[]): Promise<boolean>
     {
-        const message = await this.prophet.think();
+        const message = await this.prophet.think(steps);
         this.prophet.addAssistantMessage(message);
 
-        const data: {comment: string, steps: Step[]} = JSON.parse(message);
+        const data: {comment: string, steps: any} = JSON.parse(message);
 
-        for (const step of data.steps) {
-            console.log(`${step.name} - ${step.status}`);
+        const hasPlannedSteps = Object.values(data.steps).reduce<boolean>((acc, status) => acc || status === "planned", false);
+
+        console.log("Steps:");
+        for (const [key, value] of Object.entries(data.steps)) {
+            console.log(`${key}: ${value}`);
         }
 
-        const plannedSteps = data.steps.filter(step => step.status === "planned");
-        return plannedSteps.length > 0;
+        return hasPlannedSteps;
     }
 
-    async decide(): Promise<Tool[]>
+    async decide(steps: string[]): Promise<Tool[]>
     {
-        return await this.prophet.act();
+        return await this.prophet.act(steps);
     }
 
     async act(tools: Tool[])

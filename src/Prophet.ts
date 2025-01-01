@@ -83,6 +83,7 @@ export default class Prophet
                                 type: "array",
                                 items: {
                                     type: "object",
+                                    description: "The list of steps to perform to complete the scenario",
                                     properties: {
                                         name: {
                                             description: "Unique and concise name of the step, self-explaining its essence.",
@@ -96,13 +97,8 @@ export default class Prophet
                                             description: "Expectation of what exactly should happen after completion of this step.",
                                             type: "string",
                                         },
-                                        status: {
-                                            type: "string",
-                                            enum: ["planned", "failed", "completed"],
-                                            description: "Status of the step. It must be one of the following: 'planned' if didn't proceed to this step yet; 'failed' if you already did the action to complete it, but, according to your observation, it didn't help; 'passed' if, according to your observation, the step was already done.",
-                                        }
                                     },
-                                    required: ["name", "action", "expectation", "status"],
+                                    required: ["name", "action", "expectation"],
                                     additionalProperties: false,
                                 },
                             },
@@ -118,17 +114,17 @@ export default class Prophet
         return JSON.parse(completion.choices.pop().message.content).steps;
     }
 
-    async think(): Promise<string>
+    async think(steps: string[]): Promise<string>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, false));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, false, steps));
         this.dumper.add(completion);
 
         return completion.choices.pop().message.content;
     }
 
-    async act(): Promise<Tool[]>
+    async act(steps: string[]): Promise<Tool[]>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, true));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, true, steps));
         this.dumper.add(completion);
 
         return completion.choices.pop().message.tool_calls.map(call => ({
@@ -137,8 +133,14 @@ export default class Prophet
         }));
     }
 
-    private getCompletionRequest(messages: ChatCompletionMessageParam[], act: boolean): ChatCompletionCreateParamsNonStreaming
+    private getCompletionRequest(messages: ChatCompletionMessageParam[], act: boolean, steps: string[]): ChatCompletionCreateParamsNonStreaming
     {
+        const stepProperties = steps.reduce((acc: any, step) => ({...acc, [step]: {
+            type: "string",
+            enum: ["planned", "failed", "completed"],
+            description: `Status of the step ${step}.`,
+        }}), {});
+
         return {
             model: "gpt-4o-mini",
             messages: messages,
@@ -155,31 +157,11 @@ export default class Prophet
                                 type: "string",
                             },
                             steps: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        name: {
-                                            description: "Unique and concise name of the step, self-explaining its essence.",
-                                            type: "string",
-                                        },
-                                        action: {
-                                            description: "Explanation of what exactly must be done to complete this step and proceed to the next step.",
-                                            type: "string",
-                                        },
-                                        expectation: {
-                                            description: "Expectation of what exactly should happen after completion of this step.",
-                                            type: "string",
-                                        },
-                                        status: {
-                                            type: "string",
-                                            enum: ["planned", "failed", "completed"],
-                                            description: "Status of the step. It must be one of the following: 'planned' if didn't proceed to this step yet; 'failed' if you already did the action to complete it, but, according to your observation, it didn't help; 'passed' if, according to your observation, the step was already done.",
-                                        }
-                                    },
-                                    required: ["name", "action", "expectation", "status"],
-                                    additionalProperties: false,
-                                },
+                                type: "object",
+                                description: "List of steps and their statuses. Status must be one of the following: 'planned' means you didn't proceed to this step yet; 'failed' means you already did the action to complete it, but, according to your observation, it didn't help; 'passed' means, according to your observation, the step was already done.",
+                                properties: stepProperties,
+                                required: steps,
+                                additionalProperties: false,
                             },
                         },
                         required: ["comment", "steps"],
