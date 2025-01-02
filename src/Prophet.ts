@@ -3,7 +3,6 @@ import {dependencies} from "./dependencies";
 import OpenAI from "openai";
 import Dumper from "./Dumper";
 import {
-    ChatCompletionCreateParams,
     ChatCompletionCreateParamsNonStreaming,
     ChatCompletionMessageParam
 } from "openai/src/resources/chat/completions";
@@ -211,6 +210,12 @@ export default class Prophet
                 function: {
                     name: "close",
                     description: "Close the browser's screen.",
+                },
+            }, {
+                type: "function",
+                function: {
+                    name: "wait",
+                    description: "No nothing.",
                 },
             }],
         };

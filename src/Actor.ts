@@ -5,6 +5,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import {Screenshot, Step, Tool} from "./types";
 import * as fs from "node:fs";
+import Scenario from "./Scenario";
 
 @injectable()
 export default class Actor
@@ -20,23 +21,20 @@ export default class Actor
         this.webDriver = null;
     }
 
-    public async process(): Promise<void>
+    public async process(scenario: Scenario): Promise<void>
     {
-        const decomposition = fs.readFileSync("./data/decomposition.md", {encoding: "utf-8"});
-        this.prophet.addDungeonMasterMessage(decomposition);
-
-        const scenario = fs.readFileSync("./data/scenario.md", {encoding: "utf-8"});
-        this.prophet.addMessengerMessage(scenario);
+        this.prophet.addDungeonMasterMessage(scenario.briefing.strategy);
+        this.prophet.addDungeonMasterMessage(scenario.briefing.planning);
+        this.prophet.addMessengerMessage(scenario.narrative);
 
         const steps = await this.prophet.getSteps();
         const stepNames = steps.map(step => step.name);
-
         console.log("Steps:");
         for (const step of steps) {
             console.log(`${step.name}`);
         }
 
-        const instruction = fs.readFileSync("./data/instruction.md", {encoding: "utf-8"});
+        this.prophet.addDungeonMasterMessage(scenario.briefing.execution);
 
         /*await this.webDriver.get('https://test.agxmeister.services/');
 
@@ -48,8 +46,6 @@ export default class Actor
         await this.webDriver.sleep(1000);
 
         const screenshot = await this.breadcrumbs.addScreenshot((await this.webDriver.takeScreenshot()));*/
-
-        this.prophet.addDungeonMasterMessage(instruction);
 
         for (let i = 0; i < 4; i++) {
             await this.observe(this.webDriver);

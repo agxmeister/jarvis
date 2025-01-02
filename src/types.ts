@@ -10,6 +10,13 @@ export interface Tool
     parameters: any,
 }
 
+export interface Briefing
+{
+    strategy: string,
+    planning: string,
+    execution: string,
+}
+
 export interface Step
 {
     name: string,
