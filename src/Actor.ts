@@ -28,13 +28,32 @@ export default class Actor
         this.prophet.addMessengerMessage(scenario.narrative);
 
         const steps = await this.prophet.getSteps();
-        const stepNames = steps.map(step => step.name);
-        console.log("Steps:");
-        for (const step of steps) {
-            console.log(`${step.name}`);
-        }
 
         this.prophet.addDungeonMasterMessage(scenario.briefing.execution);
+
+        for (const step of steps) {
+            console.log(`Starting step ${step.name}`);
+
+            let completed = false;
+
+            for (let i = 0; i < 2; i++) {
+                await this.observe(step, this.webDriver);
+                completed = completed || await this.orient();
+                if (completed) {
+                    console.log(`Total iterations: ${i}.`);
+                    break;
+                }
+                const tools = await this.decide();
+                await this.act(tools);
+            }
+
+            if (!completed) {
+                console.log(`Failed to complete step ${step.name}`);
+                break;
+            }
+
+            console.log(`Step ${step.name} completed!`);
+        }
 
         /*await this.webDriver.get('https://test.agxmeister.services/');
 
@@ -47,47 +66,29 @@ export default class Actor
 
         const screenshot = await this.breadcrumbs.addScreenshot((await this.webDriver.takeScreenshot()));*/
 
-        for (let i = 0; i < 4; i++) {
-            await this.observe(this.webDriver);
-            const proceed = await this.orient(stepNames);
-            if (!proceed) {
-                console.log(`Execution finished on the iteration #${i}.`);
-                break;
-            }
-            const tools = await this.decide(stepNames);
-            await this.act(tools);
-        }
-
         //await this.webDriver.quit();
     }
 
-    async observe(driver: WebDriver)
+    async observe(step: Step, driver: WebDriver)
     {
         const currentUrl = driver ? await driver.getCurrentUrl() : null;
         const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
-        this.prophet.addNarratorMessage(currentUrl, screenshot?.url);
+        this.prophet.addNarratorMessage(step, currentUrl, screenshot?.url);
     }
 
-    async orient(steps: string[]): Promise<boolean>
+    async orient(): Promise<boolean>
     {
-        const message = await this.prophet.think(steps);
+        const message = await this.prophet.think();
         this.prophet.addAssistantMessage(message);
 
-        const data: {comment: string, steps: any} = JSON.parse(message);
+        const data: {observation: string, completed: boolean} = JSON.parse(message);
 
-        const hasPlannedSteps = Object.values(data.steps).reduce<boolean>((acc, status) => acc || status === "planned", false);
-
-        console.log("Steps:");
-        for (const [key, value] of Object.entries(data.steps)) {
-            console.log(`${key}: ${value}`);
-        }
-
-        return hasPlannedSteps;
+        return data.completed;
     }
 
-    async decide(steps: string[]): Promise<Tool[]>
+    async decide(): Promise<Tool[]>
     {
-        return await this.prophet.act(steps);
+        return await this.prophet.act();
     }
 
     async act(tools: Tool[])

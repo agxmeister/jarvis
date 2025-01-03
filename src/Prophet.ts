@@ -46,14 +46,19 @@ export default class Prophet
         });
     }
 
-    addNarratorMessage(currentUrl: string = null, screenshotUrl: string = null)
+    addNarratorMessage(step: Step, currentUrl: string = null, screenshotUrl: string = null)
     {
+        this.messages.push({
+            role: "user",
+            name: "Narrator",
+            content: `Currently, you are on the step "${step.name}". At the end of this step you expected to get the following: ${step.expectation}.`,
+        });
         this.messages.push({
             role: "user",
             name: "Narrator",
             content: currentUrl && screenshotUrl ? [
                 {
-                    text: `Currently, you see "${currentUrl}" in the address bar of your browser. This is what you see on the browser's screen.`,
+                    text: `You see "${currentUrl}" in the address bar of your browser.`,
                     type: "text",
                 }, {
                     type: 'image_url',
@@ -61,7 +66,7 @@ export default class Prophet
                         url: screenshotUrl,
                     },
                 }
-            ] : "Currently your browser is closed",
+            ] : "Currently your browser is closed.",
         });
     }
 
@@ -113,17 +118,17 @@ export default class Prophet
         return JSON.parse(completion.choices.pop().message.content).steps;
     }
 
-    async think(steps: string[]): Promise<string>
+    async think(): Promise<string>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, false, steps));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, false));
         this.dumper.add(completion);
 
         return completion.choices.pop().message.content;
     }
 
-    async act(steps: string[]): Promise<Tool[]>
+    async act(): Promise<Tool[]>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, true, steps));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, true));
         this.dumper.add(completion);
 
         return completion.choices.pop().message.tool_calls.map(call => ({
@@ -132,14 +137,8 @@ export default class Prophet
         }));
     }
 
-    private getCompletionRequest(messages: ChatCompletionMessageParam[], act: boolean, steps: string[]): ChatCompletionCreateParamsNonStreaming
+    private getCompletionRequest(messages: ChatCompletionMessageParam[], act: boolean): ChatCompletionCreateParamsNonStreaming
     {
-        const stepProperties = steps.reduce((acc: any, step) => ({...acc, [step]: {
-            type: "string",
-            enum: ["planned", "failed", "completed"],
-            description: `Status of the step ${step}.`,
-        }}), {});
-
         return {
             model: "gpt-4o-mini",
             messages: messages,
@@ -151,19 +150,16 @@ export default class Prophet
                     schema: {
                         type: "object",
                         properties: {
-                            comment: {
-                                description: "Describe what you see and think you should do to complete the current step of the scenario and proceed to the next step.",
+                            observation: {
+                                description: "Your interpretation of the current application's state.",
                                 type: "string",
                             },
-                            steps: {
-                                type: "object",
-                                description: "List of steps and their statuses. Status must be one of the following: 'planned' means you didn't proceed to this step yet; 'failed' means you already did the action to complete it, but, according to your observation, it didn't help; 'passed' means, according to your observation, the step was already done.",
-                                properties: stepProperties,
-                                required: steps,
-                                additionalProperties: false,
+                            completed: {
+                                description: "Status of the current step. True, if you consider it passed.",
+                                type: "boolean",
                             },
                         },
-                        required: ["comment", "steps"],
+                        required: ["observation", "completed"],
                         additionalProperties: false,
                     },
                 },
