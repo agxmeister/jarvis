@@ -4,14 +4,13 @@ import OpenAI from "openai";
 import Dumper from "./Dumper";
 import {
     ChatCompletionCreateParamsNonStreaming,
-    ChatCompletionMessageParam
 } from "openai/src/resources/chat/completions";
-import {Step, Tool} from "./types";
+import {Message, Step, Tool} from "./types";
 
 @injectable()
 export default class Prophet
 {
-    private messages: ChatCompletionMessageParam[];
+    private messages: Message[];
 
     constructor(
         @inject(dependencies.OpenAi) readonly client: OpenAI,
@@ -21,52 +20,76 @@ export default class Prophet
         this.messages = [];
     }
 
-    addDungeonMasterMessage(message:string)
+    addDungeonMasterMessage(message:string, tag: string = "master")
     {
         this.messages.push({
-            role: "system",
-            content: message,
+            tag: tag,
+            message: {
+                role: "system",
+                content: message,
+            },
         });
     }
 
-    addMessengerMessage(message: string)
+    addMessengerMessage(message: string, tag: string = "messenger")
     {
         this.messages.push({
-            role: "user",
-            name: "Messenger",
-            content: message,
+            tag: tag,
+            message: {
+                role: "user",
+                name: "Messenger",
+                content: message,
+            },
         });
     }
 
-    addAssistantMessage(message: string)
+    addAssistantMessage(message: string, tag: string = "assistant")
     {
         this.messages.push({
-            role: "assistant",
-            content: message,
+            tag: tag,
+            message: {
+                role: "assistant",
+                content: message,
+            },
         });
     }
 
-    addNarratorMessage(step: Step, currentUrl: string = null, screenshotUrl: string = null)
+    cleanNarratorMessages()
+    {
+        this.messages = this.messages.filter(message => message.tag !== "narrator");
+    }
+
+    addNarratorStepMessage(step: Step)
     {
         this.messages.push({
-            role: "user",
-            name: "Narrator",
-            content: `Currently, you are on the step "${step.name}". At the end of this step you expected to get the following: ${step.expectation}.`,
+            tag: "narrator",
+            message: {
+                role: "user",
+                name: "Narrator",
+                content: `Currently, you are on the step "${step.name}". At the end of this step you expected to get the following: ${step.expectation}.`,
+            },
         });
+    }
+
+    addNarratorObservationMessage(currentUrl: string = null, screenshotUrl: string = null)
+    {
         this.messages.push({
-            role: "user",
-            name: "Narrator",
-            content: currentUrl && screenshotUrl ? [
-                {
-                    text: `You see "${currentUrl}" in the address bar of your browser.`,
-                    type: "text",
-                }, {
-                    type: 'image_url',
-                    image_url: {
-                        url: screenshotUrl,
-                    },
-                }
-            ] : "Currently your browser is closed.",
+            tag: "narrator",
+            message: {
+                role: "user",
+                name: "Narrator",
+                content: currentUrl && screenshotUrl ? [
+                    {
+                        text: `You see "${currentUrl}" in the address bar of your browser.`,
+                        type: "text",
+                    }, {
+                        type: 'image_url',
+                        image_url: {
+                            url: screenshotUrl,
+                        },
+                    }
+                ] : "Currently your browser is closed.",
+            },
         });
     }
 
@@ -74,7 +97,7 @@ export default class Prophet
     {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
-            messages: this.messages,
+            messages: this.messages.map(message => message.message),
             response_format: {
                 type: "json_schema",
                 json_schema: {
@@ -137,11 +160,12 @@ export default class Prophet
         }));
     }
 
-    private getCompletionRequest(messages: ChatCompletionMessageParam[], act: boolean): ChatCompletionCreateParamsNonStreaming
+    private getCompletionRequest(messages: Message[], act: boolean): ChatCompletionCreateParamsNonStreaming
     {
+        console.log(`Total messages sent: ${messages.length}. Narrator messages: ${messages.filter(message => message.tag === "narrator").length}.`)
         return {
             model: "gpt-4o-mini",
-            messages: messages,
+            messages: messages.map(message => message.message),
             response_format: {
                 type: "json_schema",
                 json_schema: {

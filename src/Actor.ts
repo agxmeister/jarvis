@@ -4,7 +4,6 @@ import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import {Screenshot, Step, Tool} from "./types";
-import * as fs from "node:fs";
 import Scenario from "./Scenario";
 
 @injectable()
@@ -31,7 +30,8 @@ export default class Actor
 
         this.prophet.addDungeonMasterMessage(scenario.briefing.execution);
 
-        for (const step of steps) {
+        for (const i in steps) {
+            const step = steps[i];
             console.log(`Starting step ${step.name}`);
 
             let completed = false;
@@ -39,12 +39,22 @@ export default class Actor
             for (let i = 0; i < 2; i++) {
                 await this.observe(step, this.webDriver);
                 completed = completed || await this.orient();
+
+                const nextStep = i + 1 < steps.length ? steps[i + 1] : null;
+
+                if (completed && nextStep) {
+                    await this.observe(nextStep, this.webDriver);
+                }
+
+                if (nextStep) {
+                    const tools = await this.decide();
+                    await this.act(tools);
+                }
+
                 if (completed) {
                     console.log(`Total iterations: ${i}.`);
                     break;
                 }
-                const tools = await this.decide();
-                await this.act(tools);
             }
 
             if (!completed) {
@@ -54,26 +64,15 @@ export default class Actor
 
             console.log(`Step ${step.name} completed!`);
         }
-
-        /*await this.webDriver.get('https://test.agxmeister.services/');
-
-        const actions = this.webDriver.actions({async: true});
-
-        await this.webDriver.sleep(1000);
-        await actions.move({x: 100, y: 150}).perform();
-        await actions.click().perform();
-        await this.webDriver.sleep(1000);
-
-        const screenshot = await this.breadcrumbs.addScreenshot((await this.webDriver.takeScreenshot()));*/
-
-        //await this.webDriver.quit();
     }
 
     async observe(step: Step, driver: WebDriver)
     {
+        this.prophet.cleanNarratorMessages();
+        this.prophet.addNarratorStepMessage(step);
         const currentUrl = driver ? await driver.getCurrentUrl() : null;
         const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
-        this.prophet.addNarratorMessage(step, currentUrl, screenshot?.url);
+        this.prophet.addNarratorObservationMessage(currentUrl, screenshot?.url);
     }
 
     async orient(): Promise<boolean>
