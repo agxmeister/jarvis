@@ -24,6 +24,7 @@ export interface Step
     name: string,
     action: string,
     expectation: string,
+    observation?: string[],
 }
 
 export interface Message

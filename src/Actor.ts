@@ -5,6 +5,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import {Screenshot, Step, Tool} from "./types";
 import Scenario from "./Scenario";
+import {briefing} from "../data/briefing/briefing";
 
 @injectable()
 export default class Actor
@@ -26,22 +27,22 @@ export default class Actor
         this.prophet.addDungeonMasterMessage(scenario.briefing.planning);
         this.prophet.addMessengerMessage(scenario.narrative);
 
-        const steps = await this.prophet.getSteps();
+        const steps = await this.getSteps(briefing.steps);
 
         this.prophet.addDungeonMasterMessage(scenario.briefing.execution);
 
-        for (const i in steps) {
+        for (let i = 0; i < steps.length; i++) {
             const step = steps[i];
             console.log(`Starting step ${step.name}`);
 
             let completed = false;
 
-            for (let i = 0; i < 2; i++) {
+            for (let j = 0; j < 5; j++) {
                 await this.observe(step, this.webDriver);
 
                 completed = completed || await this.orient();
 
-                const nextStep = i + 1 < steps.length ? steps[i + 1] : null;
+                const nextStep = i + 1 < steps.length ? steps[j + 1] : null;
 
                 if (completed && nextStep) {
                     await this.observe(nextStep, this.webDriver);
@@ -53,7 +54,7 @@ export default class Actor
                 }
 
                 if (completed) {
-                    console.log(`Total iterations: ${i}.`);
+                    console.log(`Total iterations: ${j}.`);
                     break;
                 }
             }
@@ -72,8 +73,14 @@ export default class Actor
         this.prophet.cleanNarratorMessages();
         this.prophet.addNarratorStepMessage(step);
         const currentUrl = driver ? await driver.getCurrentUrl() : null;
-        const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
-        this.prophet.addNarratorObservationMessage(currentUrl, screenshot?.url);
+        if (!step.observation) {
+            const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
+            this.prophet.addNarratorObservationMessage(currentUrl, screenshot?.url);
+        } else {
+            const observation = step.observation.shift();
+            step.observation.push(observation);
+            this.prophet.addNarratorEmulatedObservationMessage(observation, currentUrl);
+        }
     }
 
     async orient(): Promise<boolean>
@@ -104,6 +111,18 @@ export default class Actor
                 await this.close();
             }
         }
+    }
+
+    private async getSteps(emulatedSteps: Partial<Step>[] = null): Promise<Step[]>
+    {
+        const steps = await this.prophet.getSteps();
+        if (!emulatedSteps) {
+            return steps;
+        }
+        return steps.map((step, index) => ({
+            ...step,
+            observation: emulatedSteps[index].observation,
+        }));
     }
 
     private async open(url: string): Promise<Screenshot>

@@ -22,5 +22,24 @@ export const briefing = {
     narrative: `
         You must proceed to URL 'https://test.agxmeister.services' in your browser and click on the screen
         at coordinates (100, 150). As a result, the coordinates you just clicked should appear on the screen.
-    `
+    `,
+    steps: [{
+        observations: [
+            "You see that the browser is closed.",
+            "You see that the browser is open and displays blank page."
+        ],
+        description: "Open web browser.",
+    }, {
+        observation: [
+            "You see that the browser is open and displays blank page.",
+            "You see that the browser displays a white page with a line of text 'Hello!' in the top left corner."
+        ],
+        description: "Go to the URL 'https://test.agxmeister.services' in web browser.",
+    }, {
+        observation: [
+            "You see that the browser displays coordinates 'x=100 and y=150' in the top left corner.",
+            "You see that the browser displays coordinates 'x=100 and y=150' in the top left corner."
+        ],
+        description: "Click on screen at coordinates (100, 150).",
+    }]
 }

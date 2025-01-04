@@ -93,6 +93,18 @@ export default class Prophet
         });
     }
 
+    addNarratorEmulatedObservationMessage(observation: string, currentUrl: string = null)
+    {
+        this.messages.push({
+            tag: "narrator",
+            message: {
+                role: "user",
+                name: "Narrator",
+                content: observation + currentUrl ? ` You see "${currentUrl}" in the address bar of your browser.` : "",
+            },
+        });
+    }
+
     async getSteps(): Promise<Step[]>
     {
         const completion = await this.client.chat.completions.create({
