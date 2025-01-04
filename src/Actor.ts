@@ -38,6 +38,7 @@ export default class Actor
 
             for (let i = 0; i < 2; i++) {
                 await this.observe(step, this.webDriver);
+
                 completed = completed || await this.orient();
 
                 const nextStep = i + 1 < steps.length ? steps[i + 1] : null;
