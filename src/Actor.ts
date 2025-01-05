@@ -6,6 +6,7 @@ import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import {Screenshot, Step, Tool} from "./types";
 import Scenario from "./Scenario";
 import {briefing} from "../data/briefing/briefing";
+import readline = require("readline/promises");
 
 @injectable()
 export default class Actor
@@ -28,6 +29,12 @@ export default class Actor
         this.prophet.addMessengerMessage(scenario.narrative);
 
         const steps = await this.getSteps(briefing.steps);
+
+        const answer = await this.askCustomerInput(steps);
+        if (answer !== "yes") {
+            console.log("Test scenario interrupted by the customer's request");
+            return;
+        }
 
         this.prophet.addDungeonMasterMessage(scenario.briefing.execution);
 
@@ -66,6 +73,17 @@ export default class Actor
 
             console.log(`Step ${step.name} completed!`);
         }
+    }
+
+    async askCustomerInput(steps: Step[]): Promise<string>
+    {
+        const request = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
+        const answer = await request.question(`Where are steps: ${steps.map(step => step.name).join(", ")}. Proceeding? `);
+        request.close();
+        return answer;
     }
 
     async observe(step: Step, driver: WebDriver)
