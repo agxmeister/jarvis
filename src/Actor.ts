@@ -5,7 +5,6 @@ import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import {Screenshot, Step, Tool} from "./types";
 import Scenario from "./Scenario";
-import {briefing} from "../data/briefing/briefing";
 import readline = require("readline/promises");
 
 @injectable()
@@ -28,19 +27,15 @@ export default class Actor
         this.prophet.addDungeonMasterMessage(scenario.briefing.planning);
         this.prophet.addMessengerMessage(scenario.narrative);
 
-        const steps = await this.getSteps(briefing.steps);
-
-        const answer = await this.askCustomerInput(steps);
-        if (answer !== "yes") {
-            console.log("Test scenario interrupted by the customer's request");
-            return;
-        }
+        const steps = await this.prophet.getSteps();
 
         this.prophet.addDungeonMasterMessage(scenario.briefing.execution);
 
         for (let i = 0; i < steps.length; i++) {
             const step = steps[i];
             console.log(`Starting step ${step.name}`);
+
+            step.observation = await this.askForObservation(step);
 
             let completed = false;
 
@@ -75,13 +70,13 @@ export default class Actor
         }
     }
 
-    async askCustomerInput(steps: Step[]): Promise<string>
+    async askForObservation(step: Step): Promise<string>
     {
         const request = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
         });
-        const answer = await request.question(`Where are steps: ${steps.map(step => step.name).join(", ")}. Proceeding? `);
+        const answer = await request.question(`Current step is "${step.name}". What do you see? `);
         request.close();
         return answer;
     }
@@ -95,9 +90,7 @@ export default class Actor
             const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
             this.prophet.addNarratorObservationMessage(currentUrl, screenshot?.url);
         } else {
-            const observation = step.observation.shift();
-            step.observation.push(observation);
-            this.prophet.addNarratorEmulatedObservationMessage(observation, currentUrl);
+            this.prophet.addNarratorEmulatedObservationMessage(step.observation, currentUrl);
         }
     }
 
@@ -129,18 +122,6 @@ export default class Actor
                 await this.close();
             }
         }
-    }
-
-    private async getSteps(emulatedSteps: Partial<Step>[] = null): Promise<Step[]>
-    {
-        const steps = await this.prophet.getSteps();
-        if (!emulatedSteps) {
-            return steps;
-        }
-        return steps.map((step, index) => ({
-            ...step,
-            observation: emulatedSteps[index].observation,
-        }));
     }
 
     private async open(url: string): Promise<Screenshot>
