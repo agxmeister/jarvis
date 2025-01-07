@@ -35,34 +35,26 @@ export default class Actor
             const step = steps[i];
             console.log(`Starting step ${step.name}`);
 
-            step.observation = await this.askForObservation(step);
-
             let completed = false;
 
             for (let j = 0; j < 5; j++) {
+                step.observation = await this.askForObservation(step);
+
                 await this.observe(step, this.webDriver);
 
                 completed = completed || await this.orient();
-
-                const nextStep = i + 1 < steps.length ? steps[j + 1] : null;
-
-                if (completed && nextStep) {
-                    await this.observe(nextStep, this.webDriver);
-                }
-
-                if (nextStep) {
-                    const tools = await this.decide();
-                    await this.act(tools);
-                }
-
                 if (completed) {
                     console.log(`Total iterations: ${j}.`);
                     break;
                 }
+
+                const tools = await this.decide();
+
+                await this.act(tools);
             }
 
             if (!completed) {
-                console.log(`Failed to complete step ${step.name}`);
+                console.log(`Scenario failed on ${step.name}.`);
                 break;
             }
 
