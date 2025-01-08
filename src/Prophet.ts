@@ -66,7 +66,7 @@ export default class Prophet
             message: {
                 role: "user",
                 name: "Narrator",
-                content: `Currently, you are on the step "${step.name}". At the end of this step you expected to get the following: ${step.expectation}.`,
+                content: `Currently, you are on the step "${step.name}". At the end of this step you expect to get the following: ${step.expectation}.`,
             },
         });
     }
@@ -100,8 +100,28 @@ export default class Prophet
             message: {
                 role: "user",
                 name: "Narrator",
-                content: observation + currentUrl ? ` You see "${currentUrl}" in the address bar of your browser.` : "",
+                content: observation + (currentUrl ? ` You see "${currentUrl}" in the address bar of your browser.` : ""),
             },
+        });
+    }
+
+    addToolMessage(message: string, tool: string)
+    {
+        this.messages.push({
+            tag: "tool",
+            message: {
+                content: message,
+                role: "tool",
+                tool_call_id: tool,
+            },
+        });
+    }
+
+    addRawMessage(message: any)
+    {
+        this.messages.push({
+            tag: "raw",
+            message: message,
         });
     }
 
@@ -158,7 +178,10 @@ export default class Prophet
         const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, false));
         this.dumper.add(completion);
 
-        return completion.choices.pop().message.content;
+        const message = completion.choices.pop().message;
+        this.addRawMessage(message);
+
+        return message.content;
     }
 
     async act(): Promise<Tool[]>
@@ -166,7 +189,11 @@ export default class Prophet
         const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, true));
         this.dumper.add(completion);
 
-        return completion.choices.pop().message.tool_calls.map(call => ({
+        const message = completion.choices.pop().message;
+        this.addRawMessage(message);
+
+        return message.tool_calls.map(call => ({
+            id: call.id,
             name: call.function.name,
             parameters: JSON.parse(call.function.arguments),
         }));
@@ -194,8 +221,12 @@ export default class Prophet
                                 description: "Status of the current step. True, if you consider it passed.",
                                 type: "boolean",
                             },
+                            comment: {
+                                description: "Describe in your own word, do you consider the current step passed or not.",
+                                type: "string",
+                            },
                         },
-                        required: ["observation", "completed"],
+                        required: ["observation", "completed", "comment"],
                         additionalProperties: false,
                     },
                 },

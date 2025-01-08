@@ -8,6 +8,7 @@ export interface Screenshot
 
 export interface Tool
 {
+    id: string,
     name: string,
     parameters: any,
 }
@@ -31,4 +32,10 @@ export interface Message
 {
     tag: string,
     message: ChatCompletionMessageParam,
+}
+
+export type OrientMessage = {
+    observation: string,
+    completed: boolean,
+    comment: string,
 }

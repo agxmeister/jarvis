@@ -3,7 +3,7 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
-import {Screenshot, Step, Tool} from "./types";
+import {OrientMessage, Screenshot, Step, Tool} from "./types";
 import Scenario from "./Scenario";
 import readline = require("readline/promises");
 
@@ -38,11 +38,18 @@ export default class Actor
             let completed = false;
 
             for (let j = 0; j < 5; j++) {
+                console.log(`Expectation: ${step.expectation}`);
+
                 step.observation = await this.askForObservation(step);
 
                 await this.observe(step, this.webDriver);
 
-                completed = completed || await this.orient();
+                const message = await this.orient();
+
+                console.log(`Observation: ${message.observation}`);
+                console.log(`Observation: ${message.comment}`);
+
+                completed = completed || message.completed;
                 if (completed) {
                     console.log(`Total iterations: ${j}.`);
                     break;
@@ -86,14 +93,11 @@ export default class Actor
         }
     }
 
-    async orient(): Promise<boolean>
+    async orient(): Promise<OrientMessage>
     {
         const message = await this.prophet.think();
         this.prophet.addAssistantMessage(message);
-
-        const data: {observation: string, completed: boolean} = JSON.parse(message);
-
-        return data.completed;
+        return JSON.parse(message);
     }
 
     async decide(): Promise<Tool[]>
@@ -107,11 +111,16 @@ export default class Actor
             if (tool.name === "open") {
                 const parameters: {url: string} = tool.parameters;
                 await this.open(parameters.url);
+                this.prophet.addToolMessage(`Requested page was opened.`, tool.id);
             } else if (tool.name === "click") {
                 const parameters: {x: number, y: number} = tool.parameters;
                 await this.click(parameters.x, parameters.y);
+                this.prophet.addToolMessage(`Click was performed.`, tool.id);
             } else if (tool.name === "close") {
                 await this.close();
+                this.prophet.addToolMessage(`Browser was closed.`, tool.id);
+            } else if (tool.name === "wait") {
+                this.prophet.addToolMessage(`Some time passed.`, tool.id);
             }
         }
     }
