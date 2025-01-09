@@ -6,6 +6,8 @@ import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import {OrientMessage, Screenshot, Step, Tool} from "./types";
 import Scenario from "./Scenario";
 import readline = require("readline/promises");
+import Thread from "./Thread";
+import Narrator from "./Narrator";
 
 @injectable()
 export default class Actor
@@ -23,13 +25,15 @@ export default class Actor
 
     public async process(scenario: Scenario): Promise<void>
     {
-        this.prophet.addDungeonMasterMessage(scenario.briefing.strategy);
-        this.prophet.addDungeonMasterMessage(scenario.briefing.planning);
-        this.prophet.addMessengerMessage(scenario.narrative);
+        const thread = new Thread();
 
-        const steps = await this.prophet.getSteps();
+        thread.addMasterMessage(scenario.briefing.strategy);
+        thread.addMasterMessage(scenario.briefing.planning);
+        thread.addMessengerMessage(scenario.narrative);
 
-        this.prophet.addDungeonMasterMessage(scenario.briefing.execution);
+        const steps = await this.prophet.getSteps(thread);
+
+        thread.addMasterMessage(scenario.briefing.execution);
 
         for (let i = 0; i < steps.length; i++) {
             const step = steps[i];
@@ -38,13 +42,15 @@ export default class Actor
             let completed = false;
 
             for (let j = 0; j < 5; j++) {
+                const narrator = new Narrator();
+
                 console.log(`Expectation: ${step.expectation}`);
 
                 step.observation = await this.askForObservation(step);
 
-                await this.observe(step, this.webDriver);
+                await this.observe(narrator, step, this.webDriver);
 
-                const message = await this.orient();
+                const message = await this.orient(thread, narrator);
 
                 console.log(`Observation: ${message.observation}`);
                 console.log(`Observation: ${message.comment}`);
@@ -55,9 +61,9 @@ export default class Actor
                     break;
                 }
 
-                const tools = await this.decide();
+                const tools = await this.decide(thread, narrator);
 
-                await this.act(tools);
+                await this.act(thread, tools);
             }
 
             if (!completed) {
@@ -80,47 +86,45 @@ export default class Actor
         return answer;
     }
 
-    async observe(step: Step, driver: WebDriver)
+    async observe(narrator: Narrator, step: Step, driver: WebDriver)
     {
-        this.prophet.cleanNarratorMessages();
-        this.prophet.addNarratorStepMessage(step);
+        narrator.addStep(step);
         const currentUrl = driver ? await driver.getCurrentUrl() : null;
         if (!step.observation) {
             const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
-            this.prophet.addNarratorObservationMessage(currentUrl, screenshot?.url);
+            narrator.addObservation(currentUrl, screenshot?.url);
         } else {
-            this.prophet.addNarratorEmulatedObservationMessage(step.observation, currentUrl);
+            narrator.addEmulatedObservation(currentUrl, step.observation)
         }
     }
 
-    async orient(): Promise<OrientMessage>
+    async orient(thread: Thread, narrator: Narrator): Promise<OrientMessage>
     {
-        const message = await this.prophet.think();
-        this.prophet.addAssistantMessage(message);
+        const message = await this.prophet.think(thread, narrator);
         return JSON.parse(message);
     }
 
-    async decide(): Promise<Tool[]>
+    async decide(thread: Thread, narrator: Narrator): Promise<Tool[]>
     {
-        return await this.prophet.act();
+        return await this.prophet.act(thread, narrator);
     }
 
-    async act(tools: Tool[])
+    async act(thread: Thread, tools: Tool[])
     {
         for (const tool of tools) {
             if (tool.name === "open") {
                 const parameters: {url: string} = tool.parameters;
                 await this.open(parameters.url);
-                this.prophet.addToolMessage(`Requested page was opened.`, tool.id);
+                thread.addToolMessage(`Requested page was opened.`, tool.id);
             } else if (tool.name === "click") {
                 const parameters: {x: number, y: number} = tool.parameters;
                 await this.click(parameters.x, parameters.y);
-                this.prophet.addToolMessage(`Click was performed.`, tool.id);
+                thread.addToolMessage(`Click was performed.`, tool.id);
             } else if (tool.name === "close") {
                 await this.close();
-                this.prophet.addToolMessage(`Browser was closed.`, tool.id);
+                thread.addToolMessage(`Browser was closed.`, tool.id);
             } else if (tool.name === "wait") {
-                this.prophet.addToolMessage(`Some time passed.`, tool.id);
+                thread.addToolMessage(`Some time passed.`, tool.id);
             }
         }
     }

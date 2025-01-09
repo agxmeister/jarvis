@@ -3,133 +3,27 @@ import {dependencies} from "./dependencies";
 import OpenAI from "openai";
 import Dumper from "./Dumper";
 import {
-    ChatCompletionCreateParamsNonStreaming,
+    ChatCompletionCreateParamsNonStreaming, ChatCompletionMessageParam,
 } from "openai/src/resources/chat/completions";
-import {Message, Step, Tool} from "./types";
+import {Step, Tool} from "./types";
+import Thread from "./Thread";
+import Narrator from "./Narrator";
 
 @injectable()
 export default class Prophet
 {
-    private messages: Message[];
-
     constructor(
         @inject(dependencies.OpenAi) readonly client: OpenAI,
         @inject(dependencies.Dumper) readonly dumper: Dumper,
     )
     {
-        this.messages = [];
     }
 
-    addDungeonMasterMessage(message:string, tag: string = "master")
-    {
-        this.messages.push({
-            tag: tag,
-            message: {
-                role: "system",
-                content: message,
-            },
-        });
-    }
-
-    addMessengerMessage(message: string, tag: string = "messenger")
-    {
-        this.messages.push({
-            tag: tag,
-            message: {
-                role: "user",
-                name: "Messenger",
-                content: message,
-            },
-        });
-    }
-
-    addAssistantMessage(message: string, tag: string = "assistant")
-    {
-        this.messages.push({
-            tag: tag,
-            message: {
-                role: "assistant",
-                content: message,
-            },
-        });
-    }
-
-    cleanNarratorMessages()
-    {
-        this.messages = this.messages.filter(message => message.tag !== "narrator");
-    }
-
-    addNarratorStepMessage(step: Step)
-    {
-        this.messages.push({
-            tag: "narrator",
-            message: {
-                role: "user",
-                name: "Narrator",
-                content: `Currently, you are on the step "${step.name}". At the end of this step you expect to get the following: ${step.expectation}.`,
-            },
-        });
-    }
-
-    addNarratorObservationMessage(currentUrl: string = null, screenshotUrl: string = null)
-    {
-        this.messages.push({
-            tag: "narrator",
-            message: {
-                role: "user",
-                name: "Narrator",
-                content: currentUrl && screenshotUrl ? [
-                    {
-                        text: `You see "${currentUrl}" in the address bar of your browser.`,
-                        type: "text",
-                    }, {
-                        type: 'image_url',
-                        image_url: {
-                            url: screenshotUrl,
-                        },
-                    }
-                ] : "Currently your browser is closed.",
-            },
-        });
-    }
-
-    addNarratorEmulatedObservationMessage(observation: string, currentUrl: string = null)
-    {
-        this.messages.push({
-            tag: "narrator",
-            message: {
-                role: "user",
-                name: "Narrator",
-                content: observation + (currentUrl ? ` You see "${currentUrl}" in the address bar of your browser.` : ""),
-            },
-        });
-    }
-
-    addToolMessage(message: string, tool: string)
-    {
-        this.messages.push({
-            tag: "tool",
-            message: {
-                content: message,
-                role: "tool",
-                tool_call_id: tool,
-            },
-        });
-    }
-
-    addRawMessage(message: any)
-    {
-        this.messages.push({
-            tag: "raw",
-            message: message,
-        });
-    }
-
-    async getSteps(): Promise<Step[]>
+    async getSteps(thread: Thread): Promise<Step[]>
     {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
-            messages: this.messages.map(message => message.message),
+            messages: thread.messages,
             response_format: {
                 type: "json_schema",
                 json_schema: {
@@ -173,24 +67,24 @@ export default class Prophet
         return JSON.parse(completion.choices.pop().message.content).steps;
     }
 
-    async think(): Promise<string>
+    async think(thread: Thread, narrator: Narrator): Promise<string>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, false));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narrator.messages], false));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
-        this.addRawMessage(message);
+        thread.addRawMessage(message);
 
         return message.content;
     }
 
-    async act(): Promise<Tool[]>
+    async act(thread: Thread, narrator: Narrator): Promise<Tool[]>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest(this.messages, true));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narrator.messages], true));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
-        this.addRawMessage(message);
+        thread.addRawMessage(message);
 
         return message.tool_calls.map(call => ({
             id: call.id,
@@ -199,12 +93,11 @@ export default class Prophet
         }));
     }
 
-    private getCompletionRequest(messages: Message[], act: boolean): ChatCompletionCreateParamsNonStreaming
+    private getCompletionRequest(messages: ChatCompletionMessageParam[], act: boolean): ChatCompletionCreateParamsNonStreaming
     {
-        console.log(`Total messages sent: ${messages.length}. Narrator messages: ${messages.filter(message => message.tag === "narrator").length}.`)
         return {
             model: "gpt-4o-mini",
-            messages: messages.map(message => message.message),
+            messages: messages,
             response_format: {
                 type: "json_schema",
                 json_schema: {

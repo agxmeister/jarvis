@@ -28,11 +28,11 @@ export interface Step
     observation?: string,
 }
 
-export interface Message
+/*export interface Message
 {
     tag: string,
     message: ChatCompletionMessageParam,
-}
+}*/
 
 export type OrientMessage = {
     observation: string,
