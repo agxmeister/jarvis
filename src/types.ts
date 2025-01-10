@@ -25,14 +25,7 @@ export interface Step
     name: string,
     action: string,
     expectation: string,
-    observation?: string,
 }
-
-/*export interface Message
-{
-    tag: string,
-    message: ChatCompletionMessageParam,
-}*/
 
 export type OrientMessage = {
     observation: string,

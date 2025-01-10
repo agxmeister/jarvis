@@ -46,14 +46,12 @@ export default class Actor
 
                 console.log(`Expectation: ${step.expectation}`);
 
-                step.observation = await this.askForObservation(step);
-
                 await this.observe(narrator, step, this.webDriver);
 
                 const message = await this.orient(thread, narrator);
 
                 console.log(`Observation: ${message.observation}`);
-                console.log(`Observation: ${message.comment}`);
+                console.log(`Comment: ${message.comment}`);
 
                 completed = completed || message.completed;
                 if (completed) {
@@ -75,7 +73,20 @@ export default class Actor
         }
     }
 
-    async askForObservation(step: Step): Promise<string>
+    async observe(narrator: Narrator, step: Step, driver: WebDriver)
+    {
+        narrator.addStep(step);
+        const currentUrl = driver ? await driver.getCurrentUrl() : null;
+        if (process.env.OBSERVATION_MODE !== "automatic") {
+            const observation = await this.getObservation(step);
+            narrator.addManualObservation(currentUrl, observation);
+            return;
+        }
+        const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
+        narrator.addAutomaticObservation(currentUrl, screenshot?.url);
+    }
+
+    async getObservation(step: Step): Promise<string>
     {
         const request = readline.createInterface({
             input: process.stdin,
@@ -84,18 +95,6 @@ export default class Actor
         const answer = await request.question(`Current step is "${step.name}". What do you see? `);
         request.close();
         return answer;
-    }
-
-    async observe(narrator: Narrator, step: Step, driver: WebDriver)
-    {
-        narrator.addStep(step);
-        const currentUrl = driver ? await driver.getCurrentUrl() : null;
-        if (!step.observation) {
-            const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
-            narrator.addObservation(currentUrl, screenshot?.url);
-        } else {
-            narrator.addEmulatedObservation(currentUrl, step.observation)
-        }
     }
 
     async orient(thread: Thread, narrator: Narrator): Promise<OrientMessage>

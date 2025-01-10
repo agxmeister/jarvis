@@ -14,7 +14,7 @@ export default class Narrator
         });
     }
 
-    addObservation(url: string, screenshot: string)
+    addAutomaticObservation(url: string, screenshot: string)
     {
         this.messages.push({
             content: url && screenshot ? [
@@ -33,7 +33,7 @@ export default class Narrator
         });
     }
 
-    addEmulatedObservation(url: string, observation : string)
+    addManualObservation(url: string, observation : string)
     {
         this.messages.push({
             content: observation + (url ? ` You see "${url}" in the address bar of your browser.` : ""),
