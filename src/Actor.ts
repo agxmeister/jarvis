@@ -8,6 +8,7 @@ import Scenario from "./Scenario";
 import readline = require("readline/promises");
 import Thread from "./Thread";
 import Narrator from "./Narrator";
+import Ooda from "./Ooda";
 
 @injectable()
 export default class Actor
@@ -39,31 +40,14 @@ export default class Actor
             const step = steps[i];
             console.log(`Starting step ${step.name}`);
 
-            let completed = false;
+            const ooda = new Ooda(
+                async (narrator: Narrator) => this.observe(narrator, step, this.webDriver),
+                async (narrator: Narrator) => await this.orient(thread, narrator),
+                async (narrator: Narrator) => await this.decide(thread, narrator),
+                async (tools: Tool[]) => await this.act(thread, tools),
+            );
 
-            for (let j = 0; j < 5; j++) {
-                const narrator = new Narrator();
-
-                console.log(`Expectation: ${step.expectation}`);
-
-                await this.observe(narrator, step, this.webDriver);
-
-                const message = await this.orient(thread, narrator);
-
-                console.log(`Observation: ${message.observation}`);
-                console.log(`Comment: ${message.comment}`);
-
-                completed = completed || message.completed;
-                if (completed) {
-                    console.log(`Total iterations: ${j}.`);
-                    break;
-                }
-
-                const tools = await this.decide(thread, narrator);
-
-                await this.act(thread, tools);
-            }
-
+            const completed = await ooda.process();
             if (!completed) {
                 console.log(`Scenario failed on ${step.name}.`);
                 break;
