@@ -36,18 +36,18 @@ export default class Actor
 
         thread.addMasterMessage(scenario.briefing.execution);
 
+        const ooda = new Ooda(
+            async (narrator: Narrator, step: Step) => this.observe(narrator, step, this.webDriver),
+            async (narrator: Narrator) => await this.orient(thread, narrator),
+            async (narrator: Narrator) => await this.decide(thread, narrator),
+            async (tools: Tool[]) => await this.act(thread, tools),
+        );
+
         for (let i = 0; i < steps.length; i++) {
             const step = steps[i];
             console.log(`Starting step ${step.name}`);
 
-            const ooda = new Ooda(
-                async (narrator: Narrator) => this.observe(narrator, step, this.webDriver),
-                async (narrator: Narrator) => await this.orient(thread, narrator),
-                async (narrator: Narrator) => await this.decide(thread, narrator),
-                async (tools: Tool[]) => await this.act(thread, tools),
-            );
-
-            const completed = await ooda.process();
+            const completed = await ooda.process(step);
             if (!completed) {
                 console.log(`Scenario failed on ${step.name}.`);
                 break;

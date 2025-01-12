@@ -1,4 +1,5 @@
 import Narrator from "./Narrator";
+import {Step} from "./types";
 
 export default class Ooda
 {
@@ -11,11 +12,11 @@ export default class Ooda
     {
     }
 
-    async process()
+    async process(step: Step)
     {
         for (let j = 0; j < 5; j++) {
             const narrator = new Narrator();
-            await this.observe(narrator);
+            await this.observe(narrator, step);
             const message = await this.orient(narrator);
             if (message.completed) {
                 return true;
