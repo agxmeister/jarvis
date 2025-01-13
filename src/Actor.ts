@@ -37,7 +37,7 @@ export default class Actor
         thread.addMasterMessage(scenario.briefing.execution);
 
         const ooda = new Ooda(
-            async (narrator: Narrator, step: Step) => this.observe(narrator, step, this.webDriver),
+            async (step: Step) => this.observe(step, this.webDriver),
             async (narrator: Narrator) => await this.orient(thread, narrator),
             async (narrator: Narrator) => await this.decide(thread, narrator),
             async (tools: Tool[]) => await this.act(thread, tools),
@@ -57,17 +57,19 @@ export default class Actor
         }
     }
 
-    async observe(narrator: Narrator, step: Step, driver: WebDriver)
+    async observe(step: Step, driver: WebDriver): Promise<Narrator>
     {
+        const narrator = new Narrator();
         narrator.addStep(step);
         const currentUrl = driver ? await driver.getCurrentUrl() : null;
         if (process.env.OBSERVATION_MODE !== "automatic") {
             const observation = await this.getObservation(step);
             narrator.addManualObservation(currentUrl, observation);
-            return;
+            return narrator;
         }
         const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
         narrator.addAutomaticObservation(currentUrl, screenshot?.url);
+        return narrator;
     }
 
     async getObservation(step: Step): Promise<string>

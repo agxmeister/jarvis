@@ -15,8 +15,7 @@ export default class Ooda
     async process(step: Step)
     {
         for (let j = 0; j < 5; j++) {
-            const narrator = new Narrator();
-            await this.observe(narrator, step);
+            const narrator = await this.observe(step);
             const message = await this.orient(narrator);
             if (message.completed) {
                 return true;
