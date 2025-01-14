@@ -3,12 +3,13 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
-import {OrientMessage, Screenshot, Step, Tool} from "./types";
+import {Orientation, Screenshot, Step, Action} from "./types";
 import Scenario from "./Scenario";
 import readline = require("readline/promises");
 import Thread from "./Thread";
-import Narrator from "./Narrator";
+import Observation from "./Observation";
 import Ooda from "./Ooda";
+import Decision from "./Decision";
 
 @injectable()
 export default class Actor
@@ -56,28 +57,27 @@ export default class Actor
     {
         return new Ooda(
             async (step: Step) => this.observe(step, this.webDriver),
-            async (thread: Thread, narrator: Narrator) => await this.orient(thread, narrator),
-            async (thread: Thread, narrator: Narrator) => await this.decide(thread, narrator),
-            async (thread: Thread, tools: Tool[]) => await this.act(thread, tools),
+            async (thread: Thread, observation: Observation) => await this.orient(thread, observation),
+            async (thread: Thread, observation: Observation) => await this.decide(thread, observation),
+            async (thread: Thread, actions: Action[]) => await this.act(thread, actions),
         );
     }
 
-    async observe(step: Step, driver: WebDriver): Promise<Narrator>
+    async observe(step: Step, driver: WebDriver): Promise<Observation>
     {
-        const narrator = new Narrator();
-        narrator.addStep(step);
+        const observation = new Observation();
+        observation.addStep(step);
         const currentUrl = driver ? await driver.getCurrentUrl() : null;
         if (process.env.OBSERVATION_MODE !== "automatic") {
-            const observation = await this.getObservation(step);
-            narrator.addManualObservation(currentUrl, observation);
-            return narrator;
+            observation.addManualObservation(currentUrl, await this.getScreenDescription(step));
+            return observation;
         }
-        const screenshot = driver ? await this.breadcrumbs.addScreenshot((await driver.takeScreenshot())) : null;
-        narrator.addAutomaticObservation(currentUrl, screenshot?.url);
-        return narrator;
+        const screenshot = driver ? await this.breadcrumbs.addScreenshot(await driver.takeScreenshot()) : null;
+        observation.addAutomaticObservation(currentUrl, screenshot?.url);
+        return observation;
     }
 
-    async getObservation(step: Step): Promise<string>
+    async getScreenDescription(step: Step): Promise<string>
     {
         const request = readline.createInterface({
             input: process.stdin,
@@ -88,33 +88,33 @@ export default class Actor
         return answer;
     }
 
-    async orient(thread: Thread, narrator: Narrator): Promise<OrientMessage>
+    async orient(thread: Thread, observation: Observation): Promise<Orientation>
     {
-        const message = await this.prophet.think(thread, narrator);
+        const message = await this.prophet.think(thread, observation);
         return JSON.parse(message);
     }
 
-    async decide(thread: Thread, narrator: Narrator): Promise<Tool[]>
+    async decide(thread: Thread, observation: Observation): Promise<Decision>
     {
-        return await this.prophet.act(thread, narrator);
+        return await this.prophet.act(thread, observation);
     }
 
-    async act(thread: Thread, tools: Tool[])
+    async act(thread: Thread, actions: Action[])
     {
-        for (const tool of tools) {
-            if (tool.name === "open") {
-                const parameters: {url: string} = tool.parameters;
+        for (const action of actions) {
+            if (action.name === "open") {
+                const parameters: {url: string} = action.parameters;
                 await this.open(parameters.url);
-                thread.addToolMessage(`Requested page was opened.`, tool.id);
-            } else if (tool.name === "click") {
-                const parameters: {x: number, y: number} = tool.parameters;
+                thread.addToolMessage(`Requested page was opened.`, action.id);
+            } else if (action.name === "click") {
+                const parameters: {x: number, y: number} = action.parameters;
                 await this.click(parameters.x, parameters.y);
-                thread.addToolMessage(`Click was performed.`, tool.id);
-            } else if (tool.name === "close") {
+                thread.addToolMessage(`Click was performed.`, action.id);
+            } else if (action.name === "close") {
                 await this.close();
-                thread.addToolMessage(`Browser was closed.`, tool.id);
-            } else if (tool.name === "wait") {
-                thread.addToolMessage(`Some time passed.`, tool.id);
+                thread.addToolMessage(`Browser was closed.`, action.id);
+            } else if (action.name === "wait") {
+                thread.addToolMessage(`Some time passed.`, action.id);
             }
         }
     }

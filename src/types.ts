@@ -6,7 +6,7 @@ export interface Screenshot
     url: string,
 }
 
-export interface Tool
+export interface Action
 {
     id: string,
     name: string,
@@ -27,7 +27,7 @@ export interface Step
     expectation: string,
 }
 
-export type OrientMessage = {
+export type Orientation = {
     observation: string,
     completed: boolean,
     comment: string,

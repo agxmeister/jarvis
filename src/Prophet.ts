@@ -5,9 +5,10 @@ import Dumper from "./Dumper";
 import {
     ChatCompletionCreateParamsNonStreaming, ChatCompletionMessageParam,
 } from "openai/src/resources/chat/completions";
-import {Step, Tool} from "./types";
+import {Step, Action} from "./types";
 import Thread from "./Thread";
-import Narrator from "./Narrator";
+import Observation from "./Observation";
+import Decision from "./Decision";
 
 @injectable()
 export default class Prophet
@@ -67,9 +68,9 @@ export default class Prophet
         return JSON.parse(completion.choices.pop().message.content).steps;
     }
 
-    async think(thread: Thread, narrator: Narrator): Promise<string>
+    async think(thread: Thread, observation: Observation): Promise<string>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narrator.messages], false));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...observation.messages], false));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
@@ -78,19 +79,19 @@ export default class Prophet
         return message.content;
     }
 
-    async act(thread: Thread, narrator: Narrator): Promise<Tool[]>
+    async act(thread: Thread, observation: Observation): Promise<Decision>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narrator.messages], true));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...observation.messages], true));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
         thread.addRawMessage(message);
 
-        return message.tool_calls.map(call => ({
+        return new Decision(message.tool_calls.map(call => ({
             id: call.id,
             name: call.function.name,
             parameters: JSON.parse(call.function.arguments),
-        }));
+        })));
     }
 
     private getCompletionRequest(messages: ChatCompletionMessageParam[], act: boolean): ChatCompletionCreateParamsNonStreaming

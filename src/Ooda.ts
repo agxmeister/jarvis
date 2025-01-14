@@ -15,13 +15,13 @@ export default class Ooda
     async process(thread: Thread, step: Step)
     {
         for (let j = 0; j < 5; j++) {
-            const narrator = await this.observe(step);
-            const message = await this.orient(thread, narrator);
-            if (message.completed) {
+            const observation = await this.observe(step);
+            const orientation = await this.orient(thread, observation);
+            if (orientation.completed) {
                 return true;
             }
-            const tools = await this.decide(thread, narrator);
-            await this.act(thread, tools);
+            const decision = await this.decide(thread, observation);
+            await this.act(thread, decision.actions);
         }
         return false;
     }
