@@ -1,5 +1,3 @@
-import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
-
 export interface Screenshot
 {
     id: string,
