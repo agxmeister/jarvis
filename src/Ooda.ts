@@ -13,7 +13,24 @@ export default class Ooda
     {
     }
 
-    async process(context: any, step: Step)
+    async process(context: any, steps: Step[]): Promise<void>
+    {
+        const result = await this.processScenario(context, steps);
+        console.log(result ? "Scenario completed" : "Scenario failed");
+    }
+
+    private async processScenario(context: any, steps: Step[]): Promise<boolean>
+    {
+        for (const step of steps) {
+            const completed = await this.processStep(context, step);
+            if (!completed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private async processStep(context: any, step: Step): Promise<boolean>
     {
         for (let j = 0; j < 5; j++) {
             const observation = await this.observe(context, step);

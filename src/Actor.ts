@@ -40,19 +40,7 @@ export default class Actor
         thread.addMasterMessage(scenario.briefing.execution);
 
         const ooda = this.getOoda();
-
-        for (let i = 0; i < steps.length; i++) {
-            const step = steps[i];
-            console.log(`Starting step ${step.name}`);
-
-            const completed = await ooda.process(context, step);
-            if (!completed) {
-                console.log(`Scenario failed on ${step.name}.`);
-                break;
-            }
-
-            console.log(`Step ${step.name} completed!`);
-        }
+        await ooda.process(context, steps);
     }
 
     private getOoda(): Ooda
