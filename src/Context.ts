@@ -1,16 +1,6 @@
-import {WebDriver} from "selenium-webdriver";
-import Breadcrumbs from "./Breadcrumbs";
-import Prophet from "./Prophet";
-import Thread from "./Thread";
-
-export default class Context
+export default class Context<Properties>
 {
-    constructor(
-        readonly driver: WebDriver,
-        readonly breadcrumbs: Breadcrumbs,
-        readonly prophet: Prophet,
-        readonly thread: Thread,
-    )
+    constructor (readonly properties: Properties)
     {
     }
 }

@@ -1,3 +1,8 @@
+import {WebDriver} from "selenium-webdriver";
+import Breadcrumbs from "./Breadcrumbs";
+import Prophet from "./Prophet";
+import Thread from "./Thread";
+
 export interface Screenshot
 {
     id: string,
@@ -29,4 +34,11 @@ export type Orientation = {
     observation: string,
     completed: boolean,
     comment: string,
+}
+
+export type ContextProperties = {
+    driver: WebDriver,
+    breadcrumbs: Breadcrumbs,
+    prophet: Prophet,
+    thread: Thread,
 }

@@ -3,7 +3,7 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
-import {Orientation, Screenshot, Step} from "./types";
+import {ContextProperties, Orientation, Screenshot, Step} from "./types";
 import Scenario from "./Scenario";
 import readline = require("readline/promises");
 import Thread from "./Thread";
@@ -29,7 +29,12 @@ export default class Actor
     public async process(scenario: Scenario): Promise<void>
     {
         const thread = new Thread();
-        const context = new Context(this.webDriver, this.breadcrumbs, this.prophet, thread);
+        const context = new Context<ContextProperties>({
+            driver: this.webDriver,
+            breadcrumbs: this.breadcrumbs,
+            prophet: this.prophet,
+            thread: thread,
+        });
 
         thread.addMasterMessage(scenario.briefing.strategy);
         thread.addMasterMessage(scenario.briefing.planning);
@@ -46,7 +51,7 @@ export default class Actor
     private getOoda(): Ooda
     {
         return new Ooda(
-            async ({driver, breadcrumbs}: Context, step: Step) => {
+            async ({properties: {driver, breadcrumbs}}: Context<ContextProperties>, step: Step) => {
                 const observation = new Observation();
                 observation.addStep(step);
                 const currentUrl = driver ? await driver.getCurrentUrl() : null;
@@ -58,11 +63,11 @@ export default class Actor
                 observation.addAutomaticObservation(currentUrl, screenshot?.url);
                 return observation;
             },
-            async ({prophet, thread}: Context, observation: Observation) =>
+            async ({properties: {prophet, thread}}: Context<ContextProperties>, observation: Observation) =>
                 JSON.parse(await prophet.think(thread, observation)),
-            async ({prophet, thread}: Context, observation: Observation, _: Orientation) =>
+            async ({properties: {prophet, thread}}: Context<ContextProperties>, observation: Observation, _: Orientation) =>
                 await prophet.act(thread, observation),
-            async ({thread}: Context, decision: Decision) => {
+            async ({properties: {thread}}: Context<ContextProperties>, decision: Decision) => {
                 for (const action of decision.actions) {
                     if (action.name === "open") {
                         const parameters: {url: string} = action.parameters;
