@@ -1,26 +1,26 @@
 import {Orientation, Step} from "./types";
+import Context from "./Context";
 import Observation from "./Observation";
 import Decision from "./Decision";
-import {Context} from "node:vm";
 
 export default class Ooda
 {
     constructor(
-        public readonly observe: (context: Context, step: Step) => Promise<Observation>,
-        public readonly orient: (context: Context, observation: Observation) => Promise<Orientation>,
-        public readonly decide: (context: Context, observation: Observation, orientation: Orientation) => Promise<Decision>,
-        public readonly act: (context: Context, decision: Decision) => Promise<void>,
+        public readonly observe: (context: Context<any>, step: Step) => Promise<Observation<any>>,
+        public readonly orient: (context: Context<any>, observation: Observation<any>) => Promise<Orientation>,
+        public readonly decide: (context: Context<any>, observation: Observation<any>, orientation: Orientation) => Promise<Decision>,
+        public readonly act: (context: Context<any>, decision: Decision) => Promise<void>,
     )
     {
     }
 
-    async process(context: Context, steps: Step[]): Promise<void>
+    async process(context: Context<any>, steps: Step[]): Promise<void>
     {
         const result = await this.processScenario(context, steps);
         console.log(result ? "Scenario completed" : "Scenario failed");
     }
 
-    private async processScenario(context: Context, steps: Step[]): Promise<boolean>
+    private async processScenario(context: Context<any>, steps: Step[]): Promise<boolean>
     {
         for (const step of steps) {
             const completed = await this.processStep(context, step);
@@ -31,7 +31,7 @@ export default class Ooda
         return true;
     }
 
-    private async processStep(context: Context, step: Step): Promise<boolean>
+    private async processStep(context: Context<any>, step: Step): Promise<boolean>
     {
         for (let j = 0; j < 5; j++) {
             const observation = await this.observe(context, step);

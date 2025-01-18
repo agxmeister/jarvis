@@ -5,9 +5,8 @@ import Dumper from "./Dumper";
 import {
     ChatCompletionCreateParamsNonStreaming, ChatCompletionMessageParam,
 } from "openai/src/resources/chat/completions";
-import {Step, Action} from "./types";
+import {Step} from "./types";
 import Thread from "./Thread";
-import Observation from "./Observation";
 import Decision from "./Decision";
 
 @injectable()
@@ -68,9 +67,9 @@ export default class Prophet
         return JSON.parse(completion.choices.pop().message.content).steps;
     }
 
-    async think(thread: Thread, observation: Observation): Promise<string>
+    async think(thread: Thread, messages: ChatCompletionMessageParam[]): Promise<string>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...observation.messages], false));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...messages], false));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
@@ -79,9 +78,9 @@ export default class Prophet
         return message.content;
     }
 
-    async act(thread: Thread, observation: Observation): Promise<Decision>
+    async act(thread: Thread, messages: ChatCompletionMessageParam[]): Promise<Decision>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...observation.messages], true));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...messages], true));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;

@@ -11,6 +11,7 @@ import Observation from "./Observation";
 import Ooda from "./Ooda";
 import Decision from "./Decision";
 import Context from "./Context";
+import ObservationProperties from "./ObservationProperties";
 
 @injectable()
 export default class Actor
@@ -52,21 +53,25 @@ export default class Actor
     {
         return new Ooda(
             async ({properties: {driver, breadcrumbs}}: Context<ContextProperties>, step: Step) => {
-                const observation = new Observation();
-                observation.addStep(step);
+                const observationProperties = new ObservationProperties();
+                observationProperties.addStep(step);
                 const currentUrl = driver ? await driver.getCurrentUrl() : null;
                 if (process.env.OBSERVATION_MODE !== "automatic") {
-                    observation.addManualObservation(currentUrl, await this.getScreenDescription(step));
-                    return observation;
+                    observationProperties.addManualObservation(currentUrl, await this.getScreenDescription(step));
+                    return new Observation(observationProperties);
                 }
                 const screenshot = driver ? await breadcrumbs.addScreenshot(await driver.takeScreenshot()) : null;
-                observation.addAutomaticObservation(currentUrl, screenshot?.url);
-                return observation;
+                observationProperties.addAutomaticObservation(currentUrl, screenshot?.url);
+                return new Observation(observationProperties);
             },
-            async ({properties: {prophet, thread}}: Context<ContextProperties>, observation: Observation) =>
-                JSON.parse(await prophet.think(thread, observation)),
-            async ({properties: {prophet, thread}}: Context<ContextProperties>, observation: Observation, _: Orientation) =>
-                await prophet.act(thread, observation),
+            async (
+                {properties: {prophet, thread}}: Context<ContextProperties>,
+                {properties: {messages}}: Observation<ObservationProperties>
+            ) => JSON.parse(await prophet.think(thread, messages)),
+            async (
+                {properties: {prophet, thread}}: Context<ContextProperties>,
+                {properties: {messages}}: Observation<ObservationProperties>, _: Orientation
+            ) => await prophet.act(thread, messages),
             async ({properties: {thread}}: Context<ContextProperties>, decision: Decision) => {
                 for (const action of decision.actions) {
                     if (action.name === "open") {
