@@ -2,6 +2,7 @@ import {WebDriver} from "selenium-webdriver";
 import Breadcrumbs from "./Breadcrumbs";
 import Prophet from "./Prophet";
 import Thread from "./Thread";
+import Narrator from "./Narrator";
 
 export interface Screenshot
 {
@@ -41,4 +42,8 @@ export type ContextProperties = {
     breadcrumbs: Breadcrumbs,
     prophet: Prophet,
     thread: Thread,
+}
+
+export type ObservationProperties = {
+    narrator: Narrator,
 }

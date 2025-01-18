@@ -3,7 +3,7 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
-import {ContextProperties, Orientation, Screenshot, Step} from "./types";
+import {ContextProperties, ObservationProperties, Orientation, Screenshot, Step} from "./types";
 import Scenario from "./Scenario";
 import readline = require("readline/promises");
 import Thread from "./Thread";
@@ -11,7 +11,7 @@ import Observation from "./Observation";
 import Ooda from "./Ooda";
 import Decision from "./Decision";
 import Context from "./Context";
-import ObservationProperties from "./ObservationProperties";
+import Narrator from "./Narrator";
 
 @injectable()
 export default class Actor
@@ -53,25 +53,29 @@ export default class Actor
     {
         return new Ooda(
             async ({properties: {driver, breadcrumbs}}: Context<ContextProperties>, step: Step) => {
-                const observationProperties = new ObservationProperties();
-                observationProperties.addStep(step);
+                const narrator = new Narrator();
+                narrator.addStep(step);
                 const currentUrl = driver ? await driver.getCurrentUrl() : null;
                 if (process.env.OBSERVATION_MODE !== "automatic") {
-                    observationProperties.addManualObservation(currentUrl, await this.getScreenDescription(step));
-                    return new Observation(observationProperties);
+                    narrator.addManualObservation(currentUrl, await this.getScreenDescription(step));
+                    return new Observation({
+                        narrator: narrator,
+                    });
                 }
                 const screenshot = driver ? await breadcrumbs.addScreenshot(await driver.takeScreenshot()) : null;
-                observationProperties.addAutomaticObservation(currentUrl, screenshot?.url);
-                return new Observation(observationProperties);
+                narrator.addAutomaticObservation(currentUrl, screenshot?.url);
+                return new Observation({
+                    narrator: narrator,
+                });
             },
             async (
                 {properties: {prophet, thread}}: Context<ContextProperties>,
-                {properties: {messages}}: Observation<ObservationProperties>
-            ) => JSON.parse(await prophet.think(thread, messages)),
+                {properties: {narrator}}: Observation<ObservationProperties>
+            ) => JSON.parse(await prophet.think(thread, narrator)),
             async (
                 {properties: {prophet, thread}}: Context<ContextProperties>,
-                {properties: {messages}}: Observation<ObservationProperties>, _: Orientation
-            ) => await prophet.act(thread, messages),
+                {properties: {narrator}}: Observation<ObservationProperties>, _: Orientation
+            ) => await prophet.act(thread, narrator),
             async ({properties: {thread}}: Context<ContextProperties>, decision: Decision) => {
                 for (const action of decision.actions) {
                     if (action.name === "open") {

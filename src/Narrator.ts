@@ -1,7 +1,7 @@
 import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
 import {Step} from "./types";
 
-export default class ObservationProperties
+export default class Narrator
 {
     readonly messages: ChatCompletionMessageParam[] = [];
 
