@@ -1,12 +1,13 @@
-import {Orientation, Step} from "./types";
+import {Orientation, StageProperties} from "./types";
 import Context from "./Context";
 import Observation from "./Observation";
 import Decision from "./Decision";
+import Stage from "./Stage";
 
 export default class Ooda
 {
     constructor(
-        public readonly observe: (context: Context<any>, step: Step) => Promise<Observation<any>>,
+        public readonly observe: (context: Context<any>, stage: Stage<any>) => Promise<Observation<any>>,
         public readonly orient: (context: Context<any>, observation: Observation<any>) => Promise<Orientation>,
         public readonly decide: (context: Context<any>, observation: Observation<any>, orientation: Orientation) => Promise<Decision>,
         public readonly act: (context: Context<any>, decision: Decision) => Promise<void>,
@@ -14,16 +15,16 @@ export default class Ooda
     {
     }
 
-    async process(context: Context<any>, steps: Step[]): Promise<void>
+    async process(context: Context<any>, stages: Stage<any>[]): Promise<void>
     {
-        const result = await this.processScenario(context, steps);
+        const result = await this.processScenario(context, stages);
         console.log(result ? "Scenario completed" : "Scenario failed");
     }
 
-    private async processScenario(context: Context<any>, steps: Step[]): Promise<boolean>
+    private async processScenario(context: Context<any>, stages: Stage<any>[]): Promise<boolean>
     {
-        for (const step of steps) {
-            const completed = await this.processStep(context, step);
+        for (const stage of stages) {
+            const completed = await this.processStep(context, stage);
             if (!completed) {
                 return false;
             }
@@ -31,10 +32,10 @@ export default class Ooda
         return true;
     }
 
-    private async processStep(context: Context<any>, step: Step): Promise<boolean>
+    private async processStep(context: Context<any>, stage: Stage<any>): Promise<boolean>
     {
         for (let j = 0; j < 5; j++) {
-            const observation = await this.observe(context, step);
+            const observation = await this.observe(context, stage);
             const orientation = await this.orient(context, observation);
             if (orientation.completed) {
                 return true;

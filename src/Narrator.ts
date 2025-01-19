@@ -1,14 +1,15 @@
 import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
-import {Step} from "./types";
+import {StageProperties} from "./types";
+import Stage from "./Stage";
 
 export default class Narrator
 {
     readonly messages: ChatCompletionMessageParam[] = [];
 
-    addStep(step: Step)
+    addStep(stage: Stage<StageProperties>)
     {
         this.messages.push({
-            content: `Currently, you are on the step "${step.name}". At the end of this step you expect to get the following: ${step.expectation}.`,
+            content: `Currently, you are on the step "${stage.properties.name}". At the end of this step you expect to get the following: ${stage.properties.expectation}.`,
             role: "user",
             name: "Narrator",
         });

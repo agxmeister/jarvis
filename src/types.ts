@@ -24,13 +24,6 @@ export interface Briefing
     execution: string,
 }
 
-export interface Step
-{
-    name: string,
-    action: string,
-    expectation: string,
-}
-
 export type Orientation = {
     observation: string,
     completed: boolean,
@@ -42,6 +35,13 @@ export type ContextProperties = {
     breadcrumbs: Breadcrumbs,
     prophet: Prophet,
     thread: Thread,
+}
+
+export interface StageProperties
+{
+    name: string,
+    action: string,
+    expectation: string,
 }
 
 export type ObservationProperties = {

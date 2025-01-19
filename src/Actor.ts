@@ -3,7 +3,7 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
-import {ContextProperties, ObservationProperties, Orientation, Screenshot, Step} from "./types";
+import {ContextProperties, ObservationProperties, Orientation, Screenshot, StageProperties} from "./types";
 import Scenario from "./Scenario";
 import readline = require("readline/promises");
 import Thread from "./Thread";
@@ -12,6 +12,7 @@ import Ooda from "./Ooda";
 import Decision from "./Decision";
 import Context from "./Context";
 import Narrator from "./Narrator";
+import Stage from "./Stage";
 
 @injectable()
 export default class Actor
@@ -41,23 +42,23 @@ export default class Actor
         thread.addMasterMessage(scenario.briefing.planning);
         thread.addMessengerMessage(scenario.narrative);
 
-        const steps = await this.prophet.getSteps(thread);
+        const stages = (await this.prophet.getStagesProperties(thread)).map(stageProperties => new Stage(stageProperties));
 
         thread.addMasterMessage(scenario.briefing.execution);
 
         const ooda = this.getOoda();
-        await ooda.process(context, steps);
+        await ooda.process(context, stages);
     }
 
     private getOoda(): Ooda
     {
         return new Ooda(
-            async ({properties: {driver, breadcrumbs}}: Context<ContextProperties>, step: Step) => {
+            async ({properties: {driver, breadcrumbs}}: Context<ContextProperties>, stage: Stage<StageProperties>) => {
                 const narrator = new Narrator();
-                narrator.addStep(step);
+                narrator.addStep(stage);
                 const currentUrl = driver ? await driver.getCurrentUrl() : null;
                 if (process.env.OBSERVATION_MODE !== "automatic") {
-                    narrator.addManualObservation(currentUrl, await this.getScreenDescription(step));
+                    narrator.addManualObservation(currentUrl, await this.getScreenDescription(stage));
                     return new Observation({
                         narrator: narrator,
                     });
@@ -74,7 +75,8 @@ export default class Actor
             ) => JSON.parse(await prophet.think(thread, narrator)),
             async (
                 {properties: {prophet, thread}}: Context<ContextProperties>,
-                {properties: {narrator}}: Observation<ObservationProperties>, _: Orientation
+                {properties: {narrator}}: Observation<ObservationProperties>,
+                _: Orientation,
             ) => await prophet.act(thread, narrator),
             async ({properties: {thread}}: Context<ContextProperties>, decision: Decision) => {
                 for (const action of decision.actions) {
@@ -97,13 +99,13 @@ export default class Actor
         );
     }
 
-    async getScreenDescription(step: Step): Promise<string>
+    async getScreenDescription(stage: Stage<StageProperties>): Promise<string>
     {
         const request = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
         });
-        const answer = await request.question(`Current step is "${step.name}". What do you see? `);
+        const answer = await request.question(`Current step is "${stage.properties.name}". What do you see? `);
         request.close();
         return answer;
     }

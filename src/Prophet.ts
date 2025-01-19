@@ -5,7 +5,7 @@ import Dumper from "./Dumper";
 import {
     ChatCompletionCreateParamsNonStreaming, ChatCompletionMessageParam,
 } from "openai/src/resources/chat/completions";
-import {Step} from "./types";
+import {StageProperties} from "./types";
 import Thread from "./Thread";
 import Decision from "./Decision";
 import Narrator from "./Narrator";
@@ -20,7 +20,7 @@ export default class Prophet
     {
     }
 
-    async getSteps(thread: Thread): Promise<Step[]>
+    async getStagesProperties(thread: Thread): Promise<StageProperties[]>
     {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
