@@ -3,11 +3,12 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
-import {ContextProperties, ObservationProperties, Orientation, Screenshot, StageProperties} from "./types";
+import {ContextProperties, ObservationProperties, OrientationProperties, Screenshot, StageProperties} from "./types";
 import Scenario from "./Scenario";
 import readline = require("readline/promises");
 import Thread from "./Thread";
 import Observation from "./Observation";
+import Orientation from "./Orientation";
 import Ooda from "./Ooda";
 import Decision from "./Decision";
 import Context from "./Context";
@@ -72,11 +73,11 @@ export default class Actor
             async (
                 {properties: {prophet, thread}}: Context<ContextProperties>,
                 {properties: {narrator}}: Observation<ObservationProperties>
-            ) => JSON.parse(await prophet.think(thread, narrator)),
+            ) => new Orientation(JSON.parse(await prophet.think(thread, narrator))),
             async (
                 {properties: {prophet, thread}}: Context<ContextProperties>,
                 {properties: {narrator}}: Observation<ObservationProperties>,
-                _: Orientation,
+                _: Orientation<OrientationProperties>,
             ) => await prophet.act(thread, narrator),
             async ({properties: {thread}}: Context<ContextProperties>, decision: Decision) => {
                 for (const action of decision.actions) {

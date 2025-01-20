@@ -24,12 +24,6 @@ export interface Briefing
     execution: string,
 }
 
-export type Orientation = {
-    observation: string,
-    completed: boolean,
-    comment: string,
-}
-
 export type ContextProperties = {
     driver: WebDriver,
     breadcrumbs: Breadcrumbs,
@@ -46,4 +40,10 @@ export interface StageProperties
 
 export type ObservationProperties = {
     narrator: Narrator,
+}
+
+export type OrientationProperties = {
+    observation: string,
+    completed: boolean,
+    comment: string,
 }
