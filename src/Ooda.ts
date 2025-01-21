@@ -38,7 +38,7 @@ export default class Ooda
         for (let j = 0; j < 5; j++) {
             const observation = await this.observe(context, stage);
             const orientation = await this.orient(context, observation);
-            if (orientation.properties.completed) {
+            if (orientation.progression) {
                 return true;
             }
             const decision = await this.decide(context, observation, orientation);

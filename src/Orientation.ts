@@ -1,6 +1,6 @@
 export default class Orientation<Properties>
 {
-    constructor (readonly properties: Properties)
+    constructor (readonly progression: boolean, readonly properties: Properties)
     {
     }
 }

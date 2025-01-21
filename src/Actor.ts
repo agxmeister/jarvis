@@ -73,7 +73,10 @@ export default class Actor
             async (
                 {properties: {prophet, thread}}: Context<ContextProperties>,
                 {properties: {narrator}}: Observation<ObservationProperties>
-            ) => new Orientation(JSON.parse(await prophet.think(thread, narrator))),
+            ) => {
+                const data: OrientationProperties = JSON.parse(await prophet.think(thread, narrator));
+                return new Orientation(data.completed, data);
+            },
             async (
                 {properties: {prophet, thread}}: Context<ContextProperties>,
                 {properties: {narrator}}: Observation<ObservationProperties>,
