@@ -1,4 +1,3 @@
-import {OrientationProperties, StageProperties} from "./types";
 import Context from "./Context";
 import Observation from "./Observation";
 import Decision from "./Decision";
@@ -10,8 +9,8 @@ export default class Ooda
     constructor(
         public readonly observe: (context: Context<any>, stage: Stage<any>) => Promise<Observation<any>>,
         public readonly orient: (context: Context<any>, observation: Observation<any>) => Promise<Orientation<any>>,
-        public readonly decide: (context: Context<any>, observation: Observation<any>, orientation: Orientation<any>) => Promise<Decision>,
-        public readonly act: (context: Context<any>, decision: Decision) => Promise<void>,
+        public readonly decide: (context: Context<any>, observation: Observation<any>, orientation: Orientation<any>) => Promise<Decision<any>>,
+        public readonly act: (context: Context<any>, decision: Decision<any>) => Promise<void>,
     )
     {
     }

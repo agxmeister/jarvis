@@ -3,11 +3,11 @@ import {dependencies} from "./dependencies";
 import OpenAI from "openai";
 import Dumper from "./Dumper";
 import {
-    ChatCompletionCreateParamsNonStreaming, ChatCompletionMessageParam,
+    ChatCompletionCreateParamsNonStreaming,
+    ChatCompletionMessageParam,
 } from "openai/src/resources/chat/completions";
-import {StageProperties} from "./types";
+import {Action, StageProperties} from "./types";
 import Thread from "./Thread";
-import Decision from "./Decision";
 import Narrator from "./Narrator";
 
 @injectable()
@@ -79,7 +79,7 @@ export default class Prophet
         return message.content;
     }
 
-    async act(thread: Thread, narrator: Narrator): Promise<Decision>
+    async act(thread: Thread, narrator: Narrator): Promise<Action[]>
     {
         const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narrator.messages], true));
         this.dumper.add(completion);
@@ -87,11 +87,11 @@ export default class Prophet
         const message = completion.choices.pop().message;
         thread.addRawMessage(message);
 
-        return new Decision(message.tool_calls.map(call => ({
+        return message.tool_calls.map(call => ({
             id: call.id,
             name: call.function.name,
             parameters: JSON.parse(call.function.arguments),
-        })));
+        }));
     }
 
     private getCompletionRequest(messages: ChatCompletionMessageParam[], act: boolean): ChatCompletionCreateParamsNonStreaming

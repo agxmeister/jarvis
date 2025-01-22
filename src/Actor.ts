@@ -3,7 +3,14 @@ import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
-import {ContextProperties, ObservationProperties, OrientationProperties, Screenshot, StageProperties} from "./types";
+import {
+    ContextProperties,
+    DecisionProperties,
+    ObservationProperties,
+    OrientationProperties,
+    Screenshot,
+    StageProperties
+} from "./types";
 import Scenario from "./Scenario";
 import readline = require("readline/promises");
 import Thread from "./Thread";
@@ -81,9 +88,14 @@ export default class Actor
                 {properties: {prophet, thread}}: Context<ContextProperties>,
                 {properties: {narrator}}: Observation<ObservationProperties>,
                 _: Orientation<OrientationProperties>,
-            ) => await prophet.act(thread, narrator),
-            async ({properties: {thread}}: Context<ContextProperties>, decision: Decision) => {
-                for (const action of decision.actions) {
+            ) => new Decision({
+                actions: await prophet.act(thread, narrator),
+            }),
+            async (
+                {properties: {thread}}: Context<ContextProperties>,
+                {properties: {actions}}: Decision<DecisionProperties>,
+            ) => {
+                for (const action of actions) {
                     if (action.name === "open") {
                         const parameters: {url: string} = action.parameters;
                         await this.open(parameters.url);

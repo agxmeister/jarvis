@@ -47,3 +47,7 @@ export type OrientationProperties = {
     completed: boolean,
     comment: string,
 }
+
+export type DecisionProperties = {
+    actions: Action[],
+}

@@ -1,8 +1,6 @@
-import {Action} from "./types";
-
-export default class Decision
+export default class Decision<Properties>
 {
-    constructor(readonly actions: Action[])
+    constructor(readonly properties: Properties)
     {
     }
 }
