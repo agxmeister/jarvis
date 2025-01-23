@@ -2,6 +2,7 @@ import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import Prophet from "./Prophet";
 import Breadcrumbs from "./Breadcrumbs";
+import readline = require("readline/promises");
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import {
     ContextProperties,
@@ -12,15 +13,14 @@ import {
     StageProperties
 } from "./types";
 import Scenario from "./Scenario";
-import readline = require("readline/promises");
 import Thread from "./Thread";
-import Observation from "./Observation";
-import Orientation from "./Orientation";
-import Ooda from "./Ooda";
-import Decision from "./Decision";
-import Context from "./Context";
 import Narrator from "./Narrator";
-import Stage from "./Stage";
+import Observation from "./ooda/Observation";
+import Orientation from "./ooda/Orientation";
+import Ooda from "./ooda/Ooda";
+import Decision from "./ooda/Decision";
+import Context from "./ooda/Context";
+import Stage from "./ooda/Stage";
 
 @injectable()
 export default class Actor
