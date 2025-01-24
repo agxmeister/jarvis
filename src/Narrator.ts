@@ -1,6 +1,6 @@
 import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
 import {StageProperties} from "./types";
-import Stage from "./ooda/Stage";
+import {Stage} from "./ooda";
 
 export default class Narrator
 {

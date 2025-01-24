@@ -15,12 +15,7 @@ import {
 import Scenario from "./Scenario";
 import Thread from "./Thread";
 import Narrator from "./Narrator";
-import Observation from "./ooda/Observation";
-import Orientation from "./ooda/Orientation";
-import Ooda from "./ooda/Ooda";
-import Decision from "./ooda/Decision";
-import Context from "./ooda/Context";
-import Stage from "./ooda/Stage";
+import {Ooda, Stage, Context, Observation, Orientation, Decision} from "./ooda";
 
 @injectable()
 export default class Actor
