@@ -1,13 +1,13 @@
 import Context from "./Context";
 import Observation from "./Observation";
 import Decision from "./Decision";
-import Stage from "./Stage";
+import Checkpoint from "./Checkpoint";
 import Orientation from "./Orientation";
 
 export default class Ooda
 {
     constructor(
-        public readonly observe: (context: Context<any>, stage: Stage<any>) => Promise<Observation<any>>,
+        public readonly observe: (context: Context<any>, checkpoint: Checkpoint<any>) => Promise<Observation<any>>,
         public readonly orient: (context: Context<any>, observation: Observation<any>) => Promise<Orientation<any>>,
         public readonly decide: (context: Context<any>, observation: Observation<any>, orientation: Orientation<any>) => Promise<Decision<any>>,
         public readonly act: (context: Context<any>, decision: Decision<any>) => Promise<void>,
@@ -15,16 +15,16 @@ export default class Ooda
     {
     }
 
-    async process(context: Context<any>, stages: Stage<any>[]): Promise<void>
+    async process(context: Context<any>, checkpoints: Checkpoint<any>[]): Promise<void>
     {
-        const result = await this.processScenario(context, stages);
+        const result = await this.processScenario(context, checkpoints);
         console.log(result ? "Scenario completed" : "Scenario failed");
     }
 
-    private async processScenario(context: Context<any>, stages: Stage<any>[]): Promise<boolean>
+    private async processScenario(context: Context<any>, checkpoints: Checkpoint<any>[]): Promise<boolean>
     {
-        for (const stage of stages) {
-            const completed = await this.processStep(context, stage);
+        for (const checkpoint of checkpoints) {
+            const completed = await this.processStep(context, checkpoint);
             if (!completed) {
                 return false;
             }
@@ -32,10 +32,10 @@ export default class Ooda
         return true;
     }
 
-    private async processStep(context: Context<any>, stage: Stage<any>): Promise<boolean>
+    private async processStep(context: Context<any>, checkpoint: Checkpoint<any>): Promise<boolean>
     {
         for (let j = 0; j < 5; j++) {
-            const observation = await this.observe(context, stage);
+            const observation = await this.observe(context, checkpoint);
             const orientation = await this.orient(context, observation);
             if (orientation.progression) {
                 return true;

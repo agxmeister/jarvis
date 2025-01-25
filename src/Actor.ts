@@ -10,12 +10,12 @@ import {
     ObservationProperties,
     OrientationProperties,
     Screenshot,
-    StageProperties
+    CheckpointProperties
 } from "./types";
 import Scenario from "./Scenario";
 import Thread from "./Thread";
 import Narrator from "./Narrator";
-import {Ooda, Stage, Context, Observation, Orientation, Decision} from "./ooda";
+import {Ooda, Checkpoint, Context, Observation, Orientation, Decision} from "./ooda";
 
 @injectable()
 export default class Actor
@@ -45,23 +45,23 @@ export default class Actor
         thread.addMasterMessage(scenario.briefing.planning);
         thread.addMessengerMessage(scenario.narrative);
 
-        const stages = (await this.prophet.getStagesProperties(thread)).map(stageProperties => new Stage(stageProperties));
+        const checkpoints = (await this.prophet.getCheckpointsProperties(thread)).map(checkpointProperties => new Checkpoint(checkpointProperties));
 
         thread.addMasterMessage(scenario.briefing.execution);
 
         const ooda = this.getOoda();
-        await ooda.process(context, stages);
+        await ooda.process(context, checkpoints);
     }
 
     private getOoda(): Ooda
     {
         return new Ooda(
-            async ({properties: {driver, breadcrumbs}}: Context<ContextProperties>, stage: Stage<StageProperties>) => {
+            async ({properties: {driver, breadcrumbs}}: Context<ContextProperties>, checkpoint: Checkpoint<CheckpointProperties>) => {
                 const narrator = new Narrator();
-                narrator.addStep(stage);
+                narrator.addStep(checkpoint);
                 const currentUrl = driver ? await driver.getCurrentUrl() : null;
                 if (process.env.OBSERVATION_MODE !== "automatic") {
-                    narrator.addManualObservation(currentUrl, await this.getScreenDescription(stage));
+                    narrator.addManualObservation(currentUrl, await this.getScreenDescription(checkpoint));
                     return new Observation({
                         narrator: narrator,
                     });
@@ -110,13 +110,13 @@ export default class Actor
         );
     }
 
-    async getScreenDescription(stage: Stage<StageProperties>): Promise<string>
+    async getScreenDescription(checkpoint: Checkpoint<CheckpointProperties>): Promise<string>
     {
         const request = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
         });
-        const answer = await request.question(`Current step is "${stage.properties.name}". What do you see? `);
+        const answer = await request.question(`Current step is "${checkpoint.properties.name}". What do you see? `);
         request.close();
         return answer;
     }

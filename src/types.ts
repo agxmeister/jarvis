@@ -31,7 +31,7 @@ export type ContextProperties = {
     thread: Thread,
 }
 
-export interface StageProperties
+export interface CheckpointProperties
 {
     name: string,
     action: string,

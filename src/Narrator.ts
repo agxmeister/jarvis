@@ -1,15 +1,15 @@
 import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
-import {StageProperties} from "./types";
-import {Stage} from "./ooda";
+import {CheckpointProperties} from "./types";
+import {Checkpoint} from "./ooda";
 
 export default class Narrator
 {
     readonly messages: ChatCompletionMessageParam[] = [];
 
-    addStep(stage: Stage<StageProperties>)
+    addStep(checkpoint: Checkpoint<CheckpointProperties>)
     {
         this.messages.push({
-            content: `Currently, you are on the step "${stage.properties.name}". At the end of this step you expect to get the following: ${stage.properties.expectation}.`,
+            content: `Currently, you are on the step "${checkpoint.properties.name}". At the end of this step you expect to get the following: ${checkpoint.properties.expectation}.`,
             role: "user",
             name: "Narrator",
         });
