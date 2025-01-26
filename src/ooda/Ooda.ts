@@ -9,7 +9,7 @@ export default class Ooda
     constructor(
         public readonly observe: (context: Context<any>, checkpoint: Checkpoint<any>) => Promise<Observation<any>>,
         public readonly orient: (context: Context<any>, observation: Observation<any>) => Promise<Orientation<any>>,
-        public readonly decide: (context: Context<any>, observation: Observation<any>, orientation: Orientation<any>) => Promise<Decision<any>>,
+        public readonly decide: (context: Context<any>, orientation: Orientation<any>) => Promise<Decision<any>>,
         public readonly act: (context: Context<any>, decision: Decision<any>) => Promise<void>,
     )
     {
@@ -40,7 +40,7 @@ export default class Ooda
             if (orientation.progression) {
                 return true;
             }
-            const decision = await this.decide(context, observation, orientation);
+            const decision = await this.decide(context, orientation);
             await this.act(context, decision);
         }
         return false;
