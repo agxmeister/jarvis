@@ -45,7 +45,8 @@ export default class Actor
         thread.addMasterMessage(scenario.briefing.planning);
         thread.addMessengerMessage(scenario.narrative);
 
-        const checkpoints = (await this.prophet.getCheckpointsProperties(thread)).map(checkpointProperties => new Checkpoint(checkpointProperties));
+        const checkpoints = (await this.prophet.getCheckpointsProperties(thread))
+            .map(checkpointProperties => new Checkpoint(checkpointProperties.name, checkpointProperties));
 
         thread.addMasterMessage(scenario.briefing.execution);
 
