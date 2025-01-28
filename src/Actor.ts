@@ -15,7 +15,7 @@ import {
 import Scenario from "./Scenario";
 import Thread from "./Thread";
 import Narrator from "./Narrator";
-import {Ooda, Checkpoint, Context, Observation, Orientation, Decision} from "./ooda";
+import {Ooda, Checkpoint, Context, Observation, Orientation, Decision, ObserveParameters} from "./ooda";
 
 @injectable()
 export default class Actor
@@ -57,7 +57,7 @@ export default class Actor
     private getOoda(): Ooda
     {
         return new Ooda(
-            async ({properties: {driver, breadcrumbs}}: Context<ContextProperties>, checkpoint: Checkpoint<CheckpointProperties>) => {
+            async ({context: {properties: {driver, breadcrumbs}}, checkpoint}: ObserveParameters<ContextProperties, CheckpointProperties>) => {
                 const narrator = new Narrator();
                 narrator.addStep(checkpoint);
                 const currentUrl = driver ? await driver.getCurrentUrl() : null;

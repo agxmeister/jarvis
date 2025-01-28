@@ -3,11 +3,12 @@ import Observation from "./Observation";
 import Decision from "./Decision";
 import Checkpoint from "./Checkpoint";
 import Orientation from "./Orientation";
+import {ObserveParameters} from "./types";
 
 export default class Ooda
 {
     constructor(
-        public readonly observe: (context: Context<any>, checkpoint: Checkpoint<any>) => Promise<Observation<any>>,
+        public readonly observe: (parameters: ObserveParameters<any, any>) => Promise<Observation<any>>,
         public readonly orient: (context: Context<any>, observation: Observation<any>) => Promise<Orientation<any>>,
         public readonly decide: (context: Context<any>, orientation: Orientation<any>) => Promise<Decision<any>>,
         public readonly act: (context: Context<any>, decision: Decision<any>) => Promise<void>,
@@ -35,7 +36,10 @@ export default class Ooda
     private async processStep(context: Context<any>, checkpoint: Checkpoint<any>): Promise<boolean>
     {
         for (let j = 0; j < 5; j++) {
-            const observation = await this.observe(context, checkpoint);
+            const observation = await this.observe({
+                context: context,
+                checkpoint: checkpoint,
+            });
             const orientation = await this.orient(context, observation);
             if (orientation.progression) {
                 return true;
