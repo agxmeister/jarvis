@@ -15,7 +15,16 @@ import {
 import Scenario from "./Scenario";
 import Thread from "./Thread";
 import Narrator from "./Narrator";
-import {Ooda, Checkpoint, Context, Observation, Orientation, Decision, ObserveParameters} from "./ooda";
+import {
+    Ooda,
+    Checkpoint,
+    Context,
+    Observation,
+    Orientation,
+    Decision,
+    ObserveParameters,
+    OrientParameters
+} from "./ooda";
 
 @injectable()
 export default class Actor
@@ -73,10 +82,10 @@ export default class Actor
                     narrator: narrator,
                 });
             },
-            async (
-                {properties: {prophet, thread}}: Context<ContextProperties>,
-                observation: Observation<ObservationProperties>
-            ) => {
+            async ({
+                context: {properties: {prophet, thread}},
+                observation,
+            }: OrientParameters<ContextProperties, ObservationProperties>) => {
                 const {properties: {narrator}} = observation;
                 const data: OrientationProperties = JSON.parse(await prophet.think(thread, narrator));
                 return new Orientation(observation, data.completed, data);
