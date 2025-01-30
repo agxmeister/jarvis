@@ -23,7 +23,8 @@ import {
     Orientation,
     Decision,
     ObserveParameters,
-    OrientParameters
+    OrientParameters,
+    DecideParameters,
 } from "./ooda";
 
 @injectable()
@@ -90,10 +91,10 @@ export default class Actor
                 const data: OrientationProperties = JSON.parse(await prophet.think(thread, narrator));
                 return new Orientation(observation, data.completed, data);
             },
-            async (
-                {properties: {prophet, thread}}: Context<ContextProperties>,
-                orientation: Orientation<OrientationProperties>,
-            ) => {
+            async ({
+               context: {properties: {prophet, thread}},
+               orientation,
+            }: DecideParameters<ContextProperties, OrientationProperties>) => {
                 const {observation: {properties: {narrator}}} = orientation;
                 return new Decision(orientation, {
                     actions: await prophet.act(thread, narrator),
