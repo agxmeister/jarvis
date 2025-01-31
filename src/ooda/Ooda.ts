@@ -3,7 +3,7 @@ import Observation from "./Observation";
 import Decision from "./Decision";
 import Checkpoint from "./Checkpoint";
 import Orientation from "./Orientation";
-import {DecideParameters, ObserveParameters, OrientParameters} from "./types";
+import {DecideParameters, ObserveParameters, OrientParameters, ActParameters} from "./types";
 
 export default class Ooda
 {
@@ -11,7 +11,7 @@ export default class Ooda
         public readonly observe: (parameters: ObserveParameters<any, any>) => Promise<Observation<any>>,
         public readonly orient: (parameters: OrientParameters<any, any>) => Promise<Orientation<any>>,
         public readonly decide: (parameters: DecideParameters<any, any>) => Promise<Decision<any>>,
-        public readonly act: (context: Context<any>, decision: Decision<any>) => Promise<void>,
+        public readonly act: (parameters: ActParameters<any, any>) => Promise<void>,
     )
     {
     }
@@ -51,7 +51,10 @@ export default class Ooda
                 context: context,
                 orientation: orientation,
             });
-            await this.act(context, decision);
+            await this.act({
+                context: context,
+                decision: decision,
+            });
         }
         return false;
     }

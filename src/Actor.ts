@@ -25,6 +25,7 @@ import {
     ObserveParameters,
     OrientParameters,
     DecideParameters,
+    ActParameters,
 } from "./ooda";
 
 @injectable()
@@ -100,10 +101,10 @@ export default class Actor
                     actions: await prophet.act(thread, narrator),
                 });
             },
-            async (
-                {properties: {thread}}: Context<ContextProperties>,
-                {properties: {actions}}: Decision<DecisionProperties>,
-            ) => {
+            async ({
+                context: {properties: {thread}},
+                decision: {properties: {actions}},
+            }: ActParameters<ContextProperties, DecisionProperties>) => {
                 for (const action of actions) {
                     if (action.name === "open") {
                         const parameters: {url: string} = action.parameters;

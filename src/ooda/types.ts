@@ -1,4 +1,4 @@
-import {Context, Checkpoint, Observation, Orientation} from "./index";
+import {Context, Checkpoint, Observation, Orientation, Decision} from "./index";
 
 export type ObserveParameters<ContextProperties, CheckpointProperties> = {
     context: Context<ContextProperties>,
@@ -13,4 +13,9 @@ export type OrientParameters<ContextProperties, ObservationProperties> = {
 export type DecideParameters<ContextProperties, OrientationProperties> = {
     context: Context<ContextProperties>,
     orientation: Orientation<OrientationProperties>
+}
+
+export type ActParameters<ContextProperties, DecisionProperties> = {
+    context: Context<ContextProperties>,
+    decision: Decision<DecisionProperties>
 }
