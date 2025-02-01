@@ -68,7 +68,10 @@ export default class Actor
     private getOoda(): Ooda
     {
         return new Ooda(
-            async ({context: {properties: {driver, breadcrumbs}}, checkpoint}: ObserveParameters<ContextProperties, CheckpointProperties>) => {
+            async ({
+                context: {properties: {driver, breadcrumbs}},
+                checkpoint,
+            }: ObserveParameters<ContextProperties, CheckpointProperties>) => {
                 const narrator = new Narrator();
                 narrator.addStep(checkpoint);
                 const currentUrl = driver ? await driver.getCurrentUrl() : null;
@@ -86,25 +89,23 @@ export default class Actor
             },
             async ({
                 context: {properties: {prophet, thread}},
-                observation,
-            }: OrientParameters<ContextProperties, ObservationProperties>) => {
-                const {properties: {narrator}} = observation;
+                observation: {properties: {narrator}},
+            }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties>) => {
                 const data: OrientationProperties = JSON.parse(await prophet.think(thread, narrator));
-                return new Orientation(observation, data.completed, data);
+                return new Orientation(data.completed, data);
             },
             async ({
-               context: {properties: {prophet, thread}},
-               orientation,
-            }: DecideParameters<ContextProperties, OrientationProperties>) => {
-                const {observation: {properties: {narrator}}} = orientation;
-                return new Decision(orientation, {
+                context: {properties: {prophet, thread}},
+                observation: {properties: {narrator}},
+            }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties>) => {
+                return new Decision({
                     actions: await prophet.act(thread, narrator),
                 });
             },
             async ({
                 context: {properties: {thread}},
                 decision: {properties: {actions}},
-            }: ActParameters<ContextProperties, DecisionProperties>) => {
+            }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties>) => {
                 for (const action of actions) {
                     if (action.name === "open") {
                         const parameters: {url: string} = action.parameters;

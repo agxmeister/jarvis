@@ -5,17 +5,23 @@ export type ObserveParameters<ContextProperties, CheckpointProperties> = {
     checkpoint: Checkpoint<CheckpointProperties>,
 }
 
-export type OrientParameters<ContextProperties, ObservationProperties> = {
+export type OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties> = {
     context: Context<ContextProperties>,
+    checkpoint: Checkpoint<CheckpointProperties>,
     observation: Observation<ObservationProperties>
 }
 
-export type DecideParameters<ContextProperties, OrientationProperties> = {
+export type DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties> = {
     context: Context<ContextProperties>,
+    checkpoint: Checkpoint<CheckpointProperties>,
+    observation: Observation<ObservationProperties>
     orientation: Orientation<OrientationProperties>
 }
 
-export type ActParameters<ContextProperties, DecisionProperties> = {
+export type ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties> = {
     context: Context<ContextProperties>,
+    checkpoint: Checkpoint<CheckpointProperties>,
+    observation: Observation<ObservationProperties>
+    orientation: Orientation<OrientationProperties>
     decision: Decision<DecisionProperties>
 }

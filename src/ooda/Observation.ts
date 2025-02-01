@@ -1,4 +1,4 @@
-export default  class Observation<Properties>
+export default class Observation<Properties>
 {
     constructor (readonly properties: Properties)
     {

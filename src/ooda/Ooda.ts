@@ -9,9 +9,9 @@ export default class Ooda
 {
     constructor(
         public readonly observe: (parameters: ObserveParameters<any, any>) => Promise<Observation<any>>,
-        public readonly orient: (parameters: OrientParameters<any, any>) => Promise<Orientation<any>>,
-        public readonly decide: (parameters: DecideParameters<any, any>) => Promise<Decision<any>>,
-        public readonly act: (parameters: ActParameters<any, any>) => Promise<void>,
+        public readonly orient: (parameters: OrientParameters<any, any, any>) => Promise<Orientation<any>>,
+        public readonly decide: (parameters: DecideParameters<any, any, any, any>) => Promise<Decision<any>>,
+        public readonly act: (parameters: ActParameters<any, any, any, any, any>) => Promise<void>,
     )
     {
     }
@@ -42,6 +42,7 @@ export default class Ooda
             });
             const orientation = await this.orient({
                 context: context,
+                checkpoint: checkpoint,
                 observation: observation,
             });
             if (orientation.progression) {
@@ -49,10 +50,15 @@ export default class Ooda
             }
             const decision = await this.decide({
                 context: context,
+                checkpoint: checkpoint,
+                observation: observation,
                 orientation: orientation,
             });
             await this.act({
                 context: context,
+                checkpoint: checkpoint,
+                observation: observation,
+                orientation: orientation,
                 decision: decision,
             });
         }
