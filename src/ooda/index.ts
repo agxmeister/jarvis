@@ -1,4 +1,5 @@
 export {default as Ooda} from './Ooda';
+export {default as Scenario} from './Scenario';
 export {default as Checkpoint} from './Checkpoint';
 export {default as Context} from './Context';
 export {default as Observation} from './Observation';

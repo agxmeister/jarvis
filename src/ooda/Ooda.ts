@@ -1,13 +1,10 @@
-import Context from "./Context";
-import Observation from "./Observation";
-import Decision from "./Decision";
-import Checkpoint from "./Checkpoint";
-import Orientation from "./Orientation";
-import {DecideParameters, ObserveParameters, OrientParameters, ActParameters} from "./types";
+import {FrameParameters, DecideParameters, ObserveParameters, OrientParameters, ActParameters} from "./types";
+import {Context, Scenario, Checkpoint, Decision, Observation, Orientation} from "./index";
 
 export default class Ooda
 {
     constructor(
+        public readonly frame: (parameters: FrameParameters<any, any>) => Promise<Checkpoint<any>[]>,
         public readonly observe: (parameters: ObserveParameters<any, any>) => Promise<Observation<any>>,
         public readonly orient: (parameters: OrientParameters<any, any, any>) => Promise<Orientation<any>>,
         public readonly decide: (parameters: DecideParameters<any, any, any, any>) => Promise<Decision<any>>,
@@ -16,16 +13,14 @@ export default class Ooda
     {
     }
 
-    async process(context: Context<any>, checkpoints: Checkpoint<any>[]): Promise<void>
+    async process(context: Context<any>, scenario: Scenario<any>): Promise<boolean>
     {
-        const result = await this.processScenario(context, checkpoints);
-        console.log(result ? "Scenario completed" : "Scenario failed");
-    }
-
-    private async processScenario(context: Context<any>, checkpoints: Checkpoint<any>[]): Promise<boolean>
-    {
+        const checkpoints = await this.frame({
+            context: context,
+            scenario: scenario,
+        });
         for (const checkpoint of checkpoints) {
-            const completed = await this.processStep(context, checkpoint);
+            const completed = await this.processCheckpoint(context, checkpoint);
             if (!completed) {
                 return false;
             }
@@ -33,7 +28,7 @@ export default class Ooda
         return true;
     }
 
-    private async processStep(context: Context<any>, checkpoint: Checkpoint<any>): Promise<boolean>
+    private async processCheckpoint(context: Context<any>, checkpoint: Checkpoint<any>): Promise<boolean>
     {
         for (let j = 0; j < 5; j++) {
             const observation = await this.observe({

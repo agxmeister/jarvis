@@ -31,6 +31,11 @@ export type ContextProperties = {
     thread: Thread,
 }
 
+export type ScenarioProperties = {
+    briefing: Briefing,
+    narrative: string,
+}
+
 export interface CheckpointProperties
 {
     name: string,

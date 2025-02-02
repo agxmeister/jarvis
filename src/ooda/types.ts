@@ -1,4 +1,9 @@
-import {Context, Checkpoint, Observation, Orientation, Decision} from "./index";
+import {Context, Scenario, Checkpoint, Observation, Orientation, Decision} from "./index";
+
+export type FrameParameters<ContextProperties, ScenarioProperties> = {
+    context: Context<ContextProperties>,
+    scenario: Scenario<ScenarioProperties>,
+}
 
 export type ObserveParameters<ContextProperties, CheckpointProperties> = {
     context: Context<ContextProperties>,

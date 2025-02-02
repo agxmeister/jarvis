@@ -10,14 +10,14 @@ import {
     ObservationProperties,
     OrientationProperties,
     Screenshot,
-    CheckpointProperties
+    CheckpointProperties, Briefing, ScenarioProperties
 } from "./types";
-import Scenario from "./Scenario";
 import Thread from "./Thread";
 import Narrator from "./Narrator";
 import {
     Ooda,
     Checkpoint,
+    Scenario,
     Context,
     Observation,
     Orientation,
@@ -27,6 +27,7 @@ import {
     DecideParameters,
     ActParameters,
 } from "./ooda";
+import {FrameParameters} from "./ooda/types";
 
 @injectable()
 export default class Actor
@@ -42,32 +43,38 @@ export default class Actor
         this.webDriver = null;
     }
 
-    public async process(scenario: Scenario): Promise<void>
+    public async process(briefing: Briefing, narrative: string): Promise<void>
     {
-        const thread = new Thread();
-        const context = new Context<ContextProperties>({
-            driver: this.webDriver,
-            breadcrumbs: this.breadcrumbs,
-            prophet: this.prophet,
-            thread: thread,
-        });
-
-        thread.addMasterMessage(scenario.briefing.strategy);
-        thread.addMasterMessage(scenario.briefing.planning);
-        thread.addMessengerMessage(scenario.narrative);
-
-        const checkpoints = (await this.prophet.getCheckpointsProperties(thread))
-            .map(checkpointProperties => new Checkpoint(checkpointProperties.name, checkpointProperties));
-
-        thread.addMasterMessage(scenario.briefing.execution);
-
         const ooda = this.getOoda();
-        await ooda.process(context, checkpoints);
+        await ooda.process(
+            new Context<ContextProperties>({
+                driver: this.webDriver,
+                breadcrumbs: this.breadcrumbs,
+                prophet: this.prophet,
+                thread: new Thread(),
+            }),
+            new Scenario<ScenarioProperties>({
+                briefing: briefing,
+                narrative: narrative,
+            }),
+        );
     }
 
     private getOoda(): Ooda
     {
         return new Ooda(
+            async ({
+                context: {properties: {prophet, thread}},
+                scenario: {properties: {briefing, narrative}},
+            }: FrameParameters<ContextProperties, ScenarioProperties>) => {
+                thread.addMasterMessage(briefing.strategy);
+                thread.addMasterMessage(briefing.planning);
+                thread.addMessengerMessage(narrative);
+                const checkpoints = (await prophet.getCheckpointsProperties(thread))
+                    .map(checkpointProperties => new Checkpoint(checkpointProperties.name, checkpointProperties));
+                thread.addMasterMessage(briefing.execution);
+                return checkpoints;
+            },
             async ({
                 context: {properties: {driver, breadcrumbs}},
                 checkpoint,
