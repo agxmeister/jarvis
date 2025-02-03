@@ -29,11 +29,7 @@ export type ContextProperties = {
     breadcrumbs: Breadcrumbs,
     prophet: Prophet,
     thread: Thread,
-}
-
-export type ScenarioProperties = {
     briefing: Briefing,
-    narrative: string,
 }
 
 export interface CheckpointProperties

@@ -19,8 +19,4 @@ export const briefing = {
         If you report the current step is complete, the user 'Narrator' will inform you about the next step.
         You will be asked to call the tool of your choice to move further through the test scenario.
     `,
-    narrative: `
-        You must proceed to URL 'https://test.agxmeister.services' in your browser and click on the screen
-        at coordinates (100, 150). As a result, the text that contains the coordinates you just clicked must appear on the screen.
-    `,
-}
+};

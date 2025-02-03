@@ -5,12 +5,13 @@ import Breadcrumbs from "./Breadcrumbs";
 import readline = require("readline/promises");
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
 import {
+    Briefing,
+    Screenshot,
     ContextProperties,
     DecisionProperties,
     ObservationProperties,
     OrientationProperties,
-    Screenshot,
-    CheckpointProperties, Briefing, ScenarioProperties
+    CheckpointProperties,
 } from "./types";
 import Thread from "./Thread";
 import Narrator from "./Narrator";
@@ -52,11 +53,9 @@ export default class Actor
                 breadcrumbs: this.breadcrumbs,
                 prophet: this.prophet,
                 thread: new Thread(),
-            }),
-            new Scenario<ScenarioProperties>({
                 briefing: briefing,
-                narrative: narrative,
             }),
+            new Scenario<string>(narrative),
         );
     }
 
@@ -64,9 +63,9 @@ export default class Actor
     {
         return new Ooda(
             async ({
-                context: {properties: {prophet, thread}},
-                scenario: {properties: {briefing, narrative}},
-            }: FrameParameters<ContextProperties, ScenarioProperties>) => {
+                context: {properties: {prophet, briefing, thread}},
+                scenario: {properties: narrative},
+            }: FrameParameters<ContextProperties, string>) => {
                 thread.addMasterMessage(briefing.strategy);
                 thread.addMasterMessage(briefing.planning);
                 thread.addMessengerMessage(narrative);

@@ -4,11 +4,11 @@ import {Context, Scenario, Checkpoint, Decision, Observation, Orientation} from 
 export default class Ooda
 {
     constructor(
-        public readonly frame: (parameters: FrameParameters<any, any>) => Promise<Checkpoint<any>[]>,
-        public readonly observe: (parameters: ObserveParameters<any, any>) => Promise<Observation<any>>,
-        public readonly orient: (parameters: OrientParameters<any, any, any>) => Promise<Orientation<any>>,
-        public readonly decide: (parameters: DecideParameters<any, any, any, any>) => Promise<Decision<any>>,
-        public readonly act: (parameters: ActParameters<any, any, any, any, any>) => Promise<void>,
+        readonly frame: (parameters: FrameParameters<any, any>) => Promise<Checkpoint<any>[]>,
+        readonly observe: (parameters: ObserveParameters<any, any>) => Promise<Observation<any>>,
+        readonly orient: (parameters: OrientParameters<any, any, any>) => Promise<Orientation<any>>,
+        readonly decide: (parameters: DecideParameters<any, any, any, any>) => Promise<Decision<any>>,
+        readonly act: (parameters: ActParameters<any, any, any, any, any>) => Promise<void>,
     )
     {
     }
