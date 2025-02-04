@@ -61,8 +61,8 @@ export default class Actor
 
     private getOoda(): Ooda
     {
-        return new Ooda(
-            async ({
+        return new Ooda({
+            frame: async ({
                 context: {properties: {prophet, briefing, thread}},
                 scenario: {properties: narrative},
             }: FrameParameters<ContextProperties, string>) => {
@@ -74,7 +74,7 @@ export default class Actor
                 thread.addMasterMessage(briefing.execution);
                 return checkpoints;
             },
-            async ({
+            observe: async ({
                 context: {properties: {driver, breadcrumbs}},
                 checkpoint,
             }: ObserveParameters<ContextProperties, CheckpointProperties>) => {
@@ -93,14 +93,14 @@ export default class Actor
                     narrator: narrator,
                 });
             },
-            async ({
+            orient: async ({
                 context: {properties: {prophet, thread}},
                 observation: {properties: {narrator}},
             }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties>) => {
                 const data: OrientationProperties = JSON.parse(await prophet.think(thread, narrator));
                 return new Orientation(data.completed, data);
             },
-            async ({
+            decide: async ({
                 context: {properties: {prophet, thread}},
                 observation: {properties: {narrator}},
             }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties>) => {
@@ -108,7 +108,7 @@ export default class Actor
                     actions: await prophet.act(thread, narrator),
                 });
             },
-            async ({
+            act: async ({
                 context: {properties: {thread}},
                 decision: {properties: {actions}},
             }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties>) => {
@@ -129,7 +129,7 @@ export default class Actor
                     }
                 }
             },
-        );
+        });
     }
 
     async getScreenDescription(checkpoint: Checkpoint<CheckpointProperties>): Promise<string>

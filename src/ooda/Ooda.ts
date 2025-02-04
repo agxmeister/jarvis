@@ -1,21 +1,15 @@
-import {FrameParameters, DecideParameters, ObserveParameters, OrientParameters, ActParameters} from "./types";
-import {Context, Scenario, Checkpoint, Decision, Observation, Orientation} from "./index";
+import {OodaParameters} from "./types";
+import {Context, Scenario, Checkpoint} from "./index";
 
 export default class Ooda
 {
-    constructor(
-        readonly frame: (parameters: FrameParameters<any, any>) => Promise<Checkpoint<any>[]>,
-        readonly observe: (parameters: ObserveParameters<any, any>) => Promise<Observation<any>>,
-        readonly orient: (parameters: OrientParameters<any, any, any>) => Promise<Orientation<any>>,
-        readonly decide: (parameters: DecideParameters<any, any, any, any>) => Promise<Decision<any>>,
-        readonly act: (parameters: ActParameters<any, any, any, any, any>) => Promise<void>,
-    )
+    constructor(readonly handlers: OodaParameters)
     {
     }
 
     async process(context: Context<any>, scenario: Scenario<any>): Promise<boolean>
     {
-        const checkpoints = await this.frame({
+        const checkpoints = await this.handlers.frame({
             context: context,
             scenario: scenario,
         });
@@ -31,11 +25,11 @@ export default class Ooda
     private async processCheckpoint(context: Context<any>, checkpoint: Checkpoint<any>): Promise<boolean>
     {
         for (let j = 0; j < 5; j++) {
-            const observation = await this.observe({
+            const observation = await this.handlers.observe({
                 context: context,
                 checkpoint: checkpoint,
             });
-            const orientation = await this.orient({
+            const orientation = await this.handlers.orient({
                 context: context,
                 checkpoint: checkpoint,
                 observation: observation,
@@ -43,13 +37,13 @@ export default class Ooda
             if (orientation.progression) {
                 return true;
             }
-            const decision = await this.decide({
+            const decision = await this.handlers.decide({
                 context: context,
                 checkpoint: checkpoint,
                 observation: observation,
                 orientation: orientation,
             });
-            await this.act({
+            await this.handlers.act({
                 context: context,
                 checkpoint: checkpoint,
                 observation: observation,
