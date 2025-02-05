@@ -28,7 +28,7 @@ import {
     DecideParameters,
     ActParameters,
 } from "./ooda";
-import {FrameParameters} from "./ooda/types";
+import {FrameParameters, PrefaceParameters} from "./ooda/types";
 
 @injectable()
 export default class Actor
@@ -69,10 +69,13 @@ export default class Actor
                 thread.addMasterMessage(briefing.strategy);
                 thread.addMasterMessage(briefing.planning);
                 thread.addMessengerMessage(narrative);
-                const checkpoints = (await prophet.getCheckpointsProperties(thread))
+                return (await prophet.getCheckpointsProperties(thread))
                     .map(checkpointProperties => new Checkpoint(checkpointProperties.name, checkpointProperties));
+            },
+            preface: async ({
+                context: {properties: {briefing, thread}},
+            }: PrefaceParameters<ContextProperties>) => {
                 thread.addMasterMessage(briefing.execution);
-                return checkpoints;
             },
             observe: async ({
                 context: {properties: {driver, breadcrumbs}},

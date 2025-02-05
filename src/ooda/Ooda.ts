@@ -13,11 +13,21 @@ export default class Ooda
             context: context,
             scenario: scenario,
         });
+        if (this.handlers.preface) {
+            await this.handlers.preface({
+                context: context,
+            });
+        }
         for (const checkpoint of checkpoints) {
             const completed = await this.processCheckpoint(context, checkpoint);
             if (!completed) {
                 return false;
             }
+        }
+        if (this.handlers.conclude) {
+            await this.handlers.conclude({
+                context: context,
+            });
         }
         return true;
     }
