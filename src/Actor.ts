@@ -33,15 +33,12 @@ import {FrameParameters, PrefaceParameters} from "./ooda/types";
 @injectable()
 export default class Actor
 {
-    private webDriver: WebDriver;
-
     constructor(
         @inject(dependencies.WebDriverBuilder) private webDriverBuilder: Builder,
         @inject(dependencies.Prophet) private prophet: Prophet,
         @inject(dependencies.Breadcrumbs) private breadcrumbs: Breadcrumbs,
     )
     {
-        this.webDriver = null;
     }
 
     public async process(briefing: Briefing, narrative: string): Promise<void>
@@ -49,7 +46,9 @@ export default class Actor
         const ooda = this.getOoda();
         await ooda.process(
             new Context<ContextProperties>({
-                driver: this.webDriver,
+                driver: await this.webDriverBuilder
+                    .forBrowser(Browser.CHROME)
+                    .build(),
                 breadcrumbs: this.breadcrumbs,
                 prophet: this.prophet,
                 thread: new Thread(),
@@ -112,26 +111,31 @@ export default class Actor
                 });
             },
             act: async ({
-                context: {properties: {thread}},
+                context: {properties: {driver, thread}},
                 decision: {properties: {actions}},
             }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties>) => {
                 for (const action of actions) {
                     if (action.name === "open") {
                         const parameters: {url: string} = action.parameters;
-                        await this.open(parameters.url);
+                        await this.open(parameters.url, driver);
                         thread.addToolMessage(`Requested page was opened.`, action.id);
                     } else if (action.name === "click") {
                         const parameters: {x: number, y: number} = action.parameters;
-                        await this.click(parameters.x, parameters.y);
+                        await this.click(parameters.x, parameters.y, driver);
                         thread.addToolMessage(`Click was performed.`, action.id);
                     } else if (action.name === "close") {
-                        await this.close();
+                        await this.close(driver);
                         thread.addToolMessage(`Browser was closed.`, action.id);
                     } else if (action.name === "wait") {
                         thread.addToolMessage(`Some time passed.`, action.id);
                     }
                 }
             },
+            conclude: async ({context: {properties: {driver}}}: PrefaceParameters<ContextProperties>) => {
+                if (driver) {
+                    await driver.quit();
+                }
+            }
         });
     }
 
@@ -146,31 +150,27 @@ export default class Actor
         return answer;
     }
 
-    private async open(url: string): Promise<Screenshot>
+    private async open(url: string, driver: WebDriver): Promise<Screenshot>
     {
-        this.webDriver = await this.webDriverBuilder
-            .forBrowser(Browser.CHROME)
-            .build();
-        await this.webDriver.get('https://example.com');
-        await this.webDriver.manage().window().setRect({
+        await driver.get('https://example.com');
+        await driver.manage().window().setRect({
             width: 800,
             height: 600,
         });
-        await this.webDriver.get(url);
-        return await this.breadcrumbs.addScreenshot((await this.webDriver.takeScreenshot()));
+        await driver.get(url);
+        return await this.breadcrumbs.addScreenshot((await driver.takeScreenshot()));
     }
 
-    private async click(x: number, y: number): Promise<Screenshot>
+    private async click(x: number, y: number, driver: WebDriver): Promise<Screenshot>
     {
-        const actions = this.webDriver.actions({async: true});
+        const actions = driver.actions({async: true});
         await actions.move({x: x, y: y}).perform();
         await actions.click().perform();
-        return await this.breadcrumbs.addScreenshot((await this.webDriver.takeScreenshot()));
+        return await this.breadcrumbs.addScreenshot((await driver.takeScreenshot()));
     }
 
-    private async close(): Promise<void>
+    private async close(driver: WebDriver): Promise<void>
     {
-        await this.webDriver.quit();
-        this.webDriver = null;
+        await driver.quit();
     }
 }
