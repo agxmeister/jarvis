@@ -111,17 +111,17 @@ export default class Actor
                 });
             },
             act: async ({
-                context: {properties: {driver, thread}},
+                context: {properties: {driver, breadcrumbs, thread}},
                 decision: {properties: {actions}},
             }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties>) => {
                 for (const action of actions) {
                     if (action.name === "open") {
                         const parameters: {url: string} = action.parameters;
-                        await this.open(parameters.url, driver);
+                        await this.open(parameters.url, driver, breadcrumbs);
                         thread.addToolMessage(`Requested page was opened.`, action.id);
                     } else if (action.name === "click") {
                         const parameters: {x: number, y: number} = action.parameters;
-                        await this.click(parameters.x, parameters.y, driver);
+                        await this.click(parameters.x, parameters.y, driver, breadcrumbs);
                         thread.addToolMessage(`Click was performed.`, action.id);
                     } else if (action.name === "close") {
                         await this.close(driver);
@@ -150,7 +150,7 @@ export default class Actor
         return answer;
     }
 
-    private async open(url: string, driver: WebDriver): Promise<Screenshot>
+    private async open(url: string, driver: WebDriver, breadcrumbs: Breadcrumbs): Promise<Screenshot>
     {
         await driver.get('https://example.com');
         await driver.manage().window().setRect({
@@ -158,15 +158,15 @@ export default class Actor
             height: 600,
         });
         await driver.get(url);
-        return await this.breadcrumbs.addScreenshot((await driver.takeScreenshot()));
+        return await breadcrumbs.addScreenshot((await driver.takeScreenshot()));
     }
 
-    private async click(x: number, y: number, driver: WebDriver): Promise<Screenshot>
+    private async click(x: number, y: number, driver: WebDriver, breadcrumbs: Breadcrumbs): Promise<Screenshot>
     {
         const actions = driver.actions({async: true});
         await actions.move({x: x, y: y}).perform();
         await actions.click().perform();
-        return await this.breadcrumbs.addScreenshot((await driver.takeScreenshot()));
+        return await breadcrumbs.addScreenshot((await driver.takeScreenshot()));
     }
 
     private async close(driver: WebDriver): Promise<void>
