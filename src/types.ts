@@ -40,7 +40,9 @@ export interface CheckpointProperties
 }
 
 export type ObservationProperties = {
-    narrator: Narrator,
+    pageUrl: string,
+    pageScreenshotUrl: string,
+    pageDescription: string,
 }
 
 export type OrientationProperties = {

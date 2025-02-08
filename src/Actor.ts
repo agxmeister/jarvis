@@ -80,34 +80,35 @@ export default class Actor
                 context: {properties: {driver, breadcrumbs}},
                 checkpoint,
             }: ObserveParameters<ContextProperties, CheckpointProperties>) => {
-                const narrator = new Narrator();
-                narrator.addStep(checkpoint);
-                const currentUrl = driver ? await driver.getCurrentUrl() : null;
-                if (process.env.OBSERVATION_MODE !== "automatic") {
-                    narrator.addManualObservation(currentUrl, await this.getScreenDescription(checkpoint));
-                    return new Observation({
-                        narrator: narrator,
-                    });
-                }
-                const screenshot = driver ? await breadcrumbs.addScreenshot(await driver.takeScreenshot()) : null;
-                narrator.addAutomaticObservation(currentUrl, screenshot?.url);
-                return new Observation({
-                    narrator: narrator,
+                return new Observation<ObservationProperties>({
+                    pageUrl: driver
+                        ? await driver.getCurrentUrl()
+                        : null,
+                    pageScreenshotUrl: process.env.OBSERVATION_MODE === "automatic"
+                        ? driver
+                            ? (await breadcrumbs.addScreenshot(await driver.takeScreenshot())).url
+                            : null
+                        : null,
+                    pageDescription: process.env.OBSERVATION_MODE === "automatic"
+                        ? null
+                        : await this.getScreenDescription(checkpoint),
                 });
             },
             orient: async ({
                 context: {properties: {prophet, thread}},
-                observation: {properties: {narrator}},
+                checkpoint,
+                observation: {properties: {pageUrl, pageScreenshotUrl, pageDescription}},
             }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties>) => {
-                const data: OrientationProperties = JSON.parse(await prophet.think(thread, narrator));
+                const data: OrientationProperties = JSON.parse(await prophet.think(thread, this.getNarrator(pageUrl, pageScreenshotUrl, pageDescription, checkpoint)));
                 return new Orientation(data.completed, data);
             },
             decide: async ({
                 context: {properties: {prophet, thread}},
-                observation: {properties: {narrator}},
+                checkpoint,
+                observation: {properties: {pageUrl, pageScreenshotUrl, pageDescription}},
             }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties>) => {
                 return new Decision({
-                    actions: await prophet.act(thread, narrator),
+                    actions: await prophet.act(thread, this.getNarrator(pageUrl, pageScreenshotUrl, pageDescription, checkpoint)),
                 });
             },
             act: async ({
@@ -148,6 +149,18 @@ export default class Actor
         const answer = await request.question(`Current step is "${checkpoint.properties.name}". What do you see? `);
         request.close();
         return answer;
+    }
+
+    getNarrator(pageUrl: string, pageScreenshotUrl: string, pageDescription: string, checkpoint: Checkpoint<CheckpointProperties>): Narrator
+    {
+        const narrator = new Narrator();
+        narrator.addStep(checkpoint);
+        if (pageScreenshotUrl) {
+            narrator.addAutomaticObservation(pageUrl, pageScreenshotUrl);
+        } else {
+            narrator.addManualObservation(pageUrl, pageDescription);
+        }
+        return narrator;
     }
 
     private async open(url: string, driver: WebDriver, breadcrumbs: Breadcrumbs): Promise<Screenshot>
