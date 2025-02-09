@@ -14,7 +14,7 @@ import {
     CheckpointProperties,
 } from "./types";
 import Thread from "./Thread";
-import Narrator from "./Narrator";
+import Narration from "./Narration";
 import {
     Ooda,
     Checkpoint,
@@ -97,18 +97,18 @@ export default class Actor
             orient: async ({
                 context: {properties: {prophet, thread}},
                 checkpoint,
-                observation: {properties: {pageUrl, pageScreenshotUrl, pageDescription}},
+                observation,
             }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties>) => {
-                const data: OrientationProperties = JSON.parse(await prophet.think(thread, this.getNarrator(pageUrl, pageScreenshotUrl, pageDescription, checkpoint)));
+                const data: OrientationProperties = JSON.parse(await prophet.think(thread, new Narration(checkpoint.properties, observation.properties)));
                 return new Orientation(data.completed, data);
             },
             decide: async ({
                 context: {properties: {prophet, thread}},
                 checkpoint,
-                observation: {properties: {pageUrl, pageScreenshotUrl, pageDescription}},
+                observation,
             }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties>) => {
                 return new Decision({
-                    actions: await prophet.act(thread, this.getNarrator(pageUrl, pageScreenshotUrl, pageDescription, checkpoint)),
+                    actions: await prophet.act(thread, new Narration(checkpoint.properties, observation.properties)),
                 });
             },
             act: async ({
@@ -149,18 +149,6 @@ export default class Actor
         const answer = await request.question(`Current step is "${checkpoint.properties.name}". What do you see? `);
         request.close();
         return answer;
-    }
-
-    getNarrator(pageUrl: string, pageScreenshotUrl: string, pageDescription: string, checkpoint: Checkpoint<CheckpointProperties>): Narrator
-    {
-        const narrator = new Narrator();
-        narrator.addStep(checkpoint);
-        if (pageScreenshotUrl) {
-            narrator.addAutomaticObservation(pageUrl, pageScreenshotUrl);
-        } else {
-            narrator.addManualObservation(pageUrl, pageDescription);
-        }
-        return narrator;
     }
 
     private async open(url: string, driver: WebDriver, breadcrumbs: Breadcrumbs): Promise<Screenshot>

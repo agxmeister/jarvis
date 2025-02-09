@@ -2,7 +2,7 @@ import {WebDriver} from "selenium-webdriver";
 import Breadcrumbs from "./Breadcrumbs";
 import Prophet from "./Prophet";
 import Thread from "./Thread";
-import Narrator from "./Narrator";
+import Narration from "./Narration";
 
 export interface Screenshot
 {

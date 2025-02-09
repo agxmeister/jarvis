@@ -8,7 +8,7 @@ import {
 } from "openai/src/resources/chat/completions";
 import {Action, CheckpointProperties} from "./types";
 import Thread from "./Thread";
-import Narrator from "./Narrator";
+import Narration from "./Narration";
 
 @injectable()
 export default class Prophet
@@ -68,9 +68,9 @@ export default class Prophet
         return JSON.parse(completion.choices.pop().message.content).steps;
     }
 
-    async think(thread: Thread, narrator: Narrator): Promise<string>
+    async think(thread: Thread, narration: Narration): Promise<string>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narrator.messages], false));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narration.messages], false));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
@@ -79,9 +79,9 @@ export default class Prophet
         return message.content;
     }
 
-    async act(thread: Thread, narrator: Narrator): Promise<Action[]>
+    async act(thread: Thread, narration: Narration): Promise<Action[]>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narrator.messages], true));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narration.messages], true));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
