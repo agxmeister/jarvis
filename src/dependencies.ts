@@ -1,5 +1,5 @@
 export const dependencies = {
-    Prophet: Symbol.for("Prophet"),
+    Intelligence: Symbol.for("Intelligence"),
     Breadcrumbs: Symbol.for("Breadcrumbs"),
     Actor: Symbol.for("Actor"),
     WebDriverBuilder: Symbol.for("WebDriverBuilder"),

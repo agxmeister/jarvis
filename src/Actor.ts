@@ -1,6 +1,6 @@
 import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
-import Prophet from "./Prophet";
+import Intelligence from "./Intelligence";
 import Breadcrumbs from "./Breadcrumbs";
 import readline = require("readline/promises");
 import {Browser, Builder, WebDriver} from "selenium-webdriver";
@@ -35,7 +35,7 @@ export default class Actor
 {
     constructor(
         @inject(dependencies.WebDriverBuilder) private webDriverBuilder: Builder,
-        @inject(dependencies.Prophet) private prophet: Prophet,
+        @inject(dependencies.Intelligence) private intelligence: Intelligence,
         @inject(dependencies.Breadcrumbs) private breadcrumbs: Breadcrumbs,
     )
     {
@@ -50,7 +50,7 @@ export default class Actor
                     .forBrowser(Browser.CHROME)
                     .build(),
                 breadcrumbs: this.breadcrumbs,
-                prophet: this.prophet,
+                intelligence: this.intelligence,
                 thread: new Thread(),
                 briefing: briefing,
             }),
@@ -62,13 +62,13 @@ export default class Actor
     {
         return new Ooda({
             frame: async ({
-                context: {properties: {prophet, briefing, thread}},
+                context: {properties: {intelligence, briefing, thread}},
                 scenario: {properties: narrative},
             }: FrameParameters<ContextProperties, string>) => {
                 thread.addMasterMessage(briefing.strategy);
                 thread.addMasterMessage(briefing.planning);
                 thread.addMessengerMessage(narrative);
-                return (await prophet.getCheckpointsProperties(thread))
+                return (await intelligence.getCheckpointsProperties(thread))
                     .map(checkpointProperties => new Checkpoint(checkpointProperties.name, checkpointProperties));
             },
             preface: async ({
@@ -95,20 +95,20 @@ export default class Actor
                 });
             },
             orient: async ({
-                context: {properties: {prophet, thread}},
+                context: {properties: {intelligence, thread}},
                 checkpoint,
                 observation,
             }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties>) => {
-                const data: OrientationProperties = JSON.parse(await prophet.think(thread, new Narration(checkpoint.properties, observation.properties)));
+                const data: OrientationProperties = JSON.parse(await intelligence.think(thread, new Narration(checkpoint.properties, observation.properties)));
                 return new Orientation(data.completed, data);
             },
             decide: async ({
-                context: {properties: {prophet, thread}},
+                context: {properties: {intelligence, thread}},
                 checkpoint,
                 observation,
             }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties>) => {
                 return new Decision({
-                    actions: await prophet.act(thread, new Narration(checkpoint.properties, observation.properties)),
+                    actions: await intelligence.act(thread, new Narration(checkpoint.properties, observation.properties)),
                 });
             },
             act: async ({

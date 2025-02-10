@@ -1,6 +1,6 @@
 import {WebDriver} from "selenium-webdriver";
 import Breadcrumbs from "./Breadcrumbs";
-import Prophet from "./Prophet";
+import Intelligence from "./Intelligence";
 import Thread from "./Thread";
 import Narration from "./Narration";
 
@@ -27,7 +27,7 @@ export interface Briefing
 export type ContextProperties = {
     driver: WebDriver,
     breadcrumbs: Breadcrumbs,
-    prophet: Prophet,
+    intelligence: Intelligence,
     thread: Thread,
     briefing: Briefing,
 }

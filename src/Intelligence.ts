@@ -11,7 +11,7 @@ import Thread from "./Thread";
 import Narration from "./Narration";
 
 @injectable()
-export default class Prophet
+export default class Intelligence
 {
     constructor(
         @inject(dependencies.OpenAi) readonly client: OpenAI,
@@ -172,7 +172,7 @@ export default class Prophet
                 type: "function",
                 function: {
                     name: "wait",
-                    description: "No nothing.",
+                    description: "Do nothing.",
                 },
             }],
         };

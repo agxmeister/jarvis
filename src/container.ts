@@ -1,6 +1,6 @@
 import {Container} from "inversify";
 import {dependencies} from "./dependencies";
-import Prophet from "./Prophet";
+import Intelligence from "./Intelligence";
 import Breadcrumbs from "./Breadcrumbs";
 import Actor from "./Actor";
 import {Builder} from "selenium-webdriver";
@@ -13,7 +13,7 @@ container.bind<Actor>(dependencies.Actor).to(Actor);
 container.bind<Builder>(dependencies.WebDriverBuilder).toDynamicValue(
     () => new Builder()
 );
-container.bind<Prophet>(dependencies.Prophet).to(Prophet);
+container.bind<Intelligence>(dependencies.Intelligence).to(Intelligence);
 container.bind<OpenAI>(dependencies.OpenAi).toDynamicValue(
     () => new OpenAI({
         apiKey: process.env.OPENAI_API_KEY
