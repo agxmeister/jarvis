@@ -3,10 +3,9 @@ import {dependencies} from "./dependencies";
 import Intelligence from "./Intelligence";
 import Breadcrumbs from "./Breadcrumbs";
 import readline = require("readline/promises");
-import {Browser, Builder, WebDriver} from "selenium-webdriver";
+import {Browser, Builder} from "selenium-webdriver";
 import {
     Briefing,
-    Screenshot,
     ContextProperties,
     DecisionProperties,
     ObservationProperties,
@@ -29,6 +28,7 @@ import {
     ActParameters,
 } from "./ooda";
 import {FrameParameters, PrefaceParameters} from "./ooda/types";
+import {Toolbox} from "./Toolbox";
 
 @injectable()
 export default class Actor
@@ -51,6 +51,7 @@ export default class Actor
                     .build(),
                 breadcrumbs: this.breadcrumbs,
                 intelligence: this.intelligence,
+                toolbox: new Toolbox(),
                 thread: new Thread(),
                 briefing: briefing,
             }),
@@ -112,20 +113,20 @@ export default class Actor
                 });
             },
             act: async ({
-                context: {properties: {driver, breadcrumbs, thread}},
+                context: {properties: {driver, breadcrumbs, thread, toolbox}},
                 decision: {properties: {actions}},
             }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties>) => {
                 for (const action of actions) {
                     if (action.name === "open") {
                         const parameters: {url: string} = action.parameters;
-                        await this.open(parameters.url, driver, breadcrumbs);
+                        await toolbox.open(parameters.url, driver, breadcrumbs);
                         thread.addToolMessage(`Requested page was opened.`, action.id);
                     } else if (action.name === "click") {
                         const parameters: {x: number, y: number} = action.parameters;
-                        await this.click(parameters.x, parameters.y, driver, breadcrumbs);
+                        await toolbox.click(parameters.x, parameters.y, driver, breadcrumbs);
                         thread.addToolMessage(`Click was performed.`, action.id);
                     } else if (action.name === "close") {
-                        await this.close(driver);
+                        await toolbox.close(driver);
                         thread.addToolMessage(`Browser was closed.`, action.id);
                     } else if (action.name === "wait") {
                         thread.addToolMessage(`Some time passed.`, action.id);
@@ -149,29 +150,5 @@ export default class Actor
         const answer = await request.question(`Current step is "${checkpoint.properties.name}". What do you see? `);
         request.close();
         return answer;
-    }
-
-    private async open(url: string, driver: WebDriver, breadcrumbs: Breadcrumbs): Promise<Screenshot>
-    {
-        await driver.get('https://example.com');
-        await driver.manage().window().setRect({
-            width: 800,
-            height: 600,
-        });
-        await driver.get(url);
-        return await breadcrumbs.addScreenshot((await driver.takeScreenshot()));
-    }
-
-    private async click(x: number, y: number, driver: WebDriver, breadcrumbs: Breadcrumbs): Promise<Screenshot>
-    {
-        const actions = driver.actions({async: true});
-        await actions.move({x: x, y: y}).perform();
-        await actions.click().perform();
-        return await breadcrumbs.addScreenshot((await driver.takeScreenshot()));
-    }
-
-    private async close(driver: WebDriver): Promise<void>
-    {
-        await driver.quit();
     }
 }

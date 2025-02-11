@@ -1,0 +1,30 @@
+import {WebDriver} from "selenium-webdriver";
+import Breadcrumbs from "./Breadcrumbs";
+import {Screenshot} from "./types";
+
+export class Toolbox
+{
+    async open(url: string, driver: WebDriver, breadcrumbs: Breadcrumbs): Promise<Screenshot>
+    {
+        await driver.get('https://example.com');
+        await driver.manage().window().setRect({
+            width: 800,
+            height: 600,
+        });
+        await driver.get(url);
+        return await breadcrumbs.addScreenshot((await driver.takeScreenshot()));
+    }
+
+    async click(x: number, y: number, driver: WebDriver, breadcrumbs: Breadcrumbs): Promise<Screenshot>
+    {
+        const actions = driver.actions({async: true});
+        await actions.move({x: x, y: y}).perform();
+        await actions.click().perform();
+        return await breadcrumbs.addScreenshot((await driver.takeScreenshot()));
+    }
+
+    async close(driver: WebDriver): Promise<void>
+    {
+        await driver.quit();
+    }
+}

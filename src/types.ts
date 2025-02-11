@@ -3,6 +3,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import Intelligence from "./Intelligence";
 import Thread from "./Thread";
 import Narration from "./Narration";
+import {Toolbox} from "./Toolbox";
 
 export interface Screenshot
 {
@@ -28,6 +29,7 @@ export type ContextProperties = {
     driver: WebDriver,
     breadcrumbs: Breadcrumbs,
     intelligence: Intelligence,
+    toolbox: Toolbox,
     thread: Thread,
     briefing: Briefing,
 }
