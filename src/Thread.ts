@@ -1,24 +1,28 @@
-import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
+import {
+    ChatCompletionMessageParam,
+    ChatCompletionSystemMessageParam,
+    ChatCompletionUserMessageParam
+} from "openai/src/resources/chat/completions";
 
 export default class Thread
 {
     readonly messages: ChatCompletionMessageParam[] = [];
 
-    addMasterMessage(message: string)
+    addBriefing(...messages: string[])
     {
-        this.messages.push({
+        this.messages.push(...messages.map(message => ({
             content: message,
             role: "system",
-        });
+        } as ChatCompletionSystemMessageParam)));
     }
 
-    addMessengerMessage(message: string)
+    addScenario(...messages: string[])
     {
-        this.messages.push(({
+        this.messages.push(...messages.map(message => ({
             content: message,
             role: "user",
-            name: "Messenger",
-        }))
+            name: "Screenwriter",
+        } as ChatCompletionUserMessageParam)));
     }
 
     addToolMessage(message: string, tool: string)

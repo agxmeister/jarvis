@@ -66,16 +66,15 @@ export default class Actor
                 context: {properties: {intelligence, briefing, thread}},
                 scenario: {properties: narrative},
             }: FrameParameters<ContextProperties, string>) => {
-                thread.addMasterMessage(briefing.strategy);
-                thread.addMasterMessage(briefing.planning);
-                thread.addMessengerMessage(narrative);
+                thread.addBriefing(briefing.strategy, briefing.planning);
+                thread.addScenario(narrative);
                 return (await intelligence.getCheckpointsProperties(thread))
                     .map(checkpointProperties => new Checkpoint(checkpointProperties.name, checkpointProperties));
             },
             preface: async ({
                 context: {properties: {briefing, thread}},
             }: PrefaceParameters<ContextProperties>) => {
-                thread.addMasterMessage(briefing.execution);
+                thread.addBriefing(briefing.execution);
             },
             observe: async ({
                 context: {properties: {driver, breadcrumbs}},
