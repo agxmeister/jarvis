@@ -2,8 +2,6 @@ import {WebDriver} from "selenium-webdriver";
 import Breadcrumbs from "./Breadcrumbs";
 import Intelligence from "./Intelligence";
 import Thread from "./Thread";
-import Narration from "./Narration";
-import {Toolbox} from "./Toolbox";
 
 export interface Screenshot
 {
@@ -32,6 +30,31 @@ export type ContextProperties = {
     toolbox: Toolbox,
     thread: Thread,
     briefing: Briefing,
+}
+
+export type Toolbox = {
+    tools: {
+        open: {
+            handler: (url: string, driver: WebDriver, breadcrumbs: Breadcrumbs) => Promise<Screenshot>,
+            description: string,
+            parameters: any,
+        }
+        click: {
+            handler: (x: number, y: number, driver: WebDriver, breadcrumbs: Breadcrumbs) => Promise<Screenshot>,
+            description: string,
+            parameters: any,
+        },
+        close: {
+            handler: (driver: WebDriver) => Promise<void>,
+            description: string,
+            parameters: any,
+        },
+        wait: {
+            handler: () => Promise<void>,
+            description: string,
+            parameters: any,
+        }
+    },
 }
 
 export interface CheckpointProperties

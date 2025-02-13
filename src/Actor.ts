@@ -28,7 +28,7 @@ import {
     ActParameters,
 } from "./ooda";
 import {FrameParameters, PrefaceParameters} from "./ooda/types";
-import {Toolbox} from "./Toolbox";
+import {toolbox} from "./Toolbox";
 
 @injectable()
 export default class Actor
@@ -51,7 +51,7 @@ export default class Actor
                     .build(),
                 breadcrumbs: this.breadcrumbs,
                 intelligence: this.intelligence,
-                toolbox: new Toolbox(),
+                toolbox: toolbox,
                 thread: new Thread(),
                 briefing: briefing,
             }),
@@ -95,20 +95,20 @@ export default class Actor
                 });
             },
             orient: async ({
-                context: {properties: {intelligence, thread}},
+                context: {properties: {intelligence, thread, toolbox}},
                 checkpoint,
                 observation,
             }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties>) => {
-                const data: OrientationProperties = JSON.parse(await intelligence.think(thread, new Narration(checkpoint.properties, observation.properties)));
+                const data: OrientationProperties = JSON.parse(await intelligence.think(thread, new Narration(checkpoint.properties, observation.properties), toolbox));
                 return new Orientation(data.completed, data);
             },
             decide: async ({
-                context: {properties: {intelligence, thread}},
+                context: {properties: {intelligence, thread, toolbox}},
                 checkpoint,
                 observation,
             }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties>) => {
                 return new Decision({
-                    actions: await intelligence.act(thread, new Narration(checkpoint.properties, observation.properties)),
+                    actions: await intelligence.act(thread, new Narration(checkpoint.properties, observation.properties), toolbox),
                 });
             },
             act: async ({
@@ -118,14 +118,14 @@ export default class Actor
                 for (const action of actions) {
                     if (action.name === "open") {
                         const parameters: {url: string} = action.parameters;
-                        await toolbox.open(parameters.url, driver, breadcrumbs);
+                        await toolbox.tools.open.handler(parameters.url, driver, breadcrumbs);
                         thread.addToolMessage(`Requested page was opened.`, action.id);
                     } else if (action.name === "click") {
                         const parameters: {x: number, y: number} = action.parameters;
-                        await toolbox.click(parameters.x, parameters.y, driver, breadcrumbs);
+                        await toolbox.tools.click.handler(parameters.x, parameters.y, driver, breadcrumbs);
                         thread.addToolMessage(`Click was performed.`, action.id);
                     } else if (action.name === "close") {
-                        await toolbox.close(driver);
+                        await toolbox.tools.close.handler(driver);
                         thread.addToolMessage(`Browser was closed.`, action.id);
                     } else if (action.name === "wait") {
                         thread.addToolMessage(`Some time passed.`, action.id);

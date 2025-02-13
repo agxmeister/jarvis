@@ -6,7 +6,7 @@ import {
     ChatCompletionCreateParamsNonStreaming,
     ChatCompletionMessageParam,
 } from "openai/src/resources/chat/completions";
-import {Action, CheckpointProperties} from "./types";
+import {Action, CheckpointProperties, Toolbox} from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
 
@@ -68,9 +68,9 @@ export default class Intelligence
         return JSON.parse(completion.choices.pop().message.content).steps;
     }
 
-    async think(thread: Thread, narration: Narration): Promise<string>
+    async think(thread: Thread, narration: Narration, toolbox: Toolbox): Promise<string>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narration.messages], false));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox, false));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
@@ -79,9 +79,9 @@ export default class Intelligence
         return message.content;
     }
 
-    async act(thread: Thread, narration: Narration): Promise<Action[]>
+    async act(thread: Thread, narration: Narration, toolbox: Toolbox): Promise<Action[]>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narration.messages], true));
+        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox, true));
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
@@ -94,7 +94,7 @@ export default class Intelligence
         }));
     }
 
-    private getCompletionRequest(messages: ChatCompletionMessageParam[], act: boolean): ChatCompletionCreateParamsNonStreaming
+    private getCompletionRequest(messages: ChatCompletionMessageParam[], toolbox: Toolbox, act: boolean): ChatCompletionCreateParamsNonStreaming
     {
         return {
             model: "gpt-4o-mini",
@@ -130,49 +130,29 @@ export default class Intelligence
                 type: "function",
                 function: {
                     name: "click",
-                    description: "On the current browser's screen move the mouse pointer to specified coordinates and click.",
-                    parameters: {
-                        type: "object",
-                        properties: {
-                            x: {
-                                type: "integer",
-                                description: "The X coordinate to click",
-                            },
-                            y: {
-                                type: "integer",
-                                description: "The Y coordinate to click",
-                            },
-                        },
-                        required: ["x", "y"],
-                    },
+                    description: toolbox.tools.click.description,
+                    parameters: toolbox.tools.click.parameters,
                 },
             }, {
                 type: "function",
                 function: {
                     name: "open",
-                    description: "Open the given URL on browser's screen.",
-                    parameters: {
-                        type: "object",
-                        properties: {
-                            url: {
-                                type: "string",
-                                description: "URL to open in browser.",
-                            },
-                        },
-                        required: ["url"],
-                    },
+                    description: toolbox.tools.open.description,
+                    parameters: toolbox.tools.open.parameters,
                 },
             }, {
                 type: "function",
                 function: {
                     name: "close",
-                    description: "Close the browser's screen.",
+                    description: toolbox.tools.close.description,
+                    parameters: toolbox.tools.close.parameters,
                 },
             }, {
                 type: "function",
                 function: {
                     name: "wait",
-                    description: "Do nothing.",
+                    description: toolbox.tools.wait.description,
+                    parameters: toolbox.tools.wait.parameters,
                 },
             }],
         };
