@@ -126,35 +126,14 @@ export default class Intelligence
                 },
             },
             tool_choice: act ? "required" : "none",
-            tools: [{
+            tools: Object.entries(toolbox.tools).map(([name, tool]) => ({
                 type: "function",
                 function: {
-                    name: "click",
-                    description: toolbox.tools.click.description,
-                    parameters: toolbox.tools.click.parameters,
-                },
-            }, {
-                type: "function",
-                function: {
-                    name: "open",
-                    description: toolbox.tools.open.description,
-                    parameters: toolbox.tools.open.parameters,
-                },
-            }, {
-                type: "function",
-                function: {
-                    name: "close",
-                    description: toolbox.tools.close.description,
-                    parameters: toolbox.tools.close.parameters,
-                },
-            }, {
-                type: "function",
-                function: {
-                    name: "wait",
-                    description: toolbox.tools.wait.description,
-                    parameters: toolbox.tools.wait.parameters,
-                },
-            }],
+                    name: name,
+                    description: tool.description,
+                    parameters: tool.parameters,
+                }
+            })),
         };
     }
 }
