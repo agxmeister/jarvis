@@ -33,28 +33,14 @@ export type ContextProperties = {
 }
 
 export type Toolbox = {
-    tools: {
-        open: {
-            handler: (url: string, driver: WebDriver, breadcrumbs: Breadcrumbs) => Promise<Screenshot>,
-            description: string,
-            parameters: any,
-        }
-        click: {
-            handler: (x: number, y: number, driver: WebDriver, breadcrumbs: Breadcrumbs) => Promise<Screenshot>,
-            description: string,
-            parameters: any,
-        },
-        close: {
-            handler: (driver: WebDriver) => Promise<void>,
-            description: string,
-            parameters: any,
-        },
-        wait: {
-            handler: () => Promise<void>,
-            description: string,
-            parameters: any,
-        }
-    },
+    tools: Tool[],
+}
+
+export type Tool = {
+    name: string,
+    description: string,
+    handler: any,
+    parameters: any,
 }
 
 export interface CheckpointProperties

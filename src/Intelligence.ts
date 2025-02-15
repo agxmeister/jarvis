@@ -126,10 +126,10 @@ export default class Intelligence
                 },
             },
             tool_choice: act ? "required" : "none",
-            tools: Object.entries(toolbox.tools).map(([name, tool]) => ({
+            tools: toolbox.tools.map(tool => ({
                 type: "function",
                 function: {
-                    name: name,
+                    name: tool.name,
                     description: tool.description,
                     parameters: tool.parameters,
                 }

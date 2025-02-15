@@ -116,16 +116,20 @@ export default class Actor
                 decision: {properties: {actions}},
             }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties>) => {
                 for (const action of actions) {
+                    const tool = toolbox.tools.find(tool => tool.name === action.name);
+                    if (!tool) {
+                        continue;
+                    }
                     if (action.name === "open") {
                         const parameters: {url: string} = action.parameters;
-                        await toolbox.tools.open.handler(parameters.url, driver, breadcrumbs);
+                        await tool.handler(parameters.url, driver, breadcrumbs);
                         thread.addToolMessage(`Requested page was opened.`, action.id);
                     } else if (action.name === "click") {
                         const parameters: {x: number, y: number} = action.parameters;
-                        await toolbox.tools.click.handler(parameters.x, parameters.y, driver, breadcrumbs);
+                        await tool.handler(parameters.x, parameters.y, driver, breadcrumbs);
                         thread.addToolMessage(`Click was performed.`, action.id);
                     } else if (action.name === "close") {
-                        await toolbox.tools.close.handler(driver);
+                        await tool.handler(driver);
                         thread.addToolMessage(`Browser was closed.`, action.id);
                     } else if (action.name === "wait") {
                         thread.addToolMessage(`Some time passed.`, action.id);
