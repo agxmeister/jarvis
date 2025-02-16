@@ -10,7 +10,7 @@ import {
     DecisionProperties,
     ObservationProperties,
     OrientationProperties,
-    CheckpointProperties,
+    CheckpointProperties, ToolOpenHandler, ToolClickHandler, ToolCloseHandler, ToolWaitHandler,
 } from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
@@ -121,17 +121,20 @@ export default class Actor
                         continue;
                     }
                     if (action.name === "open") {
-                        const parameters: {url: string} = action.parameters;
-                        await tool.handler(parameters.url, driver, breadcrumbs);
+                        const handler = tool.handler as ToolOpenHandler;
+                        await handler(action.parameters.url, driver, breadcrumbs);
                         thread.addToolMessage(`Requested page was opened.`, action.id);
                     } else if (action.name === "click") {
-                        const parameters: {x: number, y: number} = action.parameters;
-                        await tool.handler(parameters.x, parameters.y, driver, breadcrumbs);
+                        const handler = tool.handler as ToolClickHandler;
+                        await handler(action.parameters.x, action.parameters.y, driver, breadcrumbs);
                         thread.addToolMessage(`Click was performed.`, action.id);
                     } else if (action.name === "close") {
-                        await tool.handler(driver);
+                        const handler = tool.handler as ToolCloseHandler;
+                        await handler(driver);
                         thread.addToolMessage(`Browser was closed.`, action.id);
                     } else if (action.name === "wait") {
+                        const handler = tool.handler as ToolWaitHandler;
+                        await handler()
                         thread.addToolMessage(`Some time passed.`, action.id);
                     }
                 }

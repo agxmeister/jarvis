@@ -33,15 +33,20 @@ export type ContextProperties = {
 }
 
 export type Toolbox = {
-    tools: Tool[],
+    tools: Tool<any>[],
 }
 
-export type Tool = {
+export type Tool<Handler> = {
     name: string,
     description: string,
-    handler: any,
+    handler: Handler,
     parameters: any,
 }
+
+export type ToolOpenHandler = (url: string, driver: WebDriver, breadcrumbs: Breadcrumbs) => Promise<Screenshot>;
+export type ToolClickHandler = (x: number, y: number, driver: WebDriver, breadcrumbs: Breadcrumbs) => Promise<Screenshot>;
+export type ToolCloseHandler = (driver: WebDriver) => Promise<void>;
+export type ToolWaitHandler = () => Promise<void>;
 
 export interface CheckpointProperties
 {
