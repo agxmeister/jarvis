@@ -5,6 +5,7 @@ import Dumper from "./Dumper";
 import {
     ChatCompletionCreateParamsNonStreaming,
     ChatCompletionMessageParam,
+    ChatCompletionToolChoiceOption,
 } from "openai/src/resources/chat/completions";
 import {Action, CheckpointProperties, Toolbox} from "./types";
 import Thread from "./Thread";
@@ -70,7 +71,11 @@ export default class Intelligence
 
     async think(thread: Thread, narration: Narration, toolbox: Toolbox): Promise<string>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox, false));
+        const completionRequest = {
+            ...this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox),
+            tool_choice: 'none' as ChatCompletionToolChoiceOption,
+        };
+        const completion = await this.client.chat.completions.create(completionRequest);
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
@@ -81,7 +86,11 @@ export default class Intelligence
 
     async act(thread: Thread, narration: Narration, toolbox: Toolbox): Promise<Action[]>
     {
-        const completion = await this.client.chat.completions.create(this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox, true));
+        const completionRequest = {
+            ...this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox),
+            tool_choice: 'required' as ChatCompletionToolChoiceOption,
+        };
+        const completion = await this.client.chat.completions.create(completionRequest);
         this.dumper.add(completion);
 
         const message = completion.choices.pop().message;
@@ -94,7 +103,7 @@ export default class Intelligence
         }));
     }
 
-    private getCompletionRequest(messages: ChatCompletionMessageParam[], toolbox: Toolbox, act: boolean): ChatCompletionCreateParamsNonStreaming
+    private getCompletionRequest(messages: ChatCompletionMessageParam[], toolbox: Toolbox): ChatCompletionCreateParamsNonStreaming
     {
         return {
             model: "gpt-4o-mini",
@@ -125,7 +134,6 @@ export default class Intelligence
                     },
                 },
             },
-            tool_choice: act ? "required" : "none",
             tools: toolbox.tools.map(tool => ({
                 type: "function",
                 function: {
