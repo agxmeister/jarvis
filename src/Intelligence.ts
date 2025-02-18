@@ -10,6 +10,7 @@ import {
 import {Action, CheckpointProperties, Toolbox} from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
+import {frameResponseSchema, orientResponseSchema} from "./schemas";
 
 @injectable()
 export default class Intelligence
@@ -31,36 +32,7 @@ export default class Intelligence
                 json_schema: {
                     name: "response",
                     strict: true,
-                    schema: {
-                        type: "object",
-                        properties: {
-                            steps: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    description: "The list of steps to perform to complete the scenario",
-                                    properties: {
-                                        name: {
-                                            description: "Unique and concise name of the step, self-explaining its essence.",
-                                            type: "string",
-                                        },
-                                        action: {
-                                            description: "Explanation of what exactly must be done to complete this step and proceed to the next step.",
-                                            type: "string",
-                                        },
-                                        expectation: {
-                                            description: "Expectation of what exactly should happen after completion of this step.",
-                                            type: "string",
-                                        },
-                                    },
-                                    required: ["name", "action", "expectation"],
-                                    additionalProperties: false,
-                                },
-                            },
-                        },
-                        required: ["steps"],
-                        additionalProperties: false,
-                    },
+                    schema: frameResponseSchema,
                 },
             },
         });
@@ -110,29 +82,7 @@ export default class Intelligence
             messages: messages,
             response_format: {
                 type: "json_schema",
-                json_schema: {
-                    name: "response",
-                    strict: true,
-                    schema: {
-                        type: "object",
-                        properties: {
-                            observation: {
-                                description: "Your interpretation of the current application's state.",
-                                type: "string",
-                            },
-                            completed: {
-                                description: "Status of the current step. True, if you consider it passed.",
-                                type: "boolean",
-                            },
-                            comment: {
-                                description: "Describe in your own word, do you consider the current step passed or not.",
-                                type: "string",
-                            },
-                        },
-                        required: ["observation", "completed", "comment"],
-                        additionalProperties: false,
-                    },
-                },
+                json_schema: orientResponseSchema,
             },
             tools: toolbox.tools.map(tool => ({
                 type: "function",
