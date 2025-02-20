@@ -112,7 +112,7 @@ export default class Actor
                 });
             },
             act: async ({
-                context: {properties: {driver, breadcrumbs, thread, toolbox}},
+                context: {properties: {driver, thread, toolbox}},
                 decision: {properties: {actions}},
             }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties>) => {
                 for (const action of actions) {
@@ -122,11 +122,11 @@ export default class Actor
                     }
                     if (action.name === "open") {
                         const handler = tool.handler as ToolOpenHandler;
-                        await handler(action.parameters.url, driver, breadcrumbs);
+                        await handler(action.parameters.url, driver);
                         thread.addToolMessage(`Requested page was opened.`, action.id);
                     } else if (action.name === "click") {
                         const handler = tool.handler as ToolClickHandler;
-                        await handler(action.parameters.x, action.parameters.y, driver, breadcrumbs);
+                        await handler(action.parameters.x, action.parameters.y, driver);
                         thread.addToolMessage(`Click was performed.`, action.id);
                     } else if (action.name === "close") {
                         const handler = tool.handler as ToolCloseHandler;

@@ -43,8 +43,8 @@ export type Tool<Handler> = {
     parameters: any,
 }
 
-export type ToolOpenHandler = (url: string, driver: WebDriver, breadcrumbs: Breadcrumbs) => Promise<Screenshot>;
-export type ToolClickHandler = (x: number, y: number, driver: WebDriver, breadcrumbs: Breadcrumbs) => Promise<Screenshot>;
+export type ToolOpenHandler = (url: string, driver: WebDriver) => Promise<void>;
+export type ToolClickHandler = (x: number, y: number, driver: WebDriver) => Promise<void>;
 export type ToolCloseHandler = (driver: WebDriver) => Promise<void>;
 export type ToolWaitHandler = () => Promise<void>;
 
