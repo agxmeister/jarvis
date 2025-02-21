@@ -43,10 +43,26 @@ export type Tool<Handler> = {
     parameters: any,
 }
 
-export type ToolOpenHandler = (url: string, driver: WebDriver) => Promise<void>;
-export type ToolClickHandler = (x: number, y: number, driver: WebDriver) => Promise<void>;
-export type ToolCloseHandler = (driver: WebDriver) => Promise<void>;
-export type ToolWaitHandler = () => Promise<void>;
+export type ToolHandler<Parameters> = (parameters: Parameters) => Promise<void>;
+
+export type ToolOpenHandler = ToolHandler<ToolOpenParameters>;
+export type ToolClickHandler = ToolHandler<ToolClickParameters>;
+export type ToolCloseHandler = ToolHandler<ToolCloseParameters>;
+export type ToolWaitHandler = ToolHandler<ToolWaitParameters>;
+
+export type ToolOpenParameters = {
+    driver: WebDriver,
+    url: string,
+}
+export type ToolClickParameters = {
+    driver: WebDriver,
+    x: number,
+    y: number,
+}
+export type ToolCloseParameters = {
+    driver: WebDriver,
+}
+export type ToolWaitParameters = {}
 
 export interface CheckpointProperties
 {

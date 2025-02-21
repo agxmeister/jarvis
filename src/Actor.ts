@@ -122,19 +122,28 @@ export default class Actor
                     }
                     if (action.name === "open") {
                         const handler = tool.handler as ToolOpenHandler;
-                        await handler(action.parameters.url, driver);
+                        await handler({
+                            driver,
+                            url: action.parameters.url,
+                        });
                         thread.addToolMessage(`Requested page was opened.`, action.id);
                     } else if (action.name === "click") {
                         const handler = tool.handler as ToolClickHandler;
-                        await handler(action.parameters.x, action.parameters.y, driver);
+                        await handler({
+                            driver,
+                            x: action.parameters.x,
+                            y: action.parameters.y,
+                        });
                         thread.addToolMessage(`Click was performed.`, action.id);
                     } else if (action.name === "close") {
                         const handler = tool.handler as ToolCloseHandler;
-                        await handler(driver);
+                        await handler({
+                            driver,
+                        });
                         thread.addToolMessage(`Browser was closed.`, action.id);
                     } else if (action.name === "wait") {
                         const handler = tool.handler as ToolWaitHandler;
-                        await handler()
+                        await handler({});
                         thread.addToolMessage(`Some time passed.`, action.id);
                     }
                 }

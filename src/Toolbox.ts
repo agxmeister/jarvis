@@ -1,18 +1,25 @@
 import {WebDriver} from "selenium-webdriver";
 import Breadcrumbs from "./Breadcrumbs";
-import {Screenshot, Toolbox} from "./types";
+import {
+    Screenshot,
+    Toolbox,
+    ToolClickParameters,
+    ToolCloseParameters,
+    ToolOpenParameters,
+    ToolWaitParameters
+} from "./types";
 
 export const toolbox: Toolbox = {
     tools: [{
         name: "open",
         description: "Open the given URL on browser's screen.",
-        handler: async (url: string, driver: WebDriver): Promise<void> => {
-            await driver.get('https://example.com');
-            await driver.manage().window().setRect({
+        handler: async (parameters: ToolOpenParameters): Promise<void> => {
+            await parameters.driver.get('https://example.com');
+            await parameters.driver.manage().window().setRect({
                 width: 800,
                 height: 600,
             });
-            await driver.get(url);
+            await parameters.driver.get(parameters.url);
         },
         parameters: {
             type: "object",
@@ -27,9 +34,9 @@ export const toolbox: Toolbox = {
     }, {
         name: "click",
         description: "On the current browser's screen move the mouse pointer to specified coordinates and click.",
-        handler: async (x: number, y: number, driver: WebDriver): Promise<void> => {
-            const actions = driver.actions({async: true});
-            await actions.move({x: x, y: y}).perform();
+        handler: async (parameters: ToolClickParameters): Promise<void> => {
+            const actions = parameters.driver.actions({async: true});
+            await actions.move({x: parameters.x, y: parameters.y}).perform();
             await actions.click().perform();
         },
         parameters: {
@@ -49,14 +56,14 @@ export const toolbox: Toolbox = {
     }, {
         name: "close",
         description: "Close the browser's screen.",
-        handler: async (driver: WebDriver): Promise<void> => {
-            await driver.quit();
+        handler: async (parameters: ToolCloseParameters): Promise<void> => {
+            await parameters.driver.quit();
         },
         parameters: {},
     }, {
         name: "wait",
         description: "Do nothing.",
-        handler: async (): Promise<void> => {
+        handler: async (_: ToolWaitParameters): Promise<void> => {
         },
         parameters: {},
     }],
