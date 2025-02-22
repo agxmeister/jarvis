@@ -51,18 +51,28 @@ export type ToolCloseHandler = ToolHandler<ToolCloseParameters>;
 export type ToolWaitHandler = ToolHandler<ToolWaitParameters>;
 
 export type ToolOpenParameters = {
+    id: string,
     driver: WebDriver,
+    thread: Thread,
     url: string,
 }
 export type ToolClickParameters = {
+    id: string,
     driver: WebDriver,
+    thread: Thread,
     x: number,
     y: number,
 }
 export type ToolCloseParameters = {
+    id: string,
     driver: WebDriver,
+    thread: Thread,
 }
-export type ToolWaitParameters = {}
+export type ToolWaitParameters = {
+    id: string,
+    driver: WebDriver,
+    thread: Thread,
+}
 
 export interface CheckpointProperties
 {
