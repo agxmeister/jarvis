@@ -33,42 +33,34 @@ export type ContextProperties = {
 }
 
 export type Toolbox = {
-    tools: Tool<any>[],
+    tools: Tool[],
 }
-
-export type Tool<Handler> = {
+export type Tool = {
     name: string,
     description: string,
-    handler: Handler,
+    handler: ToolHandler<any>,
     parameters: any,
 }
-
 export type ToolHandler<Parameters> = (parameters: Parameters) => Promise<void>;
-
-export type ToolOpenHandler = ToolHandler<ToolOpenParameters>;
-export type ToolClickHandler = ToolHandler<ToolClickParameters>;
-export type ToolCloseHandler = ToolHandler<ToolCloseParameters>;
-export type ToolWaitHandler = ToolHandler<ToolWaitParameters>;
-
-export type ToolOpenParameters = {
+export type ToolHandlerOpenParameters = {
     id: string,
     driver: WebDriver,
     thread: Thread,
     url: string,
 }
-export type ToolClickParameters = {
+export type ToolHandlerClickParameters = {
     id: string,
     driver: WebDriver,
     thread: Thread,
     x: number,
     y: number,
 }
-export type ToolCloseParameters = {
+export type ToolHandlerCloseParameters = {
     id: string,
     driver: WebDriver,
     thread: Thread,
 }
-export type ToolWaitParameters = {
+export type ToolHandlerWaitParameters = {
     id: string,
     driver: WebDriver,
     thread: Thread,

@@ -10,7 +10,7 @@ import {
     DecisionProperties,
     ObservationProperties,
     OrientationProperties,
-    CheckpointProperties, ToolOpenHandler, ToolClickHandler, ToolCloseHandler, ToolWaitHandler,
+    CheckpointProperties,
 } from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
@@ -120,38 +120,12 @@ export default class Actor
                     if (!tool) {
                         continue;
                     }
-                    if (action.name === "open") {
-                        const handler = tool.handler as ToolOpenHandler;
-                        await handler({
-                            id: action.id,
-                            driver: driver,
-                            thread: thread,
-                            url: action.parameters.url,
-                        });
-                    } else if (action.name === "click") {
-                        const handler = tool.handler as ToolClickHandler;
-                        await handler({
-                            id: action.id,
-                            driver: driver,
-                            thread: thread,
-                            x: action.parameters.x,
-                            y: action.parameters.y,
-                        });
-                    } else if (action.name === "close") {
-                        const handler = tool.handler as ToolCloseHandler;
-                        await handler({
-                            id: action.id,
-                            driver: driver,
-                            thread: thread,
-                        });
-                    } else if (action.name === "wait") {
-                        const handler = tool.handler as ToolWaitHandler;
-                        await handler({
-                            id: action.id,
-                            driver: driver,
-                            thread: thread,
-                        });
-                    }
+                    await tool.handler({
+                        id: action.id,
+                        driver: driver,
+                        thread: thread,
+                        ...action.parameters,
+                    });
                 }
             },
             conclude: async ({context: {properties: {driver}}}: PrefaceParameters<ContextProperties>) => {
