@@ -51,10 +51,10 @@ export default class Actor
                     .build(),
                 breadcrumbs: this.breadcrumbs,
                 intelligence: this.intelligence,
-                toolbox: toolbox,
                 thread: new Thread(),
                 briefing: briefing,
             }),
+            toolbox,
             new Scenario<string>(narrative),
         );
     }
@@ -95,7 +95,8 @@ export default class Actor
                 });
             },
             orient: async ({
-                context: {properties: {intelligence, thread, toolbox}},
+                context: {properties: {intelligence, thread}},
+                toolbox,
                 checkpoint,
                 observation,
             }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties>) => {
@@ -103,7 +104,8 @@ export default class Actor
                 return new Orientation(data.completed, data);
             },
             decide: async ({
-                context: {properties: {intelligence, thread, toolbox}},
+                context: {properties: {intelligence, thread}},
+                toolbox,
                 checkpoint,
                 observation,
             }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties>) => {
@@ -112,7 +114,8 @@ export default class Actor
                 });
             },
             act: async ({
-                context: {properties: {driver, thread, toolbox}},
+                context,
+                toolbox,
                 decision: {properties: {actions}},
             }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties>) => {
                 for (const action of actions) {
@@ -120,12 +123,7 @@ export default class Actor
                     if (!tool) {
                         continue;
                     }
-                    await tool.handler({
-                        id: action.id,
-                        driver: driver,
-                        thread: thread,
-                        ...action.parameters,
-                    });
+                    await tool.handler(action.id, context, action.parameters);
                 }
             },
             conclude: async ({context: {properties: {driver}}}: PrefaceParameters<ContextProperties>) => {

@@ -2,6 +2,7 @@ import {WebDriver} from "selenium-webdriver";
 import Breadcrumbs from "./Breadcrumbs";
 import Intelligence from "./Intelligence";
 import Thread from "./Thread";
+import {Context} from "./ooda";
 
 export interface Screenshot
 {
@@ -27,7 +28,6 @@ export type ContextProperties = {
     driver: WebDriver,
     breadcrumbs: Breadcrumbs,
     intelligence: Intelligence,
-    toolbox: Toolbox,
     thread: Thread,
     briefing: Briefing,
 }
@@ -38,32 +38,20 @@ export type Toolbox = {
 export type Tool = {
     name: string,
     description: string,
-    handler: ToolHandler<any>,
+    handler: ToolHandler,
     parameters: any,
 }
-export type ToolHandler<Parameters> = (parameters: Parameters) => Promise<void>;
+export type ToolHandler = (id: string, context: Context<any>, parameters: any) => Promise<void>;
 export type ToolHandlerOpenParameters = {
-    id: string,
-    driver: WebDriver,
-    thread: Thread,
     url: string,
 }
 export type ToolHandlerClickParameters = {
-    id: string,
-    driver: WebDriver,
-    thread: Thread,
     x: number,
     y: number,
 }
 export type ToolHandlerCloseParameters = {
-    id: string,
-    driver: WebDriver,
-    thread: Thread,
 }
 export type ToolHandlerWaitParameters = {
-    id: string,
-    driver: WebDriver,
-    thread: Thread,
 }
 
 export interface CheckpointProperties
