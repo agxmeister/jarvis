@@ -7,10 +7,11 @@ import {
     ChatCompletionMessageParam,
     ChatCompletionToolChoiceOption,
 } from "openai/src/resources/chat/completions";
-import {Action, CheckpointProperties, Toolbox} from "./types";
+import {Action, CheckpointProperties} from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
 import {frameResponseSchema, orientResponseSchema} from "./schemas";
+import Toolbox from "./Toolbox";
 
 @injectable()
 export default class Intelligence

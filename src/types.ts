@@ -32,9 +32,6 @@ export type ContextProperties = {
     briefing: Briefing,
 }
 
-export type Toolbox = {
-    tools: Tool[],
-}
 export type Tool = {
     name: string,
     description: string,

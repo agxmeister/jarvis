@@ -1,6 +1,6 @@
 import {OodaParameters} from "./types";
 import {Context, Scenario, Checkpoint} from "./index";
-import {Toolbox} from "../types";
+import Toolbox from "../Toolbox";
 
 export default class Ooda
 {
