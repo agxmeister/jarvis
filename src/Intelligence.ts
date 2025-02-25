@@ -11,7 +11,7 @@ import {Action, CheckpointProperties} from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
 import {frameResponseSchema, orientResponseSchema} from "./schemas";
-import Toolbox from "./Toolbox";
+import {Toolbox} from "./ooda/toolbox";
 
 @injectable()
 export default class Intelligence

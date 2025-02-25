@@ -1,5 +1,5 @@
 import {Context, Scenario, Checkpoint, Observation, Orientation, Decision} from "./index";
-import Toolbox from "../Toolbox";
+import {Toolbox} from "./toolbox";
 
 export type OodaParameters = {
     frame: (parameters: FrameParameters<any, any>) => Promise<Checkpoint<any>[]>,

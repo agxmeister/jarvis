@@ -32,13 +32,6 @@ export type ContextProperties = {
     briefing: Briefing,
 }
 
-export type Tool = {
-    name: string,
-    description: string,
-    handler: ToolHandler,
-    parameters: any,
-}
-export type ToolHandler = (id: string, context: Context<any>, parameters: any) => Promise<void>;
 export type ToolHandlerOpenParameters = {
     url: string,
 }

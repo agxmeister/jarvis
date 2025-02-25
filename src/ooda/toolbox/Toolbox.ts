@@ -1,5 +1,5 @@
+import {Context} from "../index";
 import {Tool} from "./types";
-import {Context} from "./ooda";
 
 export default class Toolbox
 {

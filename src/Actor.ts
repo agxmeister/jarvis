@@ -11,7 +11,6 @@ import {
     ObservationProperties,
     OrientationProperties,
     CheckpointProperties,
-    Tool,
     ToolHandlerOpenParameters,
     ToolHandlerClickParameters,
     ToolHandlerCloseParameters,
@@ -33,7 +32,7 @@ import {
     ActParameters,
 } from "./ooda";
 import {FrameParameters, PrefaceParameters} from "./ooda/types";
-import Toolbox from "./Toolbox";
+import {Toolbox, Tool} from "./ooda/toolbox";
 
 @injectable()
 export default class Actor
