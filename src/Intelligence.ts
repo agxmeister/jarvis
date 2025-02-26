@@ -12,6 +12,7 @@ import Thread from "./Thread";
 import Narration from "./Narration";
 import {frameResponseSchema, orientResponseSchema} from "./schemas";
 import {Toolbox} from "./ooda/toolbox";
+import {ToolParameter} from "./ooda/toolbox/types";
 
 @injectable()
 export default class Intelligence
@@ -90,9 +91,27 @@ export default class Intelligence
                 function: {
                     name: tool.name,
                     description: tool.description,
-                    parameters: tool.parameters,
+                    parameters: this.getToolParametersSchema(tool.parameters),
                 }
             })),
+        };
+    }
+
+    private getToolParametersSchema(parameters: ToolParameter[])
+    {
+        return {
+            type: "object",
+            properties: parameters.reduce(
+                (acc, param) => ({
+                    ...acc,
+                    [param.name]: {
+                        type: param.type,
+                        description: param.description
+                    }
+                }),
+                {}
+            ),
+            required: parameters.map(param => param.name),
         };
     }
 }
