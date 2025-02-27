@@ -1,2 +1,2 @@
 export {default as Toolbox} from "./Toolbox";
-export {Tool, ToolHandler} from './types';
+export {Tool, Handler} from './types';

@@ -1,10 +1,10 @@
 import {Context} from "../index";
 
-export type Tool = {
+export type Tool<Parameters> = {
     name: string,
     description: string,
     parameters: ToolParameter[],
-    handler: ToolHandler,
+    handler: Handler<Parameters>,
 }
 
 export type ToolParameter = {
@@ -13,4 +13,4 @@ export type ToolParameter = {
     type: string,
 }
 
-export type ToolHandler = (id: string, context: Context<any>, parameters: any) => Promise<void>;
+export type Handler<Parameters> = (id: string, context: Context<any>, parameters: Parameters) => Promise<void>;

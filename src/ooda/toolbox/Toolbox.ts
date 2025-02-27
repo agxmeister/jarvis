@@ -3,7 +3,7 @@ import {Tool} from "./types";
 
 export default class Toolbox
 {
-    constructor(readonly tools: Tool[])
+    constructor(readonly tools: Tool<any>[])
     {
     }
 

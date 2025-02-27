@@ -134,7 +134,7 @@ export default class Actor
         });
     }
 
-    private getTools(): Tool[]
+    private getTools(): Tool<any>[]
     {
         return [{
             name: "open",
