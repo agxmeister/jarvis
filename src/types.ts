@@ -32,18 +32,6 @@ export type ContextProperties = {
     briefing: Briefing,
 }
 
-export type ToolHandlerOpenParameters = {
-    url: string,
-}
-export type ToolHandlerClickParameters = {
-    x: number,
-    y: number,
-}
-export type ToolHandlerCloseParameters = {
-}
-export type ToolHandlerWaitParameters = {
-}
-
 export interface CheckpointProperties
 {
     name: string,

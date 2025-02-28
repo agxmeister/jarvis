@@ -1,4 +1,5 @@
 import {inject, injectable} from "inversify";
+import {z as zod} from "zod";
 import {dependencies} from "./dependencies";
 import Intelligence from "./Intelligence";
 import Breadcrumbs from "./Breadcrumbs";
@@ -11,10 +12,6 @@ import {
     ObservationProperties,
     OrientationProperties,
     CheckpointProperties,
-    ToolHandlerOpenParameters,
-    ToolHandlerClickParameters,
-    ToolHandlerCloseParameters,
-    ToolHandlerWaitParameters,
 } from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
@@ -33,6 +30,7 @@ import {
 } from "./ooda";
 import {FrameParameters, PrefaceParameters} from "./ooda/types";
 import {Toolbox, Tool} from "./ooda/toolbox";
+import {clickToolSchema, closeToolSchema, openToolSchema, waitToolSchema} from "./schemas";
 
 @injectable()
 export default class Actor
@@ -139,7 +137,7 @@ export default class Actor
         return [{
             name: "open",
             description: "Open the given URL on browser's screen.",
-            handler: async (id: string, context: Context<ContextProperties>, parameters: ToolHandlerOpenParameters): Promise<void> => {
+            handler: async (id: string, context: Context<ContextProperties>, parameters: zod.infer<typeof openToolSchema>): Promise<void> => {
                 await context.properties.driver.get('https://example.com');
                 await context.properties.driver.manage().window().setRect({
                     width: 800,
@@ -156,7 +154,7 @@ export default class Actor
         }, {
             name: "click",
             description: "On the current browser's screen move the mouse pointer to specified coordinates and click.",
-            handler: async (id: string, context: Context<ContextProperties>, parameters: ToolHandlerClickParameters): Promise<void> => {
+            handler: async (id: string, context: Context<ContextProperties>, parameters: zod.infer<typeof clickToolSchema>): Promise<void> => {
                 const actions = context.properties.driver.actions({async: true});
                 await actions.move({x: parameters.x, y: parameters.y}).perform();
                 await actions.click().perform();
@@ -174,7 +172,7 @@ export default class Actor
         }, {
             name: "close",
             description: "Close the browser's screen.",
-            handler: async (id: string, context: Context<ContextProperties>, _: ToolHandlerCloseParameters): Promise<void> => {
+            handler: async (id: string, context: Context<ContextProperties>, _: zod.infer<typeof closeToolSchema>): Promise<void> => {
                 await context.properties.driver.quit();
                 context.properties.thread.addToolMessage(`Browser was closed.`, id);
             },
@@ -182,7 +180,7 @@ export default class Actor
         }, {
             name: "wait",
             description: "Do nothing.",
-            handler: async (id: string, context: Context<ContextProperties>, _: ToolHandlerWaitParameters): Promise<void> => {
+            handler: async (id: string, context: Context<ContextProperties>, _: zod.infer<typeof waitToolSchema>): Promise<void> => {
                 context.properties.thread.addToolMessage(`Some time passed.`, id);
             },
             parameters: [],
