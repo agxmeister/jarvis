@@ -1,9 +1,10 @@
 import {Context} from "../index";
+import {ZodObject} from "zod";
 
 export type Tool<Parameters> = {
     name: string,
     description: string,
-    parameters: ToolParameter[],
+    schema: ZodObject<any>,
     handler: Handler<Parameters>,
 }
 

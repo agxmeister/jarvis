@@ -13,6 +13,7 @@ import Narration from "./Narration";
 import {frameResponseSchema, orientResponseSchema} from "./schemas";
 import {Toolbox} from "./ooda/toolbox";
 import {ToolParameter} from "./ooda/toolbox/types";
+import {zodToJsonSchema} from "zod-to-json-schema";
 
 @injectable()
 export default class Intelligence
@@ -91,27 +92,9 @@ export default class Intelligence
                 function: {
                     name: tool.name,
                     description: tool.description,
-                    parameters: this.getToolParametersSchema(tool.parameters),
+                    parameters: zodToJsonSchema(tool.schema),
                 }
             })),
-        };
-    }
-
-    private getToolParametersSchema(parameters: ToolParameter[])
-    {
-        return {
-            type: "object",
-            properties: parameters.reduce(
-                (acc, param) => ({
-                    ...acc,
-                    [param.name]: {
-                        type: param.type,
-                        description: param.description
-                    }
-                }),
-                {}
-            ),
-            required: parameters.map(param => param.name),
         };
     }
 }
