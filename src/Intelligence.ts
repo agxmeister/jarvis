@@ -12,7 +12,6 @@ import Thread from "./Thread";
 import Narration from "./Narration";
 import {frameResponseSchema, orientResponseSchema} from "./schemas";
 import {Toolbox} from "./ooda/toolbox";
-import {ToolParameter} from "./ooda/toolbox/types";
 import {zodToJsonSchema} from "zod-to-json-schema";
 
 @injectable()
