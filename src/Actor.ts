@@ -30,7 +30,8 @@ import {
 } from "./ooda";
 import {FrameParameters, PrefaceParameters} from "./ooda/types";
 import {Toolbox, Tool} from "./ooda/toolbox";
-import {clickToolSchema, closeToolSchema, openToolSchema, waitToolSchema} from "./schemas";
+import {clickToolSchema, closeToolSchema, waitToolSchema} from "./schemas";
+import {Open} from "./tools/Open";
 
 @injectable()
 export default class Actor
@@ -134,45 +135,35 @@ export default class Actor
 
     private getTools(): Tool<any>[]
     {
-        return [{
-            name: "open",
-            description: "Open the given URL on browser's screen.",
-            schema: openToolSchema,
-            handler: async (id: string, context: Context<ContextProperties>, parameters: zod.infer<typeof openToolSchema>): Promise<void> => {
-                await context.properties.driver.get('https://example.com');
-                await context.properties.driver.manage().window().setRect({
-                    width: 800,
-                    height: 600,
-                });
-                await context.properties.driver.get(parameters.url);
-                context.properties.thread.addToolMessage(`Requested page was opened.`, id);
-            },
-        }, {
-            name: "click",
-            description: "On the current browser's screen move the mouse pointer to specified coordinates and click.",
-            schema: clickToolSchema,
-            handler: async (id: string, context: Context<ContextProperties>, parameters: zod.infer<typeof clickToolSchema>): Promise<void> => {
-                const actions = context.properties.driver.actions({async: true});
-                await actions.move({x: parameters.x, y: parameters.y}).perform();
-                await actions.click().perform();
-                context.properties.thread.addToolMessage(`Click was performed.`, id);
-            },
-        }, {
-            name: "close",
-            description: "Close the browser's screen.",
-            schema: closeToolSchema,
-            handler: async (id: string, context: Context<ContextProperties>, _: zod.infer<typeof closeToolSchema>): Promise<void> => {
-                await context.properties.driver.quit();
-                context.properties.thread.addToolMessage(`Browser was closed.`, id);
-            },
-        }, {
-            name: "wait",
-            description: "Do nothing.",
-            schema: waitToolSchema,
-            handler: async (id: string, context: Context<ContextProperties>, _: zod.infer<typeof waitToolSchema>): Promise<void> => {
-                context.properties.thread.addToolMessage(`Some time passed.`, id);
-            },
-        }];
+        return [
+            Open,
+            {
+                name: "click",
+                description: "On the current browser's screen move the mouse pointer to specified coordinates and click.",
+                schema: clickToolSchema,
+                handler: async (id: string, context: Context<ContextProperties>, parameters: zod.infer<typeof clickToolSchema>): Promise<void> => {
+                    const actions = context.properties.driver.actions({async: true});
+                    await actions.move({x: parameters.x, y: parameters.y}).perform();
+                    await actions.click().perform();
+                    context.properties.thread.addToolMessage(`Click was performed.`, id);
+                },
+            }, {
+                name: "close",
+                description: "Close the browser's screen.",
+                schema: closeToolSchema,
+                handler: async (id: string, context: Context<ContextProperties>, _: zod.infer<typeof closeToolSchema>): Promise<void> => {
+                    await context.properties.driver.quit();
+                    context.properties.thread.addToolMessage(`Browser was closed.`, id);
+                },
+            }, {
+                name: "wait",
+                description: "Do nothing.",
+                schema: waitToolSchema,
+                handler: async (id: string, context: Context<ContextProperties>, _: zod.infer<typeof waitToolSchema>): Promise<void> => {
+                    context.properties.thread.addToolMessage(`Some time passed.`, id);
+                },
+            }
+        ];
     }
 
     async getScreenDescription(checkpoint: Checkpoint<CheckpointProperties>): Promise<string>
