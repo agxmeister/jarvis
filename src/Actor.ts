@@ -30,8 +30,9 @@ import {
 } from "./ooda";
 import {FrameParameters, PrefaceParameters} from "./ooda/types";
 import {Toolbox, Tool} from "./ooda/toolbox";
-import {clickToolSchema, closeToolSchema, waitToolSchema} from "./schemas";
+import {closeToolSchema, waitToolSchema} from "./schemas";
 import {Open} from "./tools/Open";
+import {Click} from "./tools/Click";
 
 @injectable()
 export default class Actor
@@ -137,17 +138,8 @@ export default class Actor
     {
         return [
             Open,
+            Click,
             {
-                name: "click",
-                description: "On the current browser's screen move the mouse pointer to specified coordinates and click.",
-                schema: clickToolSchema,
-                handler: async (id: string, context: Context<ContextProperties>, parameters: zod.infer<typeof clickToolSchema>): Promise<void> => {
-                    const actions = context.properties.driver.actions({async: true});
-                    await actions.move({x: parameters.x, y: parameters.y}).perform();
-                    await actions.click().perform();
-                    context.properties.thread.addToolMessage(`Click was performed.`, id);
-                },
-            }, {
                 name: "close",
                 description: "Close the browser's screen.",
                 schema: closeToolSchema,
