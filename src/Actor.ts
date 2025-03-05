@@ -1,5 +1,4 @@
 import {inject, injectable} from "inversify";
-import {z as zod} from "zod";
 import {dependencies} from "./dependencies";
 import Intelligence from "./Intelligence";
 import Breadcrumbs from "./Breadcrumbs";
@@ -29,10 +28,11 @@ import {
     ActParameters,
 } from "./ooda";
 import {FrameParameters, PrefaceParameters} from "./ooda/types";
-import {Toolbox, Tool} from "./ooda/toolbox";
-import {closeToolSchema, waitToolSchema} from "./schemas";
+import {Toolbox} from "./ooda/toolbox";
 import {Open} from "./tools/Open";
 import {Click} from "./tools/Click";
+import {Close} from "./tools/Close";
+import {Wait} from "./tools/Wait";
 
 @injectable()
 export default class Actor
@@ -58,7 +58,7 @@ export default class Actor
                 thread: new Thread(),
                 briefing: briefing,
             }),
-            new Toolbox(this.getTools()),
+            new Toolbox([Open, Click, Close, Wait]),
             new Scenario<string>(narrative),
         );
     }
@@ -132,30 +132,6 @@ export default class Actor
                 }
             }
         });
-    }
-
-    private getTools(): Tool<any>[]
-    {
-        return [
-            Open,
-            Click,
-            {
-                name: "close",
-                description: "Close the browser's screen.",
-                schema: closeToolSchema,
-                handler: async (id: string, context: Context<ContextProperties>, _: zod.infer<typeof closeToolSchema>): Promise<void> => {
-                    await context.properties.driver.quit();
-                    context.properties.thread.addToolMessage(`Browser was closed.`, id);
-                },
-            }, {
-                name: "wait",
-                description: "Do nothing.",
-                schema: waitToolSchema,
-                handler: async (id: string, context: Context<ContextProperties>, _: zod.infer<typeof waitToolSchema>): Promise<void> => {
-                    context.properties.thread.addToolMessage(`Some time passed.`, id);
-                },
-            }
-        ];
     }
 
     async getScreenDescription(checkpoint: Checkpoint<CheckpointProperties>): Promise<string>
