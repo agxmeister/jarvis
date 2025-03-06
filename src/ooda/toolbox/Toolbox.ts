@@ -3,11 +3,11 @@ import {Tool} from "./types";
 
 export default class Toolbox
 {
-    constructor(readonly tools: Tool<any>[])
+    constructor(readonly tools: Tool<Record<string, any>>[])
     {
     }
 
-    async apply(toolName: string, toolParameters: any, toolApplicationId: string, context: Context<any>): Promise<any>
+    async apply(toolName: string, toolParameters: Record<string, any>, toolApplicationId: string, context: Context<Record<string, any>>): Promise<any>
     {
         const tool = this.tools.find((tool) => tool.name === toolName);
         if (!tool) {

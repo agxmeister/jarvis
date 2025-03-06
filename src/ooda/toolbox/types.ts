@@ -8,4 +8,5 @@ export type Tool<Parameters extends Record<string, any>> = {
     handler: Handler<Parameters>,
 }
 
-export type Handler<Parameters> = (id: string, context: Context<any>, parameters: Parameters) => Promise<void>;
+export type Handler<Parameters extends Record<string, any>> =
+    (id: string, context: Context<Record<string, any>>, parameters: Parameters) => Promise<void>;

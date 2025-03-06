@@ -2,40 +2,40 @@ import {Context, Scenario, Checkpoint, Observation, Orientation, Decision} from 
 import {Toolbox} from "./toolbox";
 
 export type OodaParameters = {
-    frame: (parameters: FrameParameters<any, any>) => Promise<Checkpoint<any>[]>,
-    preface?: (parameters: PrefaceParameters<any>) => Promise<void>,
-    observe: (parameters: ObserveParameters<any, any>) => Promise<Observation<any>>,
-    orient: (parameters: OrientParameters<any, any, any>) => Promise<Orientation<any>>,
-    decide: (parameters: DecideParameters<any, any, any, any>) => Promise<Decision<any>>,
-    act: (parameters: ActParameters<any, any, any, any, any>) => Promise<void>,
-    conclude?: (parameters: ConcludeParameters<any>) => Promise<void>,
+    frame: (parameters: FrameParameters<Record<string, any>, any>) => Promise<Checkpoint<Record<string, any>>[]>,
+    preface?: (parameters: PrefaceParameters<Record<string, any>>) => Promise<void>,
+    observe: (parameters: ObserveParameters<Record<string, any>, Record<string, any>>) => Promise<Observation<Record<string, any>>>,
+    orient: (parameters: OrientParameters<Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<Orientation<Record<string, any>>>,
+    decide: (parameters: DecideParameters<Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<Decision<Record<string, any>>>,
+    act: (parameters: ActParameters<Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<void>,
+    conclude?: (parameters: ConcludeParameters<Record<string, any>>) => Promise<void>,
 }
 
-export type FrameParameters<ContextProperties, ScenarioProperties> = {
+export type FrameParameters<ContextProperties extends Record<string, any>, ScenarioProperties> = {
     context: Context<ContextProperties>,
     toolbox: Toolbox,
     scenario: Scenario<ScenarioProperties>,
 }
 
-export type PrefaceParameters<ContextProperties> = {
+export type PrefaceParameters<ContextProperties extends Record<string, any>> = {
     context: Context<ContextProperties>,
     toolbox: Toolbox,
 }
 
-export type ObserveParameters<ContextProperties, CheckpointProperties> = {
+export type ObserveParameters<ContextProperties extends Record<string, any>, CheckpointProperties extends Record<string, any>> = {
     context: Context<ContextProperties>,
     toolbox: Toolbox,
     checkpoint: Checkpoint<CheckpointProperties>,
 }
 
-export type OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties> = {
+export type OrientParameters<ContextProperties extends Record<string, any>, CheckpointProperties extends Record<string, any>, ObservationProperties extends Record<string, any>> = {
     context: Context<ContextProperties>,
     toolbox: Toolbox,
     checkpoint: Checkpoint<CheckpointProperties>,
     observation: Observation<ObservationProperties>
 }
 
-export type DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties> = {
+export type DecideParameters<ContextProperties extends Record<string, any>, CheckpointProperties extends Record<string, any>, ObservationProperties extends Record<string, any>, OrientationProperties extends Record<string, any>> = {
     context: Context<ContextProperties>,
     toolbox: Toolbox,
     checkpoint: Checkpoint<CheckpointProperties>,
@@ -43,7 +43,7 @@ export type DecideParameters<ContextProperties, CheckpointProperties, Observatio
     orientation: Orientation<OrientationProperties>
 }
 
-export type ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties> = {
+export type ActParameters<ContextProperties extends Record<string, any>, CheckpointProperties extends Record<string, any>, ObservationProperties extends Record<string, any>, OrientationProperties extends Record<string, any>, DecisionProperties extends Record<string, any>> = {
     context: Context<ContextProperties>,
     toolbox: Toolbox,
     checkpoint: Checkpoint<CheckpointProperties>,
@@ -52,7 +52,7 @@ export type ActParameters<ContextProperties, CheckpointProperties, ObservationPr
     decision: Decision<DecisionProperties>,
 }
 
-export type ConcludeParameters<ContextProperties> = {
+export type ConcludeParameters<ContextProperties extends Record<string, any>> = {
     context: Context<ContextProperties>,
     toolbox: Toolbox,
 }

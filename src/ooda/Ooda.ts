@@ -8,7 +8,7 @@ export default class Ooda
     {
     }
 
-    async process(context: Context<any>, toolbox: Toolbox, scenario: Scenario<any>): Promise<boolean>
+    async process(context: Context<Record<string, any>>, toolbox: Toolbox, scenario: Scenario<any>): Promise<boolean>
     {
         const checkpoints = await this.handlers.frame({
             context: context,
@@ -36,7 +36,7 @@ export default class Ooda
         return true;
     }
 
-    private async processCheckpoint(context: Context<any>, toolbox: Toolbox, checkpoint: Checkpoint<any>): Promise<boolean>
+    private async processCheckpoint(context: Context<Record<string, any>>, toolbox: Toolbox, checkpoint: Checkpoint<Record<string, any>>): Promise<boolean>
     {
         for (let j = 0; j < 5; j++) {
             const observation = await this.handlers.observe({
