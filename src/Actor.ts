@@ -2,37 +2,23 @@ import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import Intelligence from "./Intelligence";
 import Breadcrumbs from "./Breadcrumbs";
-import readline = require("readline/promises");
 import {Browser, Builder} from "selenium-webdriver";
 import {
     Briefing,
     ContextProperties,
-    DecisionProperties,
-    ObservationProperties,
-    OrientationProperties,
-    CheckpointProperties,
 } from "./types";
 import Thread from "./Thread";
-import Narration from "./Narration";
 import {
     Ooda,
-    Checkpoint,
     Scenario,
     Context,
-    Observation,
-    Orientation,
-    Decision,
-    ObserveParameters,
-    OrientParameters,
-    DecideParameters,
-    ActParameters,
 } from "./ooda";
-import {FrameParameters, PrefaceParameters} from "./ooda/types";
 import {Toolbox} from "./ooda/toolbox";
 import {Open} from "./tools/Open";
 import {Click} from "./tools/Click";
 import {Close} from "./tools/Close";
 import {Wait} from "./tools/Wait";
+import {Act, Conclude, Decide, Frame, Observe, Orient, Preface} from "./handlers";
 
 @injectable()
 export default class Actor
@@ -66,82 +52,13 @@ export default class Actor
     private getOoda(): Ooda
     {
         return new Ooda({
-            frame: async ({
-                context: {properties: {intelligence, briefing, thread}},
-                scenario: {properties: narrative},
-            }: FrameParameters<ContextProperties, string>) => {
-                thread.addBriefing(briefing.strategy, briefing.planning);
-                thread.addScenario(narrative);
-                return (await intelligence.getCheckpointsProperties(thread))
-                    .map(checkpointProperties => new Checkpoint(checkpointProperties.name, checkpointProperties));
-            },
-            preface: async ({
-                context: {properties: {briefing, thread}},
-            }: PrefaceParameters<ContextProperties>) => {
-                thread.addBriefing(briefing.execution);
-            },
-            observe: async ({
-                context: {properties: {driver, breadcrumbs}},
-                checkpoint,
-            }: ObserveParameters<ContextProperties, CheckpointProperties>) => {
-                return new Observation<ObservationProperties>({
-                    pageUrl: driver
-                        ? await driver.getCurrentUrl()
-                        : null,
-                    pageScreenshotUrl: process.env.OBSERVATION_MODE === "automatic"
-                        ? driver
-                            ? (await breadcrumbs.addScreenshot(await driver.takeScreenshot())).url
-                            : null
-                        : null,
-                    pageDescription: process.env.OBSERVATION_MODE === "automatic"
-                        ? null
-                        : await this.getScreenDescription(checkpoint),
-                });
-            },
-            orient: async ({
-                context: {properties: {intelligence, thread}},
-                toolbox,
-                checkpoint,
-                observation,
-            }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties>) => {
-                const data: OrientationProperties = JSON.parse(await intelligence.think(thread, new Narration(checkpoint.properties, observation.properties), toolbox));
-                return new Orientation(data.completed, data);
-            },
-            decide: async ({
-                context: {properties: {intelligence, thread}},
-                toolbox,
-                checkpoint,
-                observation,
-            }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties>) => {
-                return new Decision({
-                    actions: await intelligence.act(thread, new Narration(checkpoint.properties, observation.properties), toolbox),
-                });
-            },
-            act: async ({
-                context,
-                toolbox,
-                decision: {properties: {actions}},
-            }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties>) => {
-                for (const action of actions) {
-                    await toolbox.apply(action.name, action.parameters, action.id, context);
-                }
-            },
-            conclude: async ({context: {properties: {driver}}}: PrefaceParameters<ContextProperties>) => {
-                if (driver) {
-                    await driver.quit();
-                }
-            }
+            frame: Frame,
+            preface: Preface,
+            observe: Observe,
+            orient: Orient,
+            decide: Decide,
+            act: Act,
+            conclude: Conclude
         });
-    }
-
-    async getScreenDescription(checkpoint: Checkpoint<CheckpointProperties>): Promise<string>
-    {
-        const request = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-        });
-        const answer = await request.question(`Current step is "${checkpoint.properties.name}". What do you see? `);
-        request.close();
-        return answer;
     }
 }
