@@ -2,7 +2,6 @@ import {Context, Scenario, Checkpoint, Observation, Orientation, Decision} from 
 import {Toolbox} from "./toolbox";
 
 export type OodaParameters = {
-    frame: (parameters: FrameParameters<Record<string, any>, any>) => Promise<Checkpoint<Record<string, any>>[]>,
     preface?: (parameters: PrefaceParameters<Record<string, any>>) => Promise<void>,
     observe: (parameters: ObserveParameters<Record<string, any>, Record<string, any>>) => Promise<Observation<Record<string, any>>>,
     orient: (parameters: OrientParameters<Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<Orientation<Record<string, any>>>,

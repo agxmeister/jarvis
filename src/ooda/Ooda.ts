@@ -1,6 +1,7 @@
 import {OodaParameters} from "./types";
-import {Context, Scenario, Checkpoint} from "./index";
+import {Context, Checkpoint} from "./index";
 import {Toolbox} from "./toolbox";
+import {Checklist} from "./Checklist";
 
 export default class Ooda
 {
@@ -8,20 +9,15 @@ export default class Ooda
     {
     }
 
-    async process(context: Context<Record<string, any>>, toolbox: Toolbox, scenario: Scenario<any>): Promise<boolean>
+    async process(context: Context<Record<string, any>>, toolbox: Toolbox, checklist: Checklist): Promise<boolean>
     {
-        const checkpoints = await this.handlers.frame({
-            context: context,
-            toolbox: toolbox,
-            scenario: scenario,
-        });
         if (this.handlers.preface) {
             await this.handlers.preface({
                 context: context,
                 toolbox: toolbox,
             });
         }
-        for (const checkpoint of checkpoints) {
+        for (const checkpoint of checklist.checkpoints) {
             const completed = await this.processCheckpoint(context, toolbox, checkpoint);
             if (!completed) {
                 return false;
