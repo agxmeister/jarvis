@@ -1,4 +1,4 @@
-import {Context, Scenario, Checkpoint, Observation, Orientation, Decision} from "./index";
+import {Context, Checkpoint, Observation, Orientation, Decision} from "./index";
 import {Toolbox} from "./toolbox";
 
 export type OodaParameters = {
@@ -8,12 +8,6 @@ export type OodaParameters = {
     decide: (parameters: DecideParameters<Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<Decision<Record<string, any>>>,
     act: (parameters: ActParameters<Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<void>,
     conclude?: (parameters: ConcludeParameters<Record<string, any>>) => Promise<void>,
-}
-
-export type FrameParameters<ContextProperties extends Record<string, any>, ScenarioProperties> = {
-    context: Context<ContextProperties>,
-    toolbox: Toolbox,
-    scenario: Scenario<ScenarioProperties>,
 }
 
 export type PrefaceParameters<ContextProperties extends Record<string, any>> = {

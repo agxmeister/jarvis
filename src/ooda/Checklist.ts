@@ -1,6 +1,6 @@
 import {Checkpoint} from "./index";
 
-export class Checklist
+export default class Checklist
 {
     constructor(readonly checkpoints: Checkpoint<Record<string, any>>[])
     {

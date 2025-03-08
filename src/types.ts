@@ -2,7 +2,6 @@ import {WebDriver} from "selenium-webdriver";
 import Breadcrumbs from "./Breadcrumbs";
 import Intelligence from "./Intelligence";
 import Thread from "./Thread";
-import {Context} from "./ooda";
 
 export interface Screenshot
 {

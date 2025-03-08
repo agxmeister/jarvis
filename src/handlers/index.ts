@@ -1,4 +1,3 @@
-export {Frame} from './Frame.handler';
 export {Preface} from './Preface.handler';
 export {Observe} from './Observe.handler';
 export {Orient} from './Orient.handler';

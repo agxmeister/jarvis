@@ -10,7 +10,6 @@ import {
 import Thread from "./Thread";
 import {
     Ooda,
-    Scenario,
     Context,
 } from "./ooda";
 import {Toolbox} from "./ooda/toolbox";
@@ -18,8 +17,8 @@ import {Open} from "./tools/Open";
 import {Click} from "./tools/Click";
 import {Close} from "./tools/Close";
 import {Wait} from "./tools/Wait";
-import {Act, Conclude, Decide, Frame, Observe, Orient, Preface} from "./handlers";
-import {Checklist} from "./ooda/Checklist";
+import {Act, Conclude, Decide, Observe, Orient, Preface} from "./handlers";
+import {Coordinator} from "./coordinator";
 
 @injectable()
 export default class Actor
@@ -34,21 +33,19 @@ export default class Actor
 
     public async process(briefing: Briefing, narrative: string): Promise<void>
     {
+        const thread = new Thread();
+        const coordinator = new Coordinator(this.intelligence, briefing, thread);
         const context = new Context<ContextProperties>({
             driver: await this.webDriverBuilder
                 .forBrowser(Browser.CHROME)
                 .build(),
             breadcrumbs: this.breadcrumbs,
             intelligence: this.intelligence,
-            thread: new Thread(),
+            thread: thread,
             briefing: briefing,
         });
         const toolbox = new Toolbox([Open, Click, Close, Wait]);
-        const checklist = new Checklist(await Frame({
-            context: context,
-            toolbox: toolbox,
-            scenario: new Scenario<string>(narrative),
-        }));
+        const checklist = await coordinator.getChecklist(narrative);
 
         const ooda = this.getOoda();
         await ooda.process(
