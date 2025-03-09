@@ -1,5 +1,6 @@
-import {Context, Checkpoint, Observation, Orientation, Decision} from "./index";
+import {Context, Observation, Orientation, Decision} from "./index";
 import {Toolbox} from "./toolbox";
+import {Checkpoint} from "../checklist";
 
 export type OodaParameters = {
     preface?: (parameters: PrefaceParameters<Record<string, any>>) => Promise<void>,

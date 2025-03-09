@@ -1,7 +1,7 @@
 import Intelligence from "../Intelligence";
 import Thread from "../Thread";
-import {Briefing} from "../types";
-import {Checklist, Checkpoint} from "../ooda";
+import {Briefing, CheckpointProperties} from "../types";
+import {Checklist, Checkpoint} from "../checklist";
 
 export class Coordinator
 {
@@ -9,7 +9,7 @@ export class Coordinator
     {
     }
 
-    async getChecklist(narrative: string): Promise<Checklist>
+    async getChecklist(narrative: string): Promise<Checklist<CheckpointProperties>>
     {
         this.thread.addBriefing(this.briefing.strategy, this.briefing.planning);
         this.thread.addScenario(narrative);

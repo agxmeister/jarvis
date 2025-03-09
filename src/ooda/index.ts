@@ -1,6 +1,4 @@
 export {default as Ooda} from './Ooda';
-export {default as Checklist} from './Checklist';
-export {default as Checkpoint} from './Checkpoint';
 export {default as Context} from './Context';
 export {default as Observation} from './Observation';
 export {default as Orientation} from './Orientation';

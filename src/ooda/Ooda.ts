@@ -1,14 +1,15 @@
 import {OodaParameters} from "./types";
-import {Context, Checklist, Checkpoint} from "./index";
+import {Context} from "./index";
 import {Toolbox} from "./toolbox";
+import {Checklist, Checkpoint} from "../checklist";
 
-export default class Ooda
+export default class Ooda<ContextProperties, CheckpointProperties>
 {
     constructor(readonly handlers: OodaParameters)
     {
     }
 
-    async process(context: Context<Record<string, any>>, toolbox: Toolbox, checklist: Checklist): Promise<boolean>
+    async process(context: Context<ContextProperties>, toolbox: Toolbox, checklist: Checklist<CheckpointProperties>): Promise<boolean>
     {
         if (this.handlers.preface) {
             await this.handlers.preface({
@@ -31,7 +32,7 @@ export default class Ooda
         return true;
     }
 
-    private async processCheckpoint(context: Context<Record<string, any>>, toolbox: Toolbox, checkpoint: Checkpoint<Record<string, any>>): Promise<boolean>
+    private async processCheckpoint(context: Context<ContextProperties>, toolbox: Toolbox, checkpoint: Checkpoint<CheckpointProperties>): Promise<boolean>
     {
         for (let j = 0; j < 5; j++) {
             const observation = await this.handlers.observe({

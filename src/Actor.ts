@@ -6,6 +6,7 @@ import {Browser, Builder} from "selenium-webdriver";
 import {
     Briefing,
     ContextProperties,
+    CheckpointProperties,
 } from "./types";
 import Thread from "./Thread";
 import {
@@ -55,7 +56,7 @@ export default class Actor
         );
     }
 
-    private getOoda(): Ooda
+    private getOoda(): Ooda<ContextProperties, CheckpointProperties>
     {
         return new Ooda({
             preface: Preface,
