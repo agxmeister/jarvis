@@ -42,7 +42,7 @@ export default class Intelligence
 
         this.dumper.add(completion);
 
-        return JSON.parse(completion.choices.pop().message.content);
+        return JSON.parse(completion.choices.pop()!.message.content!);
     }
 
     async think(thread: Thread, narration: Narration, toolbox: Toolbox): Promise<string>
@@ -54,10 +54,10 @@ export default class Intelligence
         const completion = await this.client.chat.completions.create(completionRequest);
         this.dumper.add(completion);
 
-        const message = completion.choices.pop().message;
+        const message = completion.choices.pop()!.message;
         thread.addRawMessage(message);
 
-        return message.content;
+        return message.content!;
     }
 
     async act(thread: Thread, narration: Narration, toolbox: Toolbox): Promise<Action[]>
@@ -69,10 +69,10 @@ export default class Intelligence
         const completion = await this.client.chat.completions.create(completionRequest);
         this.dumper.add(completion);
 
-        const message = completion.choices.pop().message;
+        const message = completion.choices.pop()!.message;
         thread.addRawMessage(message);
 
-        return message.tool_calls.map(call => ({
+        return message.tool_calls!.map(call => ({
             id: call.id,
             name: call.function.name,
             parameters: JSON.parse(call.function.arguments),

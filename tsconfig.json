@@ -4,6 +4,7 @@
             "es2015",
             "dom"
         ],
+        "strictNullChecks": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true
     },

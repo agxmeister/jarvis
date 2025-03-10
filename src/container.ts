@@ -20,8 +20,8 @@ container.bind<OpenAI>(dependencies.OpenAi).toDynamicValue(
     })
 );
 container.bind<Dumper>(dependencies.Dumper).to(Dumper);
-container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.env.DUMPER_STORAGE_PATH);
+container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.env.DUMPER_STORAGE_PATH ?? "");
 container.bind<Breadcrumbs>(dependencies.Breadcrumbs).to(Breadcrumbs);
-container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.env.BREADCRUMBS_BASE_URL)
+container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.env.BREADCRUMBS_BASE_URL ?? "");
 
 export {container};

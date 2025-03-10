@@ -33,14 +33,14 @@ export type ContextProperties = {
 
 export interface CheckpointProperties
 {
-    action?: string,
-    expectation?: string,
+    action: string,
+    expectation: string,
 }
 
 export type ObservationProperties = {
-    pageUrl: string,
-    pageScreenshotUrl: string,
-    pageDescription: string,
+    pageUrl: string|null,
+    pageScreenshotUrl: string|null,
+    pageDescription?: string|null,
 }
 
 export type OrientationProperties = {
