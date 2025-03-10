@@ -14,8 +14,8 @@ export class Coordinator
         this.thread.addBriefing(this.briefing.strategy, this.briefing.planning);
         this.thread.addScenario(narrative);
         return new Checklist(
-            (await this.intelligence.getCheckpointsProperties(this.thread))
-                .map(checkpointProperties => new Checkpoint(checkpointProperties.name, checkpointProperties))
+            (await this.intelligence.getChecklist(this.thread)).checkpoints
+                .map(checkpoint => new Checkpoint(checkpoint.name, checkpoint.properties))
         );
     }
 }

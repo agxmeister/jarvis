@@ -33,9 +33,8 @@ export type ContextProperties = {
 
 export interface CheckpointProperties
 {
-    name: string,
-    action: string,
-    expectation: string,
+    action?: string,
+    expectation?: string,
 }
 
 export type ObservationProperties = {

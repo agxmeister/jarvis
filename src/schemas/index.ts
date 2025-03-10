@@ -1,2 +1,2 @@
-export {frameResponseSchema} from './frame';
+export {checklistSchema} from './checklist';
 export {orientResponseSchema} from './orient';

@@ -1,3 +1,4 @@
+import {z as zod} from "zod";
 import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import OpenAI from "openai";
@@ -7,10 +8,10 @@ import {
     ChatCompletionMessageParam,
     ChatCompletionToolChoiceOption,
 } from "openai/src/resources/chat/completions";
-import {Action, CheckpointProperties} from "./types";
+import {Action} from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
-import {frameResponseSchema, orientResponseSchema} from "./schemas";
+import {checklistSchema, orientResponseSchema} from "./schemas";
 import {Toolbox} from "./ooda/toolbox";
 import {zodToJsonSchema} from "zod-to-json-schema";
 
@@ -24,7 +25,7 @@ export default class Intelligence
     {
     }
 
-    async getCheckpointsProperties(thread: Thread): Promise<CheckpointProperties[]>
+    async getChecklist(thread: Thread): Promise<zod.infer<typeof checklistSchema>>
     {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
@@ -34,13 +35,14 @@ export default class Intelligence
                 json_schema: {
                     name: "response",
                     strict: true,
-                    schema: frameResponseSchema,
+                    schema: zodToJsonSchema(checklistSchema),
                 },
             },
         });
+
         this.dumper.add(completion);
 
-        return JSON.parse(completion.choices.pop().message.content).steps;
+        return JSON.parse(completion.choices.pop().message.content);
     }
 
     async think(thread: Thread, narration: Narration, toolbox: Toolbox): Promise<string>

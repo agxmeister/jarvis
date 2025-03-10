@@ -2,6 +2,7 @@ import {ObserveParameters} from "../ooda";
 import {ContextProperties, CheckpointProperties, ObservationProperties} from "../types";
 import {Observation} from "../ooda";
 import readline = require("readline/promises");
+import {Checkpoint} from "../checklist";
 
 export const Observe = async ({
     context: {properties: {driver, breadcrumbs}},
@@ -18,16 +19,16 @@ export const Observe = async ({
             : null,
         pageDescription: process.env.OBSERVATION_MODE === "automatic"
             ? null
-            : await getScreenDescription(checkpoint.properties),
+            : await getScreenDescription(checkpoint),
     });
 };
 
-async function getScreenDescription(checkpointProperties: CheckpointProperties): Promise<string> {
+async function getScreenDescription(checkpoint: Checkpoint<CheckpointProperties>): Promise<string> {
     const request = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
-    const answer = await request.question(`Current step is "${checkpointProperties.name}". What do you see? `);
+    const answer = await request.question(`Current step is "${checkpoint.name}". What do you see? `);
     request.close();
     return answer;
 }

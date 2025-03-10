@@ -9,6 +9,6 @@ export const Decide = async ({
     observation,
 }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties>) => {
     return new Decision<DecisionProperties>({
-        actions: await intelligence.act(thread, new Narration(checkpoint.properties, observation.properties), toolbox),
+        actions: await intelligence.act(thread, new Narration(checkpoint, observation.properties), toolbox),
     });
 };

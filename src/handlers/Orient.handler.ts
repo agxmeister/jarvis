@@ -9,7 +9,7 @@ export const Orient = async ({
     observation,
 }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties>) => {
     const data: OrientationProperties = JSON.parse(
-        await intelligence.think(thread, new Narration(checkpoint.properties, observation.properties), toolbox)
+        await intelligence.think(thread, new Narration(checkpoint, observation.properties), toolbox)
     );
     return new Orientation(data.completed, data);
 };
