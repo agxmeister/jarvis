@@ -1,6 +1,4 @@
-export class Checkpoint<Properties extends Record<string, any>>
-{
-    constructor (readonly name: string, readonly properties: Properties)
-    {
-    }
+export interface Checkpoint<Properties extends Record<string, any>> {
+    name: string;
+    properties: Properties;
 }

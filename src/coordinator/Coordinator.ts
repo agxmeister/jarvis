@@ -1,7 +1,7 @@
 import Intelligence from "../Intelligence";
 import Thread from "../Thread";
+import {Checklist} from "../checklist";
 import {Briefing, CheckpointProperties} from "../types";
-import {Checklist, Checkpoint} from "../checklist";
 
 export class Coordinator
 {
@@ -13,9 +13,6 @@ export class Coordinator
     {
         this.thread.addBriefing(this.briefing.strategy, this.briefing.planning);
         this.thread.addScenario(narrative);
-        return new Checklist(
-            (await this.intelligence.getChecklist(this.thread)).checkpoints
-                .map(checkpoint => new Checkpoint(checkpoint.name, checkpoint.properties))
-        );
+        return await this.intelligence.getChecklist(this.thread);
     }
 }

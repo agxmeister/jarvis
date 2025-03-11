@@ -1,8 +1,5 @@
 import {Checkpoint} from "./Checkpoint";
 
-export class Checklist<Properties extends Record<string, any>>
-{
-    constructor(readonly checkpoints: Checkpoint<Properties>[])
-    {
-    }
+export interface Checklist<Properties extends Record<string, any>> {
+    checkpoints: Checkpoint<Properties>[];
 }
