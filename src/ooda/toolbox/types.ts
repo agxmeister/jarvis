@@ -1,12 +1,12 @@
-import {Context} from "../index";
 import {ZodObject, ZodType} from "zod";
 
-export type Tool<Parameters extends Record<string, any>> = {
-    name: string,
-    description: string,
-    schema: ZodObject<{[key in keyof Parameters]: ZodType<Parameters[key]>}>,
-    handler: Handler<Parameters>,
+export interface Tool<Parameters extends Record<string, any>, Context extends Record<string, any>> {
+    name: string;
+    description: string;
+    schema: ZodObject<{[key in keyof Parameters]: ZodType<Parameters[key]>}>;
+    handler: Handler<Parameters, Context>;
 }
 
-export type Handler<Parameters extends Record<string, any>> =
-    (id: string, context: Context<Record<string, any>>, parameters: Parameters) => Promise<void>;
+export interface Handler<Parameters extends Record<string, any>, Context extends Record<string, any>> {
+    (parameters: Parameters, context: Context): Promise<void>;
+}
