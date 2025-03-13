@@ -6,13 +6,13 @@ export default class Toolbox
     {
     }
 
-    async apply(toolName: string, toolParameters: Record<string, any>, toolContext: Record<string, any>): Promise<any>
+    async apply(name: string, parameters: Record<string, any>, runtime: Record<string, any>): Promise<any>
     {
         const tool = this.tools
-            .find((tool) => tool.name === toolName);
+            .find((tool) => tool.name === name);
         if (!tool) {
             return null;
         }
-        return await tool.handler(toolParameters, toolContext);
+        return await tool.handler(parameters, runtime);
     }
 }

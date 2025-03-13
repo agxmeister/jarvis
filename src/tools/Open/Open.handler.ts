@@ -1,16 +1,16 @@
 import {z as zod} from "zod";
 import {schema} from "./Open.schema";
 import {Handler} from "../../ooda/toolbox";
-import {ToolContext} from "../types";
+import {Runtime} from "../types";
 
-export const handler: Handler<zod.infer<typeof schema>, ToolContext> = async (
-    parameters, context
+export const handler: Handler<zod.infer<typeof schema>, Runtime> = async (
+    parameters, runtime
 ) => {
-    await context.context.properties.driver.get('https://example.com');
-    await context.context.properties.driver.manage().window().setRect({
+    await runtime.context.properties.driver.get('https://example.com');
+    await runtime.context.properties.driver.manage().window().setRect({
         width: 800,
         height: 600,
     });
-    await context.context.properties.driver.get(parameters.url);
-    context.context.properties.thread.addToolMessage(`Requested page was opened.`, context.action);
+    await runtime.context.properties.driver.get(parameters.url);
+    runtime.context.properties.thread.addToolMessage(`Requested page was opened.`, runtime.action);
 }

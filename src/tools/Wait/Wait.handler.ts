@@ -1,12 +1,12 @@
 import {z as zod} from "zod";
 import {schema} from "./Wait.schema";
 import {Handler} from "../../ooda/toolbox";
-import {ToolContext} from "../types";
+import {Runtime} from "../types";
 
-export const handler: Handler<zod.infer<typeof schema>, ToolContext> = async (
-    parameters, context
+export const handler: Handler<zod.infer<typeof schema>, Runtime> = async (
+    parameters, runtime
 ): Promise<void> => {
     const waitTime = parameters.milliseconds;
     await new Promise(resolve => setTimeout(resolve, waitTime));
-    context.context.properties.thread.addToolMessage(`Waited for ${waitTime} milliseconds.`, context.action);
+    runtime.context.properties.thread.addToolMessage(`Waited for ${waitTime} milliseconds.`, runtime.action);
 }

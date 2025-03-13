@@ -1,12 +1,12 @@
 import {ZodObject, ZodType} from "zod";
 
-export interface Tool<Parameters extends Record<string, any>, Context extends Record<string, any>> {
+export interface Tool<Parameters extends Record<string, any>, Runtime extends Record<string, any>> {
     name: string;
     description: string;
     schema: ZodObject<{[key in keyof Parameters]: ZodType<Parameters[key]>}>;
-    handler: Handler<Parameters, Context>;
+    handler: Handler<Parameters, Runtime>;
 }
 
-export interface Handler<Parameters extends Record<string, any>, Context extends Record<string, any>> {
-    (parameters: Parameters, context: Context): Promise<void>;
+export interface Handler<Parameters extends Record<string, any>, Runtime extends Record<string, any>> {
+    (parameters: Parameters, context: Runtime): Promise<void>;
 }
