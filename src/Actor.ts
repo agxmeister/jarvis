@@ -20,6 +20,7 @@ import {Close} from "./tools/Close";
 import {Wait} from "./tools/Wait";
 import {Act, Conclude, Decide, Observe, Orient, Preface} from "./handlers";
 import {Coordinator} from "./coordinator";
+import {Runtime} from "./tools/types";
 
 @injectable()
 export default class Actor
@@ -45,7 +46,7 @@ export default class Actor
             thread: thread,
             briefing: briefing,
         });
-        const toolbox = new Toolbox([Open, Click, Close, Wait]);
+        const toolbox: Toolbox<Runtime> = new Toolbox([Open, Click, Close, Wait]);
         const checklist = await coordinator.getChecklist(narrative);
 
         const ooda = this.getOoda();
@@ -56,7 +57,7 @@ export default class Actor
         );
     }
 
-    private getOoda(): Ooda<ContextProperties, CheckpointProperties>
+    private getOoda(): Ooda<ContextProperties, CheckpointProperties, Runtime>
     {
         return new Ooda({
             preface: Preface,

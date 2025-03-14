@@ -14,6 +14,7 @@ import Narration from "./Narration";
 import {checklistSchema, orientResponseSchema} from "./schemas";
 import {Toolbox} from "./ooda/toolbox";
 import {zodToJsonSchema} from "zod-to-json-schema";
+import {Runtime} from "./tools/types";
 
 @injectable()
 export default class Intelligence
@@ -45,7 +46,7 @@ export default class Intelligence
         return JSON.parse(completion.choices.pop()!.message.content!);
     }
 
-    async think(thread: Thread, narration: Narration, toolbox: Toolbox): Promise<string>
+    async think(thread: Thread, narration: Narration, toolbox: Toolbox<Runtime>): Promise<string>
     {
         const completionRequest = {
             ...this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox),
@@ -60,7 +61,7 @@ export default class Intelligence
         return message.content!;
     }
 
-    async act(thread: Thread, narration: Narration, toolbox: Toolbox): Promise<Action[]>
+    async act(thread: Thread, narration: Narration, toolbox: Toolbox<Runtime>): Promise<Action[]>
     {
         const completionRequest = {
             ...this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox),
@@ -79,7 +80,7 @@ export default class Intelligence
         }));
     }
 
-    private getCompletionRequest(messages: ChatCompletionMessageParam[], toolbox: Toolbox): ChatCompletionCreateParamsNonStreaming
+    private getCompletionRequest(messages: ChatCompletionMessageParam[], toolbox: Toolbox<Runtime>): ChatCompletionCreateParamsNonStreaming
     {
         return {
             model: "gpt-4o-mini",
