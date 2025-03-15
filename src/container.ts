@@ -6,6 +6,7 @@ import Actor from "./Actor";
 import {Builder} from "selenium-webdriver";
 import OpenAI from "openai";
 import Dumper from "./Dumper";
+import Browser from "./Browser";
 
 const container = new Container();
 
@@ -13,6 +14,7 @@ container.bind<Actor>(dependencies.Actor).to(Actor);
 container.bind<Builder>(dependencies.WebDriverBuilder).toDynamicValue(
     () => new Builder()
 );
+container.bind<Browser>(dependencies.Browser).to(Browser);
 container.bind<Intelligence>(dependencies.Intelligence).to(Intelligence);
 container.bind<OpenAI>(dependencies.OpenAi).toDynamicValue(
     () => new OpenAI({

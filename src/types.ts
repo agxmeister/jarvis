@@ -1,8 +1,7 @@
-import {WebDriver} from "selenium-webdriver";
+import Browser from "./Browser";
 import Breadcrumbs from "./Breadcrumbs";
 import Intelligence from "./Intelligence";
 import Thread from "./Thread";
-import {Context} from "./ooda";
 
 export interface Screenshot
 {
@@ -25,7 +24,7 @@ export interface Briefing
 }
 
 export type ContextProperties = {
-    driver: WebDriver,
+    browser: Browser,
     breadcrumbs: Breadcrumbs,
     intelligence: Intelligence,
     thread: Thread,

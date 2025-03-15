@@ -6,16 +6,16 @@ import readline = require("readline/promises");
 import {Checkpoint} from "../checklist";
 
 export const Observe = async ({
-    context: {properties: {driver, breadcrumbs}},
+    context: {properties: {browser, breadcrumbs}},
     checkpoint,
 }: ObserveParameters<ContextProperties, CheckpointProperties, Runtime>) => {
     return new Observation<ObservationProperties>({
-        pageUrl: driver
-            ? await driver.getCurrentUrl()
+        pageUrl: browser.isCurrentPage()
+            ? await (await browser.getCurrentPage()).getCurrentUrl()
             : null,
         pageScreenshotUrl: process.env.OBSERVATION_MODE === "automatic"
-            ? driver
-                ? (await breadcrumbs.addScreenshot(await driver.takeScreenshot())).url
+            ? browser.isCurrentPage()
+                ? (await breadcrumbs.addScreenshot(await (await browser.getCurrentPage()).takeScreenshot())).url
                 : null
             : null,
         pageDescription: process.env.OBSERVATION_MODE === "automatic"

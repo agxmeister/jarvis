@@ -1,8 +1,8 @@
 import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
+import Browser from "./Browser";
 import Intelligence from "./Intelligence";
 import Breadcrumbs from "./Breadcrumbs";
-import {Browser, Builder} from "selenium-webdriver";
 import {
     Briefing,
     ContextProperties,
@@ -26,7 +26,7 @@ import {Runtime} from "./tools/types";
 export default class Actor
 {
     constructor(
-        @inject(dependencies.WebDriverBuilder) private webDriverBuilder: Builder,
+        @inject(dependencies.Browser) private browser: Browser,
         @inject(dependencies.Intelligence) private intelligence: Intelligence,
         @inject(dependencies.Breadcrumbs) private breadcrumbs: Breadcrumbs,
     )
@@ -38,9 +38,7 @@ export default class Actor
         const thread = new Thread();
         const coordinator = new Coordinator(this.intelligence, briefing, thread);
         const context = new Context<ContextProperties>({
-            driver: await this.webDriverBuilder
-                .forBrowser(Browser.CHROME)
-                .build(),
+            browser: this.browser,
             breadcrumbs: this.breadcrumbs,
             intelligence: this.intelligence,
             thread: thread,

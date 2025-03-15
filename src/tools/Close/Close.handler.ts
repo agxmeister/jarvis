@@ -6,6 +6,6 @@ import {Runtime} from "../types";
 export const handler: Handler<zod.infer<typeof schema>, Runtime> = async (
     parameters, runtime
 ): Promise<void> => {
-    await runtime.context.properties.driver.close();
+    await runtime.context.properties.browser.close();
     runtime.context.properties.thread.addToolMessage(`Browser tab was closed.`, runtime.action);
 }
