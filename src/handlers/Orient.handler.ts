@@ -4,7 +4,7 @@ import {Runtime} from "../tools/types";
 import Narration from "../Narration";
 
 export const Orient = async ({
-    context: {properties: {intelligence, thread}},
+    context: {intelligence, thread},
     toolbox,
     checkpoint,
     observation,

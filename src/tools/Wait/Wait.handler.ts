@@ -8,5 +8,5 @@ export const handler: Handler<zod.infer<typeof schema>, Runtime> = async (
 ): Promise<void> => {
     const waitTime = parameters.milliseconds;
     await new Promise(resolve => setTimeout(resolve, waitTime));
-    runtime.context.properties.thread.addToolMessage(`Waited for ${waitTime} milliseconds.`, runtime.action);
+    runtime.context.thread.addToolMessage(`Waited for ${waitTime} milliseconds.`, runtime.action);
 }

@@ -3,7 +3,7 @@ import {ContextProperties} from "../types";
 import {Runtime} from "../tools/types";
 
 export const Conclude = async ({
-    context: {properties: {browser}}
+    context: {browser}
 }: PrefaceParameters<ContextProperties, Runtime>) => {
     await  browser.close();
 };

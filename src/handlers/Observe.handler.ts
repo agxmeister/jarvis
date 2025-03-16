@@ -6,7 +6,7 @@ import readline = require("readline/promises");
 import {Checkpoint} from "../checklist";
 
 export const Observe = async ({
-    context: {properties: {browser, breadcrumbs}},
+    context: {browser, breadcrumbs},
     checkpoint,
 }: ObserveParameters<ContextProperties, CheckpointProperties, Runtime>) => {
     return new Observation<ObservationProperties>({

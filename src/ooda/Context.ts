@@ -1,6 +1,3 @@
-export default class Context<Properties extends Record<string, any>>
-{
-    constructor (readonly properties: Properties)
-    {
-    }
-}
+export type Context<Properties extends Record<string, any>> = {
+    [key in keyof Properties]: Properties[key];
+};

@@ -37,13 +37,13 @@ export default class Actor
     {
         const thread = new Thread();
         const coordinator = new Coordinator(this.intelligence, briefing, thread);
-        const context = new Context<ContextProperties>({
+        const context: Context<ContextProperties> = {
             browser: this.browser,
             breadcrumbs: this.breadcrumbs,
             intelligence: this.intelligence,
             thread: thread,
             briefing: briefing,
-        });
+        };
         const toolbox: Toolbox<Runtime> = new Toolbox([Open, Click, Close, Wait]);
         const checklist = await coordinator.getChecklist(narrative);
 

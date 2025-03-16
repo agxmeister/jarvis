@@ -3,7 +3,7 @@ import {ContextProperties} from "../types";
 import {Runtime} from "../tools/types";
 
 export const Preface = async ({
-    context: {properties: {briefing, thread}},
+    context: {briefing, thread},
 }: PrefaceParameters<ContextProperties, Runtime>) => {
     thread.addBriefing(briefing.execution);
 };
