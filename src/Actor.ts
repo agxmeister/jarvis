@@ -44,7 +44,9 @@ export default class Actor
             thread: thread,
             briefing: briefing,
         };
-        const toolbox: Toolbox<Runtime> = new Toolbox([Open, Click, Close, Wait]);
+        const toolbox: Toolbox<Runtime> = {
+            tools: [Open, Click, Close, Wait],
+        };
         const checklist = await coordinator.getChecklist(narrative);
 
         const ooda = this.getOoda();

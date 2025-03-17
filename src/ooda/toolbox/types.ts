@@ -1,5 +1,9 @@
 import {ZodObject, ZodType} from "zod";
 
+export interface Toolbox<Runtime extends Record<string, any>> {
+    tools: Tool<Record<string, any>, Runtime>[];
+}
+
 export interface Tool<Parameters extends Record<string, any>, Runtime extends Record<string, any>> {
     name: string;
     description: string;
