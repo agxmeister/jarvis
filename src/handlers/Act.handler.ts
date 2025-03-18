@@ -1,7 +1,7 @@
 import {ActParameters} from "../ooda";
 import {ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties} from "../types";
 import {Runtime} from "../tools/types";
-import {apply} from "../ooda/toolbox";
+import {apply} from "../toolbox";
 
 export const Act = async ({
     context,

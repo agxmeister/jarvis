@@ -1,7 +1,7 @@
 import {z as zod} from "zod";
 import {schema} from "./Close.schema";
 import {handler} from "./Close.handler";
-import {Tool} from "../../ooda/toolbox";
+import {Tool} from "../../toolbox";
 import {Runtime} from "../types";
 
 export const Close: Tool<zod.infer<typeof schema>, Runtime> = {

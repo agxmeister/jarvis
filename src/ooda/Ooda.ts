@@ -1,6 +1,6 @@
 import {OodaParameters} from "./types";
 import {Context} from "./index";
-import {Toolbox} from "./toolbox";
+import {Toolbox} from "../toolbox";
 import {Checklist, Checkpoint} from "../checklist";
 
 export default class Ooda<ContextProperties extends Record<string, any>, CheckpointProperties extends Record<string, any>, Runtime extends Record<string, any>>

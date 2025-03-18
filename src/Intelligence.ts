@@ -12,7 +12,7 @@ import {Action} from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
 import {checklistSchema, orientResponseSchema} from "./schemas";
-import {Toolbox} from "./ooda/toolbox";
+import {Toolbox} from "./toolbox";
 import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "./tools/types";
 

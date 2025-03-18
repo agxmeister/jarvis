@@ -13,7 +13,7 @@ import {
     Ooda,
     Context,
 } from "./ooda";
-import {Toolbox} from "./ooda/toolbox";
+import {Toolbox} from "./toolbox";
 import {Open} from "./tools/Open";
 import {Click} from "./tools/Click";
 import {Close} from "./tools/Close";

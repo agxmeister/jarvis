@@ -1,5 +1,5 @@
 import {Context, Observation, Orientation, Decision} from "./index";
-import {Toolbox} from "./toolbox";
+import {Toolbox} from "../toolbox";
 import {Checkpoint} from "../checklist";
 
 export type OodaParameters = {
