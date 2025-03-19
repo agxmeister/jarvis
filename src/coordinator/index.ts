@@ -1,1 +1,1 @@
-export {Coordinator} from './Coordinator';
+export {getChecklist} from './utils';

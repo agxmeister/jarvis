@@ -19,7 +19,7 @@ import {Click} from "./tools/Click";
 import {Close} from "./tools/Close";
 import {Wait} from "./tools/Wait";
 import {Act, Conclude, Decide, Observe, Orient, Preface} from "./handlers";
-import {Coordinator} from "./coordinator";
+import {getChecklist} from "./coordinator";
 import {Runtime} from "./tools/types";
 
 @injectable()
@@ -36,7 +36,6 @@ export default class Actor
     public async process(briefing: Briefing, narrative: string): Promise<void>
     {
         const thread = new Thread();
-        const coordinator = new Coordinator(this.intelligence, briefing, thread);
         const context: Context<ContextProperties> = {
             browser: this.browser,
             breadcrumbs: this.breadcrumbs,
@@ -47,7 +46,7 @@ export default class Actor
         const toolbox: Toolbox<Runtime> = {
             tools: [Open, Click, Close, Wait],
         };
-        const checklist = await coordinator.getChecklist(narrative);
+        const checklist = await getChecklist(narrative, briefing, this.intelligence, thread);
 
         const ooda = this.getOoda();
         await ooda.process(
