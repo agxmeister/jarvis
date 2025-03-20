@@ -19,7 +19,7 @@ import {Click} from "./tools/Click";
 import {Close} from "./tools/Close";
 import {Wait} from "./tools/Wait";
 import {Act, Conclude, Decide, Observe, Orient, Preface} from "./handlers";
-import {getChecklist} from "./coordinator";
+import {getChecklist} from "./utils";
 import {Runtime} from "./tools/types";
 
 @injectable()

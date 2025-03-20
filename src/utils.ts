@@ -1,6 +1,6 @@
-import {Briefing} from "../types";
-import Intelligence from "../Intelligence";
-import Thread from "../Thread";
+import {Briefing} from "./types";
+import Intelligence from "./Intelligence";
+import Thread from "./Thread";
 
 export const getChecklist = async (
     narrative: string,
