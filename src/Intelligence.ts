@@ -56,7 +56,7 @@ export default class Intelligence
         this.dumper.add(completion);
 
         const message = completion.choices.pop()!.message;
-        thread.addRawMessage(message);
+        thread.addMessage(message);
 
         return message.content!;
     }
@@ -71,7 +71,7 @@ export default class Intelligence
         this.dumper.add(completion);
 
         const message = completion.choices.pop()!.message;
-        thread.addRawMessage(message);
+        thread.addMessage(message);
 
         return message.tool_calls!.map(call => ({
             id: call.id,

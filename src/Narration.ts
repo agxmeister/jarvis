@@ -1,13 +1,5 @@
-import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
+import Flow from "./Flow";
 
-export default class Narration
+export default class Narration extends Flow
 {
-    constructor(readonly messages: ChatCompletionMessageParam[] = [])
-    {
-    }
-
-    addMessage(message: ChatCompletionMessageParam)
-    {
-        this.messages.push(message);
-    }
 }

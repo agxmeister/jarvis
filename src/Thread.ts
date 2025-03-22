@@ -1,13 +1,11 @@
 import {
-    ChatCompletionMessageParam,
     ChatCompletionSystemMessageParam,
     ChatCompletionUserMessageParam
 } from "openai/src/resources/chat/completions";
+import Flow from "./Flow";
 
-export default class Thread
+export default class Thread extends Flow
 {
-    readonly messages: ChatCompletionMessageParam[] = [];
-
     addBriefing(...messages: string[])
     {
         this.messages.push(...messages.map(message => ({
@@ -32,10 +30,5 @@ export default class Thread
             role: "tool",
             tool_call_id: tool,
         }))
-    }
-
-    addRawMessage(message: ChatCompletionMessageParam)
-    {
-        this.messages.push(message);
     }
 }
