@@ -2,7 +2,6 @@ import {Briefing, CheckpointProperties, ObservationProperties} from "./types";
 import Intelligence from "./Intelligence";
 import Thread from "./Thread";
 import {Checkpoint} from "./checklist";
-import {ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
 import Narration from "./Narration";
 
 export const getChecklist = async (
@@ -22,21 +21,21 @@ export const getNarration = (
     observationProperties: ObservationProperties
 ) =>
 {
-    const messages: ChatCompletionMessageParam[] = [];
-    messages.push({
+    const narration = new Narration();
+    narration.addMessage({
         content: `Currently, you are on the step "${checkpoint.name}". At the end of this step you expect to get the following: ${checkpoint.properties.expectation}.`,
         role: "user",
         name: "Narrator",
     });
 
     if (observationProperties.pageUrl) {
-        messages.push({
+        narration.addMessage({
             content: `Page with the URL "${observationProperties.pageUrl}" is opened in your browser.`,
             role: "user",
             name: "Narrator",
         });
     } else {
-        messages.push({
+        narration.addMessage({
             content: `Your browser is closed.`,
             role: "user",
             name: "Narrator",
@@ -44,7 +43,7 @@ export const getNarration = (
     }
 
     if (observationProperties.pageScreenshotUrl) {
-        messages.push({
+        narration.addMessage({
             content: [
                 {
                     text: `This is what you see on the browser's page.`,
@@ -62,12 +61,12 @@ export const getNarration = (
     }
 
     if (observationProperties.pageDescription) {
-        messages.push({
+        narration.addMessage({
             content: `This is a textual description of the browser's page content: ${observationProperties.pageDescription}.`,
             role: "user",
             name: "Narrator",
         });
     }
 
-    return new Narration(messages);
+    return narration;
 }
