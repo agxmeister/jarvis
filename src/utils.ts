@@ -3,6 +3,8 @@ import Intelligence from "./Intelligence";
 import Thread from "./Thread";
 import {Checkpoint} from "./checklist";
 import Narration from "./Narration";
+import {checklistSchema} from "./schemas";
+import {z as zod} from "zod/lib";
 
 export const getChecklist = async (
     narrative: string,
@@ -13,7 +15,7 @@ export const getChecklist = async (
 {
     thread.addBriefing(briefing.strategy, briefing.planning);
     thread.addScenario(narrative);
-    return await intelligence.getChecklist(thread);
+    return (await intelligence.process(thread, checklistSchema)) as zod.infer<typeof checklistSchema>;
 };
 
 export const getNarration = (

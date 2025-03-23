@@ -1,4 +1,4 @@
-import {z as zod} from "zod";
+import {z as zod, ZodSchema} from "zod";
 import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import OpenAI from "openai";
@@ -11,7 +11,7 @@ import {
 import {Action} from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
-import {checklistSchema, orientResponseSchema} from "./schemas";
+import {orientResponseSchema} from "./schemas";
 import {Toolbox} from "./toolbox";
 import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "./tools/types";
@@ -26,7 +26,7 @@ export default class Intelligence
     {
     }
 
-    async getChecklist(thread: Thread): Promise<zod.infer<typeof checklistSchema>>
+    async process(thread: Thread, schema: ZodSchema): Promise<zod.infer<typeof schema>>
     {
         const completion = await this.client.chat.completions.create({
             model: "gpt-4o-mini",
@@ -36,7 +36,7 @@ export default class Intelligence
                 json_schema: {
                     name: "response",
                     strict: true,
-                    schema: zodToJsonSchema(checklistSchema),
+                    schema: zodToJsonSchema(schema),
                 },
             },
         });
