@@ -27,18 +27,9 @@ export default class Intelligence
 
     async process(thread: Thread, schema: ZodSchema): Promise<zod.infer<typeof schema>>
     {
-        const completion = await this.client.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: thread.messages,
-            response_format: {
-                type: "json_schema",
-                json_schema: {
-                    name: "response",
-                    strict: true,
-                    schema: zodToJsonSchema(schema),
-                },
-            },
-        });
+        const completion = await this.client.chat.completions.create(
+            this.getCompletionRequest(thread.messages, schema)
+        );
 
         this.dumper.add(completion);
 
@@ -48,7 +39,7 @@ export default class Intelligence
     async think(thread: Thread, narration: Narration, toolbox: Toolbox<Runtime>, schema: ZodSchema): Promise<zod.infer<typeof schema>>
     {
         const completionRequest = {
-            ...this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox, schema),
+            ...this.getCompletionRequest([...thread.messages, ...narration.messages], schema, toolbox),
             tool_choice: 'none' as ChatCompletionToolChoiceOption,
         };
         const completion = await this.client.chat.completions.create(completionRequest);
@@ -63,7 +54,7 @@ export default class Intelligence
     async act(thread: Thread, narration: Narration, toolbox: Toolbox<Runtime>, schema: ZodSchema): Promise<Action[]>
     {
         const completionRequest = {
-            ...this.getCompletionRequest([...thread.messages, ...narration.messages], toolbox, schema),
+            ...this.getCompletionRequest([...thread.messages, ...narration.messages], schema, toolbox),
             tool_choice: 'required' as ChatCompletionToolChoiceOption,
         };
         const completion = await this.client.chat.completions.create(completionRequest);
@@ -79,7 +70,7 @@ export default class Intelligence
         }));
     }
 
-    private getCompletionRequest(messages: ChatCompletionMessageParam[], toolbox: Toolbox<Runtime>, schema: ZodSchema): ChatCompletionCreateParamsNonStreaming
+    private getCompletionRequest(messages: ChatCompletionMessageParam[], schema: ZodSchema, toolbox?: Toolbox<Runtime>): ChatCompletionCreateParamsNonStreaming
     {
         return {
             model: "gpt-4o-mini",
@@ -92,14 +83,15 @@ export default class Intelligence
                     schema: zodToJsonSchema(schema),
                 },
             },
-            tools: toolbox.tools.map(tool => ({
-                type: "function",
-                function: {
-                    name: tool.name,
-                    description: tool.description,
-                    parameters: zodToJsonSchema(tool.schema),
-                }
-            })),
+            tools: toolbox ?
+                toolbox.tools.map(tool => ({
+                    type: "function",
+                    function: {
+                        name: tool.name,
+                        description: tool.description,
+                        parameters: zodToJsonSchema(tool.schema),
+                    }
+                })) : [],
         };
     }
 }
