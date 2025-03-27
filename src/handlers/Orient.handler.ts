@@ -15,8 +15,8 @@ export const Orient = async ({
         await intelligence.think(
             thread,
             getNarration(checkpoint, observation.properties),
-            toolbox,
             orientSchema,
+            toolbox,
         )
     ) as zod.infer<typeof orientSchema>;
     return new Orientation(data.completed, data);

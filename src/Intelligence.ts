@@ -25,18 +25,7 @@ export default class Intelligence
     {
     }
 
-    async process(thread: Thread, schema: ZodSchema): Promise<zod.infer<typeof schema>>
-    {
-        const completion = await this.client.chat.completions.create(
-            this.getCompletionRequest(thread.messages, schema)
-        );
-
-        this.dumper.add(completion);
-
-        return JSON.parse(completion.choices.pop()!.message.content!);
-    }
-
-    async think(thread: Thread, narration: Narration, toolbox: Toolbox<Runtime>, schema: ZodSchema): Promise<zod.infer<typeof schema>>
+    async think(thread: Thread, narration: Narration, schema: ZodSchema, toolbox?: Toolbox<Runtime>): Promise<zod.infer<typeof schema>>
     {
         const completionRequest = {
             ...this.getCompletionRequest([...thread.messages, ...narration.messages], schema, toolbox),

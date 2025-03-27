@@ -15,7 +15,7 @@ export const getChecklist = async (
 {
     thread.addBriefing(briefing.strategy, briefing.planning);
     thread.addScenario(narrative);
-    return (await intelligence.process(thread, checklistSchema)) as zod.infer<typeof checklistSchema>;
+    return (await intelligence.think(thread, new Narration(), checklistSchema)) as zod.infer<typeof checklistSchema>;
 };
 
 export const getNarration = (
