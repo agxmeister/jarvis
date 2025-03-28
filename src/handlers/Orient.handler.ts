@@ -1,9 +1,8 @@
 import {OrientParameters, Orientation} from "../ooda";
 import {ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties} from "../types";
 import {Runtime} from "../tools/types";
-import {getNarration} from "../utils";
+import {getData, getNarration} from "../utils";
 import {orientSchema} from "../schemas";
-import {z as zod} from "zod/lib";
 
 export const Orient = async ({
     context: {intelligence, thread},
@@ -11,13 +10,14 @@ export const Orient = async ({
     checkpoint,
     observation,
 }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties, Runtime>) => {
-    const data: OrientationProperties = (
-        await intelligence.think(
+    const data: OrientationProperties = await getData(
+        (await intelligence.process(
             thread,
             getNarration(checkpoint, observation.properties),
             orientSchema,
             toolbox,
-        )
-    ) as zod.infer<typeof orientSchema>;
+        )),
+        orientSchema,
+    );
     return new Orientation(data.completed, data);
 };

@@ -1,14 +1,13 @@
-import {z as zod, ZodSchema} from "zod";
+import {ZodSchema} from "zod";
 import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import OpenAI from "openai";
 import Dumper from "./Dumper";
 import {
-    ChatCompletionCreateParamsNonStreaming,
+    ChatCompletionCreateParamsNonStreaming, ChatCompletionMessage,
     ChatCompletionMessageParam,
     ChatCompletionToolChoiceOption,
 } from "openai/src/resources/chat/completions";
-import {Action} from "./types";
 import Thread from "./Thread";
 import Narration from "./Narration";
 import {Toolbox} from "./toolbox";
@@ -25,38 +24,20 @@ export default class Intelligence
     {
     }
 
-    async think(thread: Thread, narration: Narration, schema: ZodSchema, toolbox?: Toolbox<Runtime>): Promise<zod.infer<typeof schema>>
+    async process(thread: Thread, narration: Narration, schema: ZodSchema, toolbox?: Toolbox<Runtime>, act?: boolean): Promise<ChatCompletionMessage>
     {
         const completionRequest = {
             ...this.getCompletionRequest([...thread.messages, ...narration.messages], schema, toolbox),
-            tool_choice: 'none' as ChatCompletionToolChoiceOption,
+            tool_choice: !!act ? 'required' : 'none' as ChatCompletionToolChoiceOption,
         };
         const completion = await this.client.chat.completions.create(completionRequest);
         this.dumper.add(completion);
 
         const message = completion.choices.pop()!.message;
+
         thread.addMessage(message);
 
-        return JSON.parse(message.content!);
-    }
-
-    async act(thread: Thread, narration: Narration, toolbox: Toolbox<Runtime>, schema: ZodSchema): Promise<Action[]>
-    {
-        const completionRequest = {
-            ...this.getCompletionRequest([...thread.messages, ...narration.messages], schema, toolbox),
-            tool_choice: 'required' as ChatCompletionToolChoiceOption,
-        };
-        const completion = await this.client.chat.completions.create(completionRequest);
-        this.dumper.add(completion);
-
-        const message = completion.choices.pop()!.message;
-        thread.addMessage(message);
-
-        return message.tool_calls!.map(call => ({
-            id: call.id,
-            name: call.function.name,
-            parameters: JSON.parse(call.function.arguments),
-        }));
+        return message;
     }
 
     private getCompletionRequest(messages: ChatCompletionMessageParam[], schema: ZodSchema, toolbox?: Toolbox<Runtime>): ChatCompletionCreateParamsNonStreaming

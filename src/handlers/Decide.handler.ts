@@ -1,7 +1,7 @@
 import {DecideParameters, Decision} from "../ooda";
 import {ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties} from "../types";
 import {Runtime} from "../tools/types";
-import {getNarration} from "../utils";
+import {getActions, getNarration} from "../utils";
 import {orientSchema} from "../schemas";
 
 export const Decide = async ({
@@ -11,11 +11,12 @@ export const Decide = async ({
     observation,
 }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, Runtime>) => {
     return new Decision<DecisionProperties>({
-        actions: await intelligence.act(
+        actions: await getActions((await intelligence.process(
             thread,
             getNarration(checkpoint, observation.properties),
-            toolbox,
             orientSchema,
-        ),
+            toolbox,
+            true,
+        ))),
     });
 };

@@ -1,10 +1,25 @@
-import {Briefing, CheckpointProperties, ObservationProperties} from "./types";
+import {Action, Briefing, CheckpointProperties, ObservationProperties} from "./types";
 import Intelligence from "./Intelligence";
 import Thread from "./Thread";
 import {Checkpoint} from "./checklist";
 import Narration from "./Narration";
 import {checklistSchema} from "./schemas";
 import {z as zod} from "zod/lib";
+import {ChatCompletionMessage} from "openai/src/resources/chat/completions";
+import {ZodSchema} from "zod";
+
+export const getData = async (
+    message: ChatCompletionMessage,
+    schema: ZodSchema,
+): Promise<zod.infer<typeof schema>> => JSON.parse(message.content!);
+
+export const getActions = async (
+    message: ChatCompletionMessage,
+): Promise<Action[]> => message.tool_calls!.map(call => ({
+    id: call.id,
+    name: call.function.name,
+    parameters: JSON.parse(call.function.arguments),
+}));
 
 export const getChecklist = async (
     narrative: string,
@@ -15,7 +30,10 @@ export const getChecklist = async (
 {
     thread.addBriefing(briefing.strategy, briefing.planning);
     thread.addScenario(narrative);
-    return (await intelligence.think(thread, new Narration(), checklistSchema)) as zod.infer<typeof checklistSchema>;
+    return await getData(
+        (await intelligence.process(thread, new Narration(), checklistSchema)),
+        checklistSchema,
+    );
 };
 
 export const getNarration = (
