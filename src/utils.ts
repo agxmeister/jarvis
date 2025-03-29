@@ -31,7 +31,7 @@ export const getChecklist = async (
     thread.addBriefing(briefing.strategy, briefing.planning);
     thread.addScenario(narrative);
     return await getData(
-        (await intelligence.process(thread, new Narration(), checklistSchema)),
+        (await intelligence.getDataMessage(thread, new Narration(), checklistSchema)),
         checklistSchema,
     );
 };

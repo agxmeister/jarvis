@@ -3,11 +3,7 @@ import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import OpenAI from "openai";
 import Dumper from "./Dumper";
-import {
-    ChatCompletionCreateParamsNonStreaming, ChatCompletionMessage,
-    ChatCompletionMessageParam,
-    ChatCompletionToolChoiceOption,
-} from "openai/src/resources/chat/completions";
+import {ChatCompletionMessage, ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
 import Thread from "./Thread";
 import Narration from "./Narration";
 import {Toolbox} from "./toolbox";
@@ -24,25 +20,50 @@ export default class Intelligence
     {
     }
 
-    async process(thread: Thread, narration: Narration, schema: ZodSchema, toolbox?: Toolbox<Runtime>, act?: boolean): Promise<ChatCompletionMessage>
+    async getDataMessage(
+        thread: Thread,
+        narration: Narration,
+        schema: ZodSchema,
+        toolbox?: Toolbox<Runtime>,
+    ): Promise<ChatCompletionMessage>
     {
-        const completionRequest = {
-            ...this.getCompletionRequest([...thread.messages, ...narration.messages], schema, toolbox),
-            tool_choice: !!act ? 'required' : 'none' as ChatCompletionToolChoiceOption,
-        };
-        const completion = await this.client.chat.completions.create(completionRequest);
-        this.dumper.add(completion);
+        return await this.getMessageMiddleware(thread, narration, schema, toolbox, false);
+    }
 
-        const message = completion.choices.pop()!.message;
+    async getActionsMessage(
+        thread: Thread,
+        narration: Narration,
+        schema: ZodSchema,
+        toolbox?: Toolbox<Runtime>,
+    ): Promise<ChatCompletionMessage>
+    {
+        return await this.getMessageMiddleware(thread, narration, schema, toolbox, true);
+    }
 
+    private async getMessageMiddleware(
+        thread: Thread,
+        narration: Narration,
+        schema: ZodSchema,
+        toolbox?: Toolbox<Runtime>,
+        applyTools?: boolean
+    ): Promise<ChatCompletionMessage>
+    {
+        const message = await this.getMessage([...thread.messages, ...narration.messages], schema, toolbox, applyTools);
         thread.addMessage(message);
+
+        this.dumper.add(message);
 
         return message;
     }
 
-    private getCompletionRequest(messages: ChatCompletionMessageParam[], schema: ZodSchema, toolbox?: Toolbox<Runtime>): ChatCompletionCreateParamsNonStreaming
+    private async getMessage(
+        messages: ChatCompletionMessageParam[],
+        schema: ZodSchema,
+        toolbox?: Toolbox<Runtime>,
+        applyTools?: boolean
+    ): Promise<ChatCompletionMessage>
     {
-        return {
+        return (await this.client.chat.completions.create({
             model: "gpt-4o-mini",
             messages: messages,
             response_format: {
@@ -53,7 +74,7 @@ export default class Intelligence
                     schema: zodToJsonSchema(schema),
                 },
             },
-            tools: toolbox ?
+            tools: !!toolbox ?
                 toolbox.tools.map(tool => ({
                     type: "function",
                     function: {
@@ -62,6 +83,7 @@ export default class Intelligence
                         parameters: zodToJsonSchema(tool.schema),
                     }
                 })) : [],
-        };
+            tool_choice: !!applyTools ? 'required' : 'none',
+        })).choices.pop()!.message;
     }
 }

@@ -11,12 +11,11 @@ export const Decide = async ({
     observation,
 }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, Runtime>) => {
     return new Decision<DecisionProperties>({
-        actions: await getActions((await intelligence.process(
+        actions: await getActions((await intelligence.getActionsMessage(
             thread,
             getNarration(checkpoint, observation.properties),
             orientSchema,
             toolbox,
-            true,
         ))),
     });
 };
