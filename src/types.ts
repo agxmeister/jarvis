@@ -1,7 +1,7 @@
 import Browser from "./Browser";
 import Breadcrumbs from "./Breadcrumbs";
-import Intelligence from "./Intelligence";
-import Thread from "./Thread";
+import Intelligence from "./intelligence/Intelligence";
+import Thread from "./intelligence/Thread";
 
 export interface Screenshot
 {

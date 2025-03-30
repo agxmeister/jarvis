@@ -1,12 +1,10 @@
 import {Action, Briefing, CheckpointProperties, ObservationProperties} from "./types";
-import Intelligence from "./Intelligence";
-import Thread from "./Thread";
 import {Checkpoint} from "./checklist";
-import Narration from "./Narration";
 import {checklistSchema} from "./schemas";
 import {z as zod} from "zod/lib";
 import {ChatCompletionMessage} from "openai/src/resources/chat/completions";
 import {ZodSchema} from "zod";
+import {Intelligence, Thread, Narration} from "./intelligence";
 
 export const getData = async (
     message: ChatCompletionMessage,

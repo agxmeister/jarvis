@@ -1,18 +1,17 @@
 import {inject, injectable} from "inversify";
 import {dependencies} from "./dependencies";
 import Browser from "./Browser";
-import Intelligence from "./Intelligence";
 import Breadcrumbs from "./Breadcrumbs";
 import {
     Briefing,
     ContextProperties,
     CheckpointProperties,
 } from "./types";
-import Thread from "./Thread";
 import {
     Ooda,
     Context,
 } from "./ooda";
+import {Intelligence, Thread} from "./intelligence";
 import {Toolbox} from "./toolbox";
 import {Open} from "./tools/Open";
 import {Click} from "./tools/Click";

@@ -1,6 +1,6 @@
 import {Container} from "inversify";
 import {dependencies} from "./dependencies";
-import Intelligence from "./Intelligence";
+import Intelligence from "./intelligence/Intelligence";
 import Breadcrumbs from "./Breadcrumbs";
 import Actor from "./Actor";
 import {Builder} from "selenium-webdriver";

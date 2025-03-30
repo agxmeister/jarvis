@@ -1,14 +1,13 @@
 import {ZodSchema} from "zod";
 import {inject, injectable} from "inversify";
-import {dependencies} from "./dependencies";
+import {dependencies} from "../dependencies";
 import OpenAI from "openai";
-import Dumper from "./Dumper";
+import Dumper from "../Dumper";
 import {ChatCompletionMessage, ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
-import Thread from "./Thread";
-import Narration from "./Narration";
-import {Toolbox} from "./toolbox";
+import {Toolbox} from "../toolbox";
 import {zodToJsonSchema} from "zod-to-json-schema";
-import {Runtime} from "./tools/types";
+import {Runtime} from "../tools/types";
+import {Thread, Narration} from "./index";
 
 @injectable()
 export default class Intelligence
