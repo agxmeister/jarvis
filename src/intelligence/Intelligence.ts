@@ -1,20 +1,19 @@
 import {ZodSchema} from "zod";
-import {inject, injectable} from "inversify";
+import {inject, injectable, multiInject} from "inversify";
 import {dependencies} from "../dependencies";
 import OpenAI from "openai";
-import Dumper from "../Dumper";
 import {ChatCompletionMessage, ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
 import {Toolbox} from "../toolbox";
 import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "../tools/types";
-import {Thread, Narration} from "./index";
+import {Thread, Narration, Middleware} from "./index";
 
 @injectable()
 export default class Intelligence
 {
     constructor(
         @inject(dependencies.OpenAi) readonly client: OpenAI,
-        @inject(dependencies.Dumper) readonly dumper: Dumper,
+        @multiInject(dependencies.Middleware) readonly middlewares: Middleware[],
     )
     {
     }
@@ -50,7 +49,9 @@ export default class Intelligence
         const message = await this.getMessage([...thread.messages, ...narration.messages], schema, toolbox, applyTools);
         thread.addMessage(message);
 
-        this.dumper.add(message);
+        for (const middleware of this.middlewares) {
+            middleware.run(message);
+        }
 
         return message;
     }

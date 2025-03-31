@@ -1,5 +1,6 @@
 export const dependencies = {
     Intelligence: Symbol.for("Intelligence"),
+    Middleware: Symbol.for("Middleware"),
     Breadcrumbs: Symbol.for("Breadcrumbs"),
     Actor: Symbol.for("Actor"),
     Browser: Symbol.for("Browser"),
