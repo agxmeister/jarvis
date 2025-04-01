@@ -8,7 +8,7 @@ import OpenAI from "openai";
 import Dumper from "./Dumper";
 import Browser from "./Browser";
 import {Middleware} from "./intelligence";
-import {Dump} from "./intelligence/middlewares";
+import {Dump, Log} from "./intelligence/middlewares";
 
 const container = new Container();
 
@@ -28,6 +28,7 @@ container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.e
 container.bind<Breadcrumbs>(dependencies.Breadcrumbs).to(Breadcrumbs);
 container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.env.BREADCRUMBS_BASE_URL ?? "");
 
+container.bind<Middleware>(dependencies.Middleware).to(Log).inSingletonScope();
 container.bind<Middleware>(dependencies.Middleware).to(Dump).inSingletonScope();
 
 export {container};
