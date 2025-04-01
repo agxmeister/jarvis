@@ -1,5 +1,5 @@
 import {ChatCompletionMessage} from "openai/src/resources/chat/completions";
 
 export interface Middleware {
-    run(message: ChatCompletionMessage): void;
+    run(message: ChatCompletionMessage, next: () => Promise<void>): Promise<void>;
 }

@@ -49,9 +49,14 @@ export default class Intelligence
         const message = await this.getMessage([...thread.messages, ...narration.messages], schema, toolbox, applyTools);
         thread.addMessage(message);
 
-        for (const middleware of this.middlewares) {
-            middleware.run(message);
-        }
+        let index = 0;
+        const next = async (): Promise<void> => {
+            if (index >= this.middlewares.length) {
+                return;
+            }
+            await this.middlewares[index++].run(message, next);
+        };
+        await next();
 
         return message;
     }
