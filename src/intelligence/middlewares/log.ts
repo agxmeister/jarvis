@@ -3,8 +3,8 @@ import {ChatCompletionMessage} from "openai/src/resources/chat/completions";
 
 export class Log implements Middleware
 {
-    run(message: ChatCompletionMessage, next: () => Promise<void>): Promise<void> {
+    async run(message: ChatCompletionMessage): Promise<ChatCompletionMessage> {
         console.log(message);
-        return next();
+        return message;
     }
 }

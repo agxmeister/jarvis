@@ -10,9 +10,9 @@ export class Dump implements Middleware
     {
     }
 
-    async run(message: ChatCompletionMessage, next: () => Promise<void>): Promise<void>
+    async run(message: ChatCompletionMessage): Promise<ChatCompletionMessage>
     {
         this.dumper.add(message);
-        await next();
+        return message;
     }
 }
