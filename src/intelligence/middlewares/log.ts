@@ -1,10 +1,9 @@
-import {Middleware} from "../types";
-import {ChatCompletionMessage} from "openai/src/resources/chat/completions";
+import {Middleware, Context} from "../types";
 
 export class Log implements Middleware
 {
-    async run(message: ChatCompletionMessage): Promise<ChatCompletionMessage> {
-        console.log(message);
-        return message;
+    async run(context: Context): Promise<Context> {
+        console.log(context);
+        return context;
     }
 }

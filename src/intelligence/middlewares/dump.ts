@@ -1,5 +1,4 @@
-import {Middleware} from "../types";
-import {ChatCompletionMessage} from "openai/src/resources/chat/completions";
+import {Middleware, Context} from "../types";
 import {inject} from "inversify";
 import {dependencies} from "../../dependencies";
 import Dumper from "../../Dumper";
@@ -10,9 +9,9 @@ export class Dump implements Middleware
     {
     }
 
-    async run(message: ChatCompletionMessage): Promise<ChatCompletionMessage>
+    async run(context: Context): Promise<Context>
     {
-        this.dumper.add(message);
-        return message;
+        this.dumper.add(context.output);
+        return context;
     }
 }

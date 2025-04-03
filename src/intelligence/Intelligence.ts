@@ -2,11 +2,12 @@ import {ZodSchema} from "zod";
 import {inject, injectable, multiInject} from "inversify";
 import {dependencies} from "../dependencies";
 import OpenAI from "openai";
-import {ChatCompletionMessage, ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
+import {ChatCompletion, ChatCompletionMessage, ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
 import {Toolbox} from "../toolbox";
 import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "../tools/types";
 import {Thread, Narration, Middleware} from "./index";
+import {Context} from "./types";
 
 @injectable()
 export default class Intelligence
@@ -46,22 +47,28 @@ export default class Intelligence
         applyTools?: boolean
     ): Promise<ChatCompletionMessage>
     {
-        const message = await this.getMessage([...thread.messages, ...narration.messages], schema, toolbox, applyTools);
+        const chatCompletion = await this.getChatCompletion([...thread.messages, ...narration.messages], schema, toolbox, applyTools);
+        const message = chatCompletion.choices.at(0)!.message;
+
         thread.addMessage(message);
 
-        return await this.middlewares.reduce(
-            async (acc, middleware) =>
-                middleware.run(await acc),
-            Promise.resolve(message),
+        await this.middlewares.reduce(
+            async (acc, middleware) => middleware.run(await acc),
+            Promise.resolve({
+                thread: thread,
+                output: chatCompletion,
+            } as Context),
         );
+
+        return message;
     }
 
-    private async getMessage(
+    private async getChatCompletion(
         messages: ChatCompletionMessageParam[],
         schema: ZodSchema,
         toolbox?: Toolbox<Runtime>,
         applyTools?: boolean
-    ): Promise<ChatCompletionMessage>
+    ): Promise<ChatCompletion>
     {
         return (await this.client.chat.completions.create({
             model: "gpt-4o-mini",
@@ -84,6 +91,6 @@ export default class Intelligence
                     }
                 })) : [],
             tool_choice: !!applyTools ? 'required' : 'none',
-        })).choices.pop()!.message;
+        }));
     }
 }
