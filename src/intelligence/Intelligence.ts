@@ -47,20 +47,18 @@ export default class Intelligence
         applyTools?: boolean
     ): Promise<ChatCompletionMessage>
     {
-        const chatCompletion = await this.getChatCompletion([...thread.messages, ...narration.messages], schema, toolbox, applyTools);
-        const message = chatCompletion.choices.at(0)!.message;
-
-        thread.addMessage(message);
-
-        await this.middlewares.reduce(
+        return (await this.middlewares.reduce(
             async (acc, middleware) => middleware.run(await acc),
             Promise.resolve({
                 thread: thread,
-                output: chatCompletion,
+                output: await this.getChatCompletion(
+                    [...thread.messages, ...narration.messages],
+                    schema,
+                    toolbox,
+                    applyTools,
+                ),
             } as Context),
-        );
-
-        return message;
+        )).output.choices.at(0)!.message;
     }
 
     private async getChatCompletion(
