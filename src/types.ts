@@ -2,6 +2,7 @@ import Browser from "./Browser";
 import Breadcrumbs from "./Breadcrumbs";
 import Intelligence from "./intelligence/Intelligence";
 import Thread from "./intelligence/Thread";
+import {ChatCompletionData} from "./intelligence/types";
 
 export interface Screenshot
 {
@@ -51,4 +52,8 @@ export type OrientationProperties = {
 
 export type DecisionProperties = {
     actions: Action[],
+}
+
+export interface Middleware<Data> {
+    process(data: Data): Promise<Data>;
 }

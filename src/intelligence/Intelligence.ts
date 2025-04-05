@@ -6,15 +6,16 @@ import {ChatCompletion, ChatCompletionMessage, ChatCompletionMessageParam} from 
 import {Toolbox} from "../toolbox";
 import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "../tools/types";
-import {Thread, Narration, Middleware} from "./index";
-import {Context} from "./types";
+import {Thread, Narration} from "./index";
+import {ChatCompletionData} from "./types";
+import {Middleware} from "../types";
 
 @injectable()
 export default class Intelligence
 {
     constructor(
         @inject(dependencies.OpenAi) readonly client: OpenAI,
-        @multiInject(dependencies.Middleware) readonly middlewares: Middleware[],
+        @multiInject(dependencies.Middleware) readonly middlewares: Middleware<ChatCompletionData>[],
     )
     {
     }
@@ -48,7 +49,8 @@ export default class Intelligence
     ): Promise<ChatCompletionMessage>
     {
         return (await this.middlewares.reduce(
-            async (acc, middleware) => middleware.run(await acc),
+            async (acc, middleware) =>
+                middleware.process(await acc),
             Promise.resolve({
                 thread: thread,
                 output: await this.getChatCompletion(
@@ -57,7 +59,7 @@ export default class Intelligence
                     toolbox,
                     applyTools,
                 ),
-            } as Context),
+            } as ChatCompletionData),
         )).output.choices.at(0)!.message;
     }
 

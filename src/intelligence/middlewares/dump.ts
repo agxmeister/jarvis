@@ -1,15 +1,16 @@
-import {Middleware, Context} from "../types";
+import {Middleware} from "../../types";
+import {ChatCompletionData} from "../types";
 import {inject} from "inversify";
 import {dependencies} from "../../dependencies";
 import Dumper from "../../Dumper";
 
-export class Dump implements Middleware
+export class Dump implements Middleware<ChatCompletionData>
 {
     constructor(@inject(dependencies.Dumper) readonly dumper: Dumper)
     {
     }
 
-    async run(context: Context): Promise<Context>
+    async process(context: ChatCompletionData): Promise<ChatCompletionData>
     {
         this.dumper.add(context.output);
         return context;

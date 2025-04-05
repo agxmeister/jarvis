@@ -1,8 +1,9 @@
-import {Middleware, Context} from "../types";
+import {Middleware} from "../../types";
+import {ChatCompletionData} from "../types";
 
-export class Conversation implements Middleware
+export class Conversation implements Middleware<ChatCompletionData>
 {
-    async run(context: Context): Promise<Context>
+    async process(context: ChatCompletionData): Promise<ChatCompletionData>
     {
         context.thread.addMessage(context.output.choices.at(0)!.message);
         return context;
