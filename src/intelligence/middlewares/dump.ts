@@ -12,7 +12,7 @@ export class Dump implements Middleware<ChatCompletionData>
 
     async process(context: ChatCompletionData): Promise<ChatCompletionData>
     {
-        this.dumper.add(context.output);
+        this.dumper.add(context.chatCompletion);
         return context;
     }
 }

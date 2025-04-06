@@ -2,7 +2,12 @@ import {ZodSchema} from "zod";
 import {inject, injectable, multiInject} from "inversify";
 import {dependencies} from "../dependencies";
 import OpenAI from "openai";
-import {ChatCompletion, ChatCompletionMessage, ChatCompletionMessageParam} from "openai/src/resources/chat/completions";
+import {
+    ChatCompletion,
+    ChatCompletionCreateParamsBase,
+    ChatCompletionMessage,
+    ChatCompletionMessageParam
+} from "openai/src/resources/chat/completions";
 import {Toolbox} from "../toolbox";
 import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "../tools/types";
@@ -48,29 +53,32 @@ export default class Intelligence
         applyTools?: boolean
     ): Promise<ChatCompletionMessage>
     {
+        const chatCompletionRequest = this.getChatCompletionRequest(
+            [...thread.messages, ...narration.messages],
+            schema,
+            toolbox,
+            applyTools,
+        );
+        const chatCompletion = await this.client.chat.completions.create(chatCompletionRequest);
         return (await this.middlewares.reduce(
             async (acc, middleware) =>
                 middleware.process(await acc),
             Promise.resolve({
                 thread: thread,
-                output: await this.getChatCompletion(
-                    [...thread.messages, ...narration.messages],
-                    schema,
-                    toolbox,
-                    applyTools,
-                ),
+                chatCompletionRequest: chatCompletionRequest,
+                chatCompletion: chatCompletion,
             } as ChatCompletionData),
-        )).output.choices.at(0)!.message;
+        )).chatCompletion.choices.at(0)!.message;
     }
 
-    private async getChatCompletion(
+    private getChatCompletionRequest(
         messages: ChatCompletionMessageParam[],
         schema: ZodSchema,
         toolbox?: Toolbox<Runtime>,
         applyTools?: boolean
-    ): Promise<ChatCompletion>
+    ): ChatCompletionCreateParamsBase
     {
-        return (await this.client.chat.completions.create({
+        return {
             model: "gpt-4o-mini",
             messages: messages,
             response_format: {
@@ -91,6 +99,6 @@ export default class Intelligence
                     }
                 })) : [],
             tool_choice: !!applyTools ? 'required' : 'none',
-        }));
+        };
     }
 }
