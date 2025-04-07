@@ -10,6 +10,7 @@ import Browser from "./Browser";
 import {Middleware} from "./types";
 import {ChatCompletionData} from "./intelligence/types";
 import {Conversation, Dump, Log} from "./intelligence/middlewares";
+import pino, {Logger} from "pino";
 
 const container = new Container();
 
@@ -28,6 +29,14 @@ container.bind<Dumper>(dependencies.Dumper).to(Dumper);
 container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.env.DUMPER_STORAGE_PATH ?? "");
 container.bind<Breadcrumbs>(dependencies.Breadcrumbs).to(Breadcrumbs);
 container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.env.BREADCRUMBS_BASE_URL ?? "");
+container.bind<Logger>(dependencies.Logger).toDynamicValue(
+    () => pino({
+        level: "debug",
+        transport: {
+            target: 'pino-pretty',
+        },
+    }),
+);
 
 container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(Conversation).inSingletonScope();
 container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(Dump).inSingletonScope();

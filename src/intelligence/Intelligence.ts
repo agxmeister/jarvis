@@ -3,7 +3,6 @@ import {inject, injectable, multiInject} from "inversify";
 import {dependencies} from "../dependencies";
 import OpenAI from "openai";
 import {
-    ChatCompletion,
     ChatCompletionCreateParamsBase,
     ChatCompletionMessage,
     ChatCompletionMessageParam
@@ -62,7 +61,7 @@ export default class Intelligence
         const chatCompletion = await this.client.chat.completions.create(chatCompletionRequest);
         return (await this.middlewares.reduce(
             async (acc, middleware) =>
-                middleware.process(await acc),
+                await middleware.process(await acc),
             Promise.resolve({
                 thread: thread,
                 chatCompletionRequest: chatCompletionRequest,

@@ -9,4 +9,5 @@ export const dependencies = {
     BreadcrumbsBaseUrl: Symbol.for("BreadcrumbsBaseUrl"),
     Dumper: Symbol.for("Dumper"),
     DumperStoragePath: Symbol.for("DumperStoragePath"),
+    Logger: Symbol.for("Logger"),
 };
