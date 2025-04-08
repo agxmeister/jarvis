@@ -1,7 +1,7 @@
 import {Middleware} from "../../types";
 import {ChatCompletionData} from "../types";
 
-export class Conversation implements Middleware<ChatCompletionData>
+export class KeepMessageHistory implements Middleware<ChatCompletionData>
 {
     async process(context: ChatCompletionData): Promise<ChatCompletionData>
     {

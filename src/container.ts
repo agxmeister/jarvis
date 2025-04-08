@@ -9,7 +9,7 @@ import Dumper from "./Dumper";
 import Browser from "./Browser";
 import {Middleware} from "./types";
 import {ChatCompletionData} from "./intelligence/types";
-import {Conversation, Dump, Log} from "./intelligence/middlewares";
+import {KeepMessageHistory, DumpChatCompletion, LogChatCompletionMessage} from "./intelligence/middlewares";
 import pino, {Logger} from "pino";
 
 const container = new Container();
@@ -38,8 +38,8 @@ container.bind<Logger>(dependencies.Logger).toDynamicValue(
     }),
 );
 
-container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(Conversation).inSingletonScope();
-container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(Dump).inSingletonScope();
-container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(Log).inSingletonScope();
+container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(KeepMessageHistory).inSingletonScope();
+container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(DumpChatCompletion).inSingletonScope();
+container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(LogChatCompletionMessage).inSingletonScope();
 
 export {container};

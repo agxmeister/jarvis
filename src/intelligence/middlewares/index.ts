@@ -1,3 +1,3 @@
-export {Log} from "./log";
-export {Dump} from "./dump";
-export {Conversation} from "./conversation";
+export {LogChatCompletionMessage} from "./LogChatCompletionMessage";
+export {DumpChatCompletion} from "./DumpChatCompletion";
+export {KeepMessageHistory} from "./KeepMessageHistory";
