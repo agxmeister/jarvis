@@ -14,6 +14,16 @@ export class LogChatCompletionMessage implements Middleware<ChatCompletionData>
         this.logger.debug({
             ...message,
             content: JSON.parse(message.content!),
+            tool_calls: message.tool_calls?.reduce(
+                (acc, call) => [...acc, {
+                    ...call,
+                    function: {
+                        ...call.function,
+                        arguments: JSON.parse(call.function.arguments),
+                    }
+                }],
+                []
+            ),
         });
         return context;
     }
