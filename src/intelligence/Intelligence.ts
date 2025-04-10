@@ -31,7 +31,7 @@ export default class Intelligence
         toolbox?: Toolbox<Runtime>,
     ): Promise<ChatCompletionMessage>
     {
-        return await this.getMessageMiddleware(thread, narration, schema, toolbox, false);
+        return await this.getChatCompletionMessage(thread, narration, schema, toolbox, false);
     }
 
     async getActionsMessage(
@@ -41,33 +41,44 @@ export default class Intelligence
         toolbox?: Toolbox<Runtime>,
     ): Promise<ChatCompletionMessage>
     {
-        return await this.getMessageMiddleware(thread, narration, schema, toolbox, true);
+        return await this.getChatCompletionMessage(thread, narration, schema, toolbox, true);
     }
 
-    private async getMessageMiddleware(
+    private async getChatCompletionMessage(
         thread: Thread,
         narration: Narration,
         schema: ZodSchema,
         toolbox?: Toolbox<Runtime>,
-        applyTools?: boolean
+        applyTools?: boolean,
     ): Promise<ChatCompletionMessage>
     {
-        const chatCompletionRequest = this.getChatCompletionRequest(
-            [...thread.messages, ...narration.messages],
-            schema,
-            toolbox,
-            applyTools,
-        );
-        const chatCompletion = await this.client.chat.completions.create(chatCompletionRequest);
+        return (
+            await this.getChatCompletionData(
+                thread,
+                this.getChatCompletionRequest(
+                    [...thread.messages, ...narration.messages],
+                    schema,
+                    toolbox,
+                    applyTools,
+                ),
+            )
+        ).chatCompletion.choices.at(0)!.message;
+    }
+
+    private async getChatCompletionData(
+        thread: Thread,
+        chatCompletionRequest: ChatCompletionCreateParamsBase,
+    ): Promise<ChatCompletionData>
+    {
         return (await this.middlewares.reduce(
             async (acc, middleware) =>
                 await middleware.process(await acc),
             Promise.resolve({
                 thread: thread,
                 chatCompletionRequest: chatCompletionRequest,
-                chatCompletion: chatCompletion,
+                chatCompletion: (await this.client.chat.completions.create(chatCompletionRequest)),
             } as ChatCompletionData),
-        )).chatCompletion.choices.at(0)!.message;
+        ));
     }
 
     private getChatCompletionRequest(
