@@ -32,10 +32,12 @@ container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.
 container.bind<Logger>(dependencies.Logger).toDynamicValue(
     () => pino({
         level: "debug",
-        transport: {
-            target: 'pino-pretty',
+    }, pino.transport({
+        target: 'pino-pretty',
+        options: {
+            destination: process.env.LOG_PATH ?? "",
         },
-    }),
+    })),
 );
 
 container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(KeepMessageHistory).inSingletonScope();
