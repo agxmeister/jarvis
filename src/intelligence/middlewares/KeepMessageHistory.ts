@@ -1,4 +1,4 @@
-import {Middleware} from "../../types";
+import {Middleware} from "../../middleware";
 import {ChatCompletionData} from "../types";
 
 export class KeepMessageHistory implements Middleware<ChatCompletionData>

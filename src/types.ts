@@ -53,7 +53,3 @@ export type OrientationProperties = {
 export type DecisionProperties = {
     actions: Action[],
 }
-
-export interface Middleware<Data> {
-    process(data: Data): Promise<Data>;
-}

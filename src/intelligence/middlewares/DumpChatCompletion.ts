@@ -1,4 +1,4 @@
-import {Middleware} from "../../types";
+import {Middleware} from "../../middleware";
 import {ChatCompletionData} from "../types";
 import {inject} from "inversify";
 import {dependencies} from "../../dependencies";

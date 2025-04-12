@@ -1,3 +1,4 @@
+import pino, {Logger} from "pino";
 import {Container} from "inversify";
 import {dependencies} from "./dependencies";
 import Intelligence from "./intelligence/Intelligence";
@@ -7,10 +8,9 @@ import {Builder} from "selenium-webdriver";
 import OpenAI from "openai";
 import Dumper from "./Dumper";
 import Browser from "./Browser";
-import {Middleware} from "./types";
-import {ChatCompletionData} from "./intelligence/types";
+import {Middleware} from "./middleware";
+import {ChatCompletionData} from "./intelligence";
 import {KeepMessageHistory, DumpChatCompletion, LogChatCompletionMessage} from "./intelligence/middlewares";
-import pino, {Logger} from "pino";
 
 const container = new Container();
 

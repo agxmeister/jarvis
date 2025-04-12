@@ -3,6 +3,7 @@ import {inject, injectable, multiInject} from "inversify";
 import {dependencies} from "../dependencies";
 import OpenAI from "openai";
 import {
+    ChatCompletion,
     ChatCompletionCreateParamsBase,
     ChatCompletionMessage,
     ChatCompletionMessageParam
@@ -12,7 +13,7 @@ import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "../tools/types";
 import {Thread, Narration} from "./index";
 import {ChatCompletionData} from "./types";
-import {Middleware} from "../types";
+import {Middleware, processMiddlewares} from "../middleware";
 
 @injectable()
 export default class Intelligence
@@ -70,15 +71,14 @@ export default class Intelligence
         chatCompletionRequest: ChatCompletionCreateParamsBase,
     ): Promise<ChatCompletionData>
     {
-        return (await this.middlewares.reduce(
-            async (acc, middleware) =>
-                await middleware.process(await acc),
-            Promise.resolve({
+        return await processMiddlewares<ChatCompletionData>(
+            this.middlewares,
+            {
                 thread: thread,
                 chatCompletionRequest: chatCompletionRequest,
-                chatCompletion: (await this.client.chat.completions.create(chatCompletionRequest)),
-            } as ChatCompletionData),
-        ));
+                chatCompletion: (await this.client.chat.completions.create(chatCompletionRequest)) as ChatCompletion,
+            },
+        );
     }
 
     private getChatCompletionRequest(
