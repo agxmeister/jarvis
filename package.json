@@ -1,5 +1,6 @@
 {
     "dependencies": {
+        "dayjs": "^1.11.13",
         "inversify": "^6.2.1",
         "mocha": "10.8.2",
         "openai": "^4.76.1",
