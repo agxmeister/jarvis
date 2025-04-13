@@ -1,4 +1,5 @@
 import pino, {Logger} from "pino";
+import * as dayjs from 'dayjs';
 import {Container} from "inversify";
 import {dependencies} from "./dependencies";
 import Intelligence from "./intelligence/Intelligence";
@@ -26,16 +27,18 @@ container.bind<OpenAI>(dependencies.OpenAi).toDynamicValue(
     })
 );
 container.bind<Dumper>(dependencies.Dumper).to(Dumper);
-container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.env.DUMPER_STORAGE_PATH ?? "");
+container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.env.DUMP_PATH ?? "");
 container.bind<Breadcrumbs>(dependencies.Breadcrumbs).to(Breadcrumbs);
 container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.env.BREADCRUMBS_BASE_URL ?? "");
+
+const now = Date.now()
 container.bind<Logger>(dependencies.Logger).toDynamicValue(
     () => pino({
         level: "debug",
     }, pino.transport({
         target: 'pino-pretty',
         options: {
-            destination: process.env.LOG_PATH ?? "",
+            destination: `${process.env.LOG_PATH}/${dayjs().format("YYYY-MM-DD")}.log`,
         },
     })),
 );
