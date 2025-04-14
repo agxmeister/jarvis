@@ -6,7 +6,7 @@ import {apply} from "../toolbox";
 export const Act = async ({
     context,
     toolbox,
-    decision: {properties: {actions}},
+    decision: {actions},
 }: ActParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, DecisionProperties, Runtime>) => {
     for (const action of actions) {
         await apply(toolbox, action.name, action.parameters, {

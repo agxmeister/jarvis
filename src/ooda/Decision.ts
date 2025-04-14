@@ -1,6 +1,3 @@
-export default class Decision<Properties extends Record<string, any>>
-{
-    constructor (readonly properties: Properties)
-    {
-    }
-}
+export type Decision<Properties extends Record<string, any>> = {
+    [key in keyof Properties]: Properties[key];
+};
