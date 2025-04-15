@@ -13,7 +13,7 @@ export const Orient = async ({
     const data: OrientationProperties = await getData(
         (await intelligence.getDataMessage(
             thread,
-            getNarration(checkpoint, observation.properties),
+            getNarration(checkpoint, observation),
             orientSchema,
             toolbox,
         )),

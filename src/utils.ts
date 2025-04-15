@@ -5,6 +5,7 @@ import {z as zod} from "zod/lib";
 import {ChatCompletionMessage} from "openai/src/resources/chat/completions";
 import {ZodSchema} from "zod";
 import {Intelligence, Thread, Narration} from "./intelligence";
+import {Observation} from "./ooda";
 
 export const getData = async (
     message: ChatCompletionMessage,
@@ -36,7 +37,7 @@ export const getChecklist = async (
 
 export const getNarration = (
     checkpoint: Checkpoint<CheckpointProperties>,
-    observationProperties: ObservationProperties
+    observation: Observation<ObservationProperties>
 ) =>
 {
     const narration = new Narration();
@@ -46,9 +47,9 @@ export const getNarration = (
         name: "Narrator",
     });
 
-    if (observationProperties.pageUrl) {
+    if (observation.pageUrl) {
         narration.addMessage({
-            content: `Page with the URL "${observationProperties.pageUrl}" is opened in your browser.`,
+            content: `Page with the URL "${observation.pageUrl}" is opened in your browser.`,
             role: "user",
             name: "Narrator",
         });
@@ -60,7 +61,7 @@ export const getNarration = (
         });
     }
 
-    if (observationProperties.pageScreenshotUrl) {
+    if (observation.pageScreenshotUrl) {
         narration.addMessage({
             content: [
                 {
@@ -69,7 +70,7 @@ export const getNarration = (
                 }, {
                     type: 'image_url',
                     image_url: {
-                        url: observationProperties.pageScreenshotUrl,
+                        url: observation.pageScreenshotUrl,
                     },
                 }
             ],
@@ -78,9 +79,9 @@ export const getNarration = (
         });
     }
 
-    if (observationProperties.pageDescription) {
+    if (observation.pageDescription) {
         narration.addMessage({
-            content: `This is a textual description of the browser's page content: ${observationProperties.pageDescription}.`,
+            content: `This is a textual description of the browser's page content: ${observation.pageDescription}.`,
             role: "user",
             name: "Narrator",
         });

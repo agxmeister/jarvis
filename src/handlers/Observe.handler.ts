@@ -8,8 +8,8 @@ import {Checkpoint} from "../checklist";
 export const Observe = async ({
     context: {browser, breadcrumbs},
     checkpoint,
-}: ObserveParameters<ContextProperties, CheckpointProperties, Runtime>) => {
-    return new Observation<ObservationProperties>({
+}: ObserveParameters<ContextProperties, CheckpointProperties, Runtime>): Promise<Observation<ObservationProperties>> => {
+    return {
         pageUrl: browser.isCurrentPage()
             ? await (await browser.getCurrentPage()).getCurrentUrl()
             : null,
@@ -21,7 +21,7 @@ export const Observe = async ({
         pageDescription: process.env.OBSERVATION_MODE === "automatic"
             ? null
             : await getScreenDescription(checkpoint),
-    });
+    };
 };
 
 async function getScreenDescription(checkpoint: Checkpoint<CheckpointProperties>): Promise<string> {
