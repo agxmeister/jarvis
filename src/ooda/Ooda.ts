@@ -46,7 +46,7 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 checkpoint: checkpoint,
                 observation: observation,
             });
-            if (orientation.progression) {
+            if (await this.handlers.proceed(orientation)) {
                 return true;
             }
             const decision = await this.handlers.decide({
