@@ -1,9 +1,3 @@
-export default class Orientation<Properties extends Record<string, any>>
-{
-    constructor (
-        readonly progression: boolean,
-        readonly properties: Properties,
-    )
-    {
-    }
-}
+export type Orientation<Properties extends Record<string, any>> = {
+    [key in keyof Properties]: Properties[key];
+};

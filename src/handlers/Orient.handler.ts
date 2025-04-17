@@ -9,8 +9,8 @@ export const Orient = async ({
     toolbox,
     checkpoint,
     observation,
-}: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties, Runtime>) => {
-    const data: OrientationProperties = await getData(
+}: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties, Runtime>): Promise<Orientation<OrientationProperties>> => {
+    return await getData(
         (await intelligence.getDataMessage(
             thread,
             getNarration(checkpoint, observation),
@@ -19,5 +19,4 @@ export const Orient = async ({
         )),
         orientSchema,
     );
-    return new Orientation(data.completed, data);
 };
