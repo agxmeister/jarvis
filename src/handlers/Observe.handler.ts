@@ -10,17 +10,19 @@ export const Observe = async ({
     checkpoint,
 }: ObserveParameters<ContextProperties, CheckpointProperties, Runtime>): Promise<Observation<ObservationProperties>> => {
     return {
-        pageUrl: browser.isCurrentPage()
-            ? await (await browser.getCurrentPage()).getCurrentUrl()
-            : null,
-        pageScreenshotUrl: process.env.OBSERVATION_MODE === "automatic"
-            ? browser.isCurrentPage()
-                ? (await breadcrumbs.addScreenshot(await (await browser.getCurrentPage()).takeScreenshot())).url
-                : null
-            : null,
-        pageDescription: process.env.OBSERVATION_MODE === "automatic"
-            ? null
-            : await getScreenDescription(checkpoint),
+        page: {
+            url: browser.isCurrentPage()
+                ? await (await browser.getCurrentPage()).getCurrentUrl()
+                : null,
+            screenshotUrl: process.env.OBSERVATION_MODE === "automatic"
+                ? browser.isCurrentPage()
+                    ? (await breadcrumbs.addScreenshot(await (await browser.getCurrentPage()).takeScreenshot())).url
+                    : null
+                : null,
+            description: process.env.OBSERVATION_MODE === "automatic"
+                ? null
+                : await getScreenDescription(checkpoint),
+        }
     };
 };
 

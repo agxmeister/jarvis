@@ -39,9 +39,13 @@ export interface CheckpointProperties
 }
 
 export type ObservationProperties = {
-    pageUrl: string|null,
-    pageScreenshotUrl: string|null,
-    pageDescription?: string|null,
+    page: PageProperties,
+}
+
+export type PageProperties = {
+    url: string|null,
+    screenshotUrl: string|null,
+    description?: string|null,
 }
 
 export type OrientationProperties = {

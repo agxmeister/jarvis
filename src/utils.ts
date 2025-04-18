@@ -47,9 +47,9 @@ export const getNarration = (
         name: "Narrator",
     });
 
-    if (observation.pageUrl) {
+    if (observation.page.url) {
         narration.addMessage({
-            content: `Page with the URL "${observation.pageUrl}" is opened in your browser.`,
+            content: `Page with the URL "${observation.page.url}" is opened in your browser.`,
             role: "user",
             name: "Narrator",
         });
@@ -61,7 +61,7 @@ export const getNarration = (
         });
     }
 
-    if (observation.pageScreenshotUrl) {
+    if (observation.page.screenshotUrl) {
         narration.addMessage({
             content: [
                 {
@@ -70,7 +70,7 @@ export const getNarration = (
                 }, {
                     type: 'image_url',
                     image_url: {
-                        url: observation.pageScreenshotUrl,
+                        url: observation.page.screenshotUrl,
                     },
                 }
             ],
@@ -79,9 +79,9 @@ export const getNarration = (
         });
     }
 
-    if (observation.pageDescription) {
+    if (observation.page.description) {
         narration.addMessage({
-            content: `This is a textual description of the browser's page content: ${observation.pageDescription}.`,
+            content: `This is a textual description of the browser's page content: ${observation.page.description}.`,
             role: "user",
             name: "Narrator",
         });

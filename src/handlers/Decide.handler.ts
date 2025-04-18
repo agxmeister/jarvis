@@ -9,6 +9,7 @@ export const Decide = async ({
     toolbox,
     checkpoint,
     observation,
+    orientation,
 }: DecideParameters<ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties, Runtime>): Promise<Decision<DecisionProperties>> => {
     return {
         actions: await getActions((await intelligence.getActionsMessage(
