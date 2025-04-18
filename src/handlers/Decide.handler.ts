@@ -14,7 +14,7 @@ export const Decide = async ({
     return {
         actions: await getActions((await intelligence.getActionsMessage(
             thread,
-            getNarration(checkpoint, observation),
+            getNarration(checkpoint, observation.page),
             orientSchema,
             toolbox,
         ))),

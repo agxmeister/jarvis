@@ -1,4 +1,4 @@
-import {Action, Briefing, CheckpointProperties, ObservationProperties} from "./types";
+import {Action, Briefing, CheckpointProperties, ObservationProperties, PageProperties} from "./types";
 import {Checkpoint} from "./checklist";
 import {checklistSchema} from "./schemas";
 import {z as zod} from "zod/lib";
@@ -37,7 +37,7 @@ export const getChecklist = async (
 
 export const getNarration = (
     checkpoint: Checkpoint<CheckpointProperties>,
-    observation: Observation<ObservationProperties>
+    page: PageProperties,
 ) =>
 {
     const narration = new Narration();
@@ -47,9 +47,9 @@ export const getNarration = (
         name: "Narrator",
     });
 
-    if (observation.page.url) {
+    if (page.url) {
         narration.addMessage({
-            content: `Page with the URL "${observation.page.url}" is opened in your browser.`,
+            content: `Page with the URL "${page.url}" is opened in your browser.`,
             role: "user",
             name: "Narrator",
         });
@@ -61,7 +61,7 @@ export const getNarration = (
         });
     }
 
-    if (observation.page.screenshotUrl) {
+    if (page.screenshotUrl) {
         narration.addMessage({
             content: [
                 {
@@ -70,7 +70,7 @@ export const getNarration = (
                 }, {
                     type: 'image_url',
                     image_url: {
-                        url: observation.page.screenshotUrl,
+                        url: page.screenshotUrl,
                     },
                 }
             ],
@@ -79,9 +79,9 @@ export const getNarration = (
         });
     }
 
-    if (observation.page.description) {
+    if (page.description) {
         narration.addMessage({
-            content: `This is a textual description of the browser's page content: ${observation.page.description}.`,
+            content: `This is a textual description of the browser's page content: ${page.description}.`,
             role: "user",
             name: "Narrator",
         });
