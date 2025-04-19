@@ -1,6 +1,6 @@
 import {z as zod} from 'zod';
 
-export const checklistSchema = zod.object({
+export const getChecklistResponseSchema = zod.object({
     checkpoints: zod.array(
         zod.object({
             name: zod.string()
@@ -16,4 +16,4 @@ export const checklistSchema = zod.object({
             .describe("The checkpoint. An intermediate result that must be achieved to follow the scenario.")
     ),
 })
-    .describe("The checklist. A list of checkpoints to follow to complete the scenario.");
+    .describe("Schema of the checklist data.");

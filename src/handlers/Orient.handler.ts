@@ -2,7 +2,7 @@ import {OrientParameters, Orientation} from "../ooda";
 import {ContextProperties, CheckpointProperties, ObservationProperties, OrientationProperties} from "../types";
 import {Runtime} from "../tools/types";
 import {getData, getNarration} from "../utils";
-import {orientSchema} from "../schemas";
+import {followChecklistResponseSchema} from "../schemas";
 
 export const Orient = async ({
     context: {intelligence, thread},
@@ -14,9 +14,9 @@ export const Orient = async ({
         (await intelligence.getDataMessage(
             thread,
             getNarration(checkpoint, observation.page),
-            orientSchema,
+            followChecklistResponseSchema,
             toolbox,
         )),
-        orientSchema,
+        followChecklistResponseSchema,
     );
 };

@@ -1,6 +1,6 @@
 import {z as zod} from 'zod';
 
-export const orientSchema = zod.object({
+export const followChecklistResponseSchema = zod.object({
     observation: zod.string()
         .describe("Your interpretation of the current application's state."),
     completed: zod.boolean()
@@ -8,4 +8,4 @@ export const orientSchema = zod.object({
     comment: zod.string()
         .describe("Describe in your own word, do you consider the current step passed or not."),
 }).strict()
-    .describe("The response schema for orientation.");
+    .describe("Schema of the current checkpoint state data.");

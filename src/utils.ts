@@ -1,6 +1,6 @@
 import {Action, Briefing, CheckpointProperties, ObservationProperties, PageProperties} from "./types";
 import {Checkpoint} from "./checklist";
-import {checklistSchema} from "./schemas";
+import {getChecklistResponseSchema} from "./schemas";
 import {z as zod} from "zod/lib";
 import {ChatCompletionMessage} from "openai/src/resources/chat/completions";
 import {ZodSchema} from "zod";
@@ -30,8 +30,8 @@ export const getChecklist = async (
     thread.addBriefing(briefing.strategy, briefing.planning);
     thread.addScenario(narrative);
     return await getData(
-        (await intelligence.getDataMessage(thread, new Narration(), checklistSchema)),
-        checklistSchema,
+        (await intelligence.getDataMessage(thread, new Narration(), getChecklistResponseSchema)),
+        getChecklistResponseSchema,
     );
 };
 

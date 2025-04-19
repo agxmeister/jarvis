@@ -1,2 +1,2 @@
-export {checklistSchema} from './checklist';
-export {orientSchema} from './orient';
+export {getChecklistResponseSchema} from './getChecklistResponse';
+export {followChecklistResponseSchema} from './followChecklistResponse';
