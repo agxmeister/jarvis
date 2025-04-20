@@ -2,7 +2,7 @@ import {Context, Observation, Orientation, Decision} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checkpoint} from "../checklist";
 
-export type OodaParameters = {
+export type Handlers = {
     preface?: (parameters: PrefaceParameters<Record<string, any>, Record<string, any>>) => Promise<void>,
     observe: (parameters: ObserveParameters<Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<Observation<Record<string, any>>>,
     orient: (parameters: OrientParameters<Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<Orientation<Record<string, any>>>,
