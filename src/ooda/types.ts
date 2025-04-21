@@ -8,8 +8,11 @@ export type Handlers = {
     orient: (parameters: OrientParameters<Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<Orientation<Record<string, any>>>,
     decide: (parameters: DecideParameters<Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<Decision<Record<string, any>>>,
     act: (parameters: ActParameters<Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>, Record<string, any>>) => Promise<void>,
-    proceed: (decision: Orientation<Record<string, any>>) => Promise<boolean>,
     conclude?: (parameters: ConcludeParameters<Record<string, any>, Record<string, any>>) => Promise<void>,
+}
+
+export type Middlewares = {
+    orient: (orientation: Orientation<Record<string, any>>) => Promise<boolean>,
 }
 
 export type PrefaceParameters<ContextProperties extends Record<string, any>, Runtime extends Record<string, any>> = {

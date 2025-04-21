@@ -17,7 +17,7 @@ import {Open} from "./tools/Open";
 import {Click} from "./tools/Click";
 import {Close} from "./tools/Close";
 import {Wait} from "./tools/Wait";
-import {Act, Proceed, Conclude, Decide, Observe, Orient, Preface} from "./handlers";
+import {Act, Conclude, Decide, Observe, OrientHandler, OrientMiddleware, Preface} from "./handlers";
 import {getChecklist} from "./utils";
 import {Runtime} from "./tools/types";
 
@@ -60,11 +60,12 @@ export default class Actor
         return new Ooda({
             preface: Preface,
             observe: Observe,
-            orient: Orient,
+            orient: OrientHandler,
             decide: Decide,
             act: Act,
-            proceed: Proceed,
             conclude: Conclude
+        }, {
+            orient: OrientMiddleware,
         });
     }
 }

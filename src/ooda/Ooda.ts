@@ -1,11 +1,11 @@
-import {Handlers} from "./types";
+import {Handlers, Middlewares} from "./types";
 import {Context} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checklist, Checkpoint} from "../checklist";
 
 export default class Ooda<ContextProperties extends Record<string, any>, CheckpointProperties extends Record<string, any>, Runtime extends Record<string, any>>
 {
-    constructor(readonly handlers: Handlers)
+    constructor(readonly handlers: Handlers, readonly middlewares: Middlewares)
     {
     }
 
@@ -46,7 +46,7 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 checkpoint: checkpoint,
                 observation: observation,
             });
-            if (await this.handlers.proceed(orientation)) {
+            if (await this.middlewares.orient(orientation)) {
                 return true;
             }
             const decision = await this.handlers.decide({
