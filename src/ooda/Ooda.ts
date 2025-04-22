@@ -46,8 +46,10 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 checkpoint: checkpoint,
                 observation: observation,
             });
-            if (await this.middlewares.orient(orientation)) {
-                return true;
+            for (const middleware of this.middlewares.orient) {
+                if (await middleware(orientation)) {
+                    return true;
+                }
             }
             const decision = await this.handlers.decide({
                 context: context,

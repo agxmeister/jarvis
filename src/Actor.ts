@@ -65,7 +65,7 @@ export default class Actor
             act: Act,
             conclude: Conclude
         }, {
-            orient: OrientMiddleware,
+            orient: [OrientMiddleware],
         });
     }
 }
