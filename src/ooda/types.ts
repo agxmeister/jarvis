@@ -15,7 +15,7 @@ export type Middlewares = {
     orient: Middleware<Orientation<Record<string, any>>>[],
 }
 
-export type Middleware<Data> = (data: Data) => Promise<boolean>
+export type Middleware<Data> = (data: Data, next: () => Promise<boolean>) => Promise<boolean>
 
 export type PrefaceParameters<ContextProperties extends Record<string, any>, Runtime extends Record<string, any>> = {
     context: Context<ContextProperties>,

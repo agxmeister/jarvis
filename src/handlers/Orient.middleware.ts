@@ -1,7 +1,10 @@
 import {Orientation} from "../ooda";
 import {OrientationProperties} from "../types";
 
-export const Orient = async (orientation: Orientation<OrientationProperties>): Promise<boolean> =>
+export const Orient = async (orientation: Orientation<OrientationProperties>, next: () => Promise<boolean>): Promise<boolean> =>
 {
-    return orientation.completed;
+    if (orientation.completed) {
+        return true;
+    }
+    return await next();
 }
