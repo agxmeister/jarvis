@@ -1,5 +1,5 @@
-import {Handlers, Middlewares} from "./types";
-import {Context} from "./index";
+import {Handlers, MiddlewareContext, Middlewares} from "./types";
+import {Context, Orientation} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checklist, Checkpoint} from "../checklist";
 
@@ -46,15 +46,24 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 checkpoint: checkpoint,
                 observation: observation,
             });
+
+            const middlewareContext: MiddlewareContext<Orientation<Record<string, any>>> = {
+                data: orientation,
+                restart: false,
+            };
             const getNext = (i = 0) => async () => this.middlewares.orient[i](
-                orientation,
+                middlewareContext,
                 i < this.middlewares.orient.length - 1
                     ? getNext(i + 1)
-                    : async () => false
+                    : async () => {
+                        return;
+                    },
             );
-            if (await getNext()()) {
+            await getNext()();
+            if (middlewareContext.restart) {
                 return true;
             }
+
             const decision = await this.handlers.decide({
                 context: context,
                 toolbox: toolbox,
