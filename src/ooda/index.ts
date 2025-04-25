@@ -4,3 +4,4 @@ export {Observation} from './Observation';
 export {Orientation} from './Orientation';
 export {Decision} from './Decision';
 export {ObserveParameters, OrientParameters, DecideParameters, ActParameters} from './types';
+export {getMiddlewareRunner} from './utils';
