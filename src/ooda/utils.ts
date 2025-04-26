@@ -1,8 +1,8 @@
 import {Middleware, MiddlewareContext} from "./types";
 
-export const getMiddlewareRunner = <Data>(
-    middlewares: Middleware<Data>[],
-    context: MiddlewareContext<Data>,
+export const getMiddlewareRunner = <State extends Record<string, any>, Data>(
+    middlewares: Middleware<State, Data>[],
+    context: MiddlewareContext<State, Data>,
     indent = 0,
 ) => async () => middlewares[indent](
     context,

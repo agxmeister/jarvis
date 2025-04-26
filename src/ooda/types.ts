@@ -12,14 +12,21 @@ export type Handlers = {
 }
 
 export type Middlewares = {
-    orient: Middleware<Orientation<Record<string, any>>>[],
+    orient: Middleware<State, Orientation<Record<string, any>>>[],
 }
 
-export type Middleware<Data> = (context: MiddlewareContext<Data>, next: () => Promise<void>) => Promise<void>
-
-export type MiddlewareContext<Data> = {
-    data: Data,
+export type State = {
     restart: boolean,
+}
+
+export type Middleware<State extends Record<string, any>, Data> = (
+    context: MiddlewareContext<State, Data>,
+    next: () => Promise<void>,
+) => Promise<void>
+
+export type MiddlewareContext<State extends Record<string, any>, Data> = {
+    state: State,
+    data: Data,
 }
 
 export type PrefaceParameters<ContextProperties extends Record<string, any>, Runtime extends Record<string, any>> = {

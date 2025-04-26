@@ -1,4 +1,4 @@
-import {Handlers, MiddlewareContext, Middlewares} from "./types";
+import {Handlers, MiddlewareContext, Middlewares, State} from "./types";
 import {Context, getMiddlewareRunner, Orientation} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checklist, Checkpoint} from "../checklist";
@@ -47,12 +47,14 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 observation: observation,
             });
 
-            const orientContext: MiddlewareContext<Orientation<Record<string, any>>> = {
+            const orientContext: MiddlewareContext<State, Orientation<Record<string, any>>> = {
+                state: {
+                    restart: false,
+                },
                 data: orientation,
-                restart: false,
             };
             await getMiddlewareRunner(this.middlewares.orient, orientContext)();
-            if (orientContext.restart) {
+            if (orientContext.state.restart) {
                 return true;
             }
 
