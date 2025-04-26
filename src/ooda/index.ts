@@ -3,5 +3,4 @@ export {Context} from './Context';
 export {Observation} from './Observation';
 export {Orientation} from './Orientation';
 export {Decision} from './Decision';
-export {ObserveParameters, OrientParameters, DecideParameters, ActParameters} from './types';
-export {getMiddlewareRunner} from './utils';
+export {ObserveParameters, OrientParameters, DecideParameters, ActParameters, Handlers, Middlewares, State} from './types';

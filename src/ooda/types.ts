@@ -1,6 +1,7 @@
 import {Context, Observation, Orientation, Decision} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checkpoint} from "../checklist";
+import {Middleware} from "./middleware";
 
 export type Handlers = {
     preface?: (parameters: PrefaceParameters<Record<string, any>, Record<string, any>>) => Promise<void>,
@@ -17,16 +18,6 @@ export type Middlewares = {
 
 export type State = {
     restart: boolean,
-}
-
-export type Middleware<State extends Record<string, any>, Data> = (
-    context: MiddlewareContext<State, Data>,
-    next: () => Promise<void>,
-) => Promise<void>
-
-export type MiddlewareContext<State extends Record<string, any>, Data> = {
-    state: State,
-    data: Data,
 }
 
 export type PrefaceParameters<ContextProperties extends Record<string, any>, Runtime extends Record<string, any>> = {

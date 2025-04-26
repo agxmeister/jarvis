@@ -1,10 +1,10 @@
-import {Orientation} from "../ooda";
+import {Orientation, State} from "../ooda";
+import {Context} from "../ooda/middleware";
 import {OrientationProperties} from "../types";
-import {MiddlewareContext, State} from "../ooda/types";
 
-export const Orient = async (context: MiddlewareContext<State, Orientation<OrientationProperties>>, next: () => Promise<void>): Promise<void> =>
+export const Orient = async (context: Context<State, Orientation<OrientationProperties>>, next: () => Promise<void>): Promise<void> =>
 {
-    if (context.data.completed) {
+    if (context.payload.completed) {
         context.state.restart = true;
         return;
     }
