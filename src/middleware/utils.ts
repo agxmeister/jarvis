@@ -1,12 +1,10 @@
-import {Middleware} from "./types";
-
 export const processMiddlewares = async <Data>(
-    middlewares: Middleware<Data>[],
+    middlewares: ((data: Data) => Promise<Data>)[],
     data: Data,
 ): Promise<Data> => {
     return (await middlewares.reduce(
         async (acc, middleware) =>
-            await middleware.process(await acc),
+            await middleware(await acc),
         Promise.resolve(data),
     ));
 }

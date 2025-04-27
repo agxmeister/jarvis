@@ -72,7 +72,7 @@ export default class Intelligence
     ): Promise<ChatCompletionData>
     {
         return await processMiddlewares<ChatCompletionData>(
-            this.middlewares,
+            this.middlewares.map(middleware => middleware.process.bind(middleware)),
             {
                 thread: thread,
                 chatCompletionRequest: chatCompletionRequest,
