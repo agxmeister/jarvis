@@ -13,7 +13,8 @@ import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "../tools/types";
 import {Thread, Narration} from "./index";
 import {ChatCompletionData} from "./types";
-import {Middleware, processMiddlewares} from "../middleware";
+import {Middleware} from "../middleware";
+import {Context as MiddlewareContext, getMiddlewareRunner} from "../ooda/middleware";
 
 @injectable()
 export default class Intelligence
@@ -71,14 +72,20 @@ export default class Intelligence
         chatCompletionRequest: ChatCompletionCreateParamsBase,
     ): Promise<ChatCompletionData>
     {
-        return await processMiddlewares<ChatCompletionData>(
-            this.middlewares.map(middleware => middleware.process.bind(middleware)),
-            {
+        const context: MiddlewareContext<Record<string, any>, ChatCompletionData> = {
+            state: {
+            },
+            payload: {
                 thread: thread,
                 chatCompletionRequest: chatCompletionRequest,
                 chatCompletion: (await this.client.chat.completions.create(chatCompletionRequest)) as ChatCompletion,
             },
-        );
+        };
+        await getMiddlewareRunner(
+            this.middlewares.map(middleware => middleware.process.bind(middleware)),
+            context,
+        )();
+        return context.payload;
     }
 
     private getChatCompletionRequest(

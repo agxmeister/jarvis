@@ -3,16 +3,16 @@ import {ChatCompletionData} from "../types";
 import {inject} from "inversify";
 import {dependencies} from "../../dependencies";
 import Dumper from "../../Dumper";
+import {Context as MiddlewareContext} from "../../ooda/middleware";
 
-export class DumpChatCompletion implements Middleware<ChatCompletionData>
+export class DumpChatCompletion implements Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>>
 {
     constructor(@inject(dependencies.Dumper) readonly dumper: Dumper)
     {
     }
 
-    async process(context: ChatCompletionData): Promise<ChatCompletionData>
+    async process(context: MiddlewareContext<Record<string, any>, ChatCompletionData>): Promise<void>
     {
-        this.dumper.add(context.chatCompletion);
-        return context;
+        this.dumper.add(context.payload.chatCompletion);
     }
 }

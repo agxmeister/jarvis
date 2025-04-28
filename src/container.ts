@@ -12,6 +12,7 @@ import Browser from "./Browser";
 import {Middleware} from "./middleware";
 import {ChatCompletionData} from "./intelligence";
 import {KeepMessageHistory, DumpChatCompletion, LogChatCompletionMessage} from "./intelligence/middlewares";
+import {Context as MiddlewareContext} from "./ooda/middleware";
 
 const container = new Container();
 
@@ -43,8 +44,8 @@ container.bind<Logger>(dependencies.Logger).toDynamicValue(
     })),
 );
 
-container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(KeepMessageHistory).inSingletonScope();
-container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(DumpChatCompletion).inSingletonScope();
-container.bind<Middleware<ChatCompletionData>>(dependencies.Middleware).to(LogChatCompletionMessage).inSingletonScope();
+container.bind<Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>>>(dependencies.Middleware).to(KeepMessageHistory).inSingletonScope();
+container.bind<Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>>>(dependencies.Middleware).to(DumpChatCompletion).inSingletonScope();
+container.bind<Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>>>(dependencies.Middleware).to(LogChatCompletionMessage).inSingletonScope();
 
 export {container};

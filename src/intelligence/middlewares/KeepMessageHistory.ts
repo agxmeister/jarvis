@@ -1,11 +1,11 @@
 import {Middleware} from "../../middleware";
 import {ChatCompletionData} from "../types";
+import {Context as MiddlewareContext} from "../../ooda/middleware";
 
-export class KeepMessageHistory implements Middleware<ChatCompletionData>
+export class KeepMessageHistory implements Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>>
 {
-    async process(context: ChatCompletionData): Promise<ChatCompletionData>
+    async process(context: MiddlewareContext<Record<string, any>, ChatCompletionData>): Promise<void>
     {
-        context.thread.addMessage(context.chatCompletion.choices.at(0)!.message);
-        return context;
+        context.payload.thread.addMessage(context.payload.chatCompletion.choices.at(0)!.message);
     }
 }
