@@ -11,8 +11,9 @@ export class DumpChatCompletion implements Middleware<MiddlewareContext<Record<s
     {
     }
 
-    async process(context: MiddlewareContext<Record<string, any>, ChatCompletionData>): Promise<void>
+    async process(context: MiddlewareContext<Record<string, any>, ChatCompletionData>, next: () => Promise<void>): Promise<void>
     {
         this.dumper.add(context.payload.chatCompletion);
+        await next();
     }
 }

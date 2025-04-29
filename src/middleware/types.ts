@@ -1,3 +1,3 @@
 export interface Middleware<Context> {
-    process(context: Context): Promise<void>;
+    process(context: Context, next: () => Promise<void>): Promise<void>;
 }

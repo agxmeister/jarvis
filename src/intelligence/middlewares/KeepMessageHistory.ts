@@ -4,8 +4,9 @@ import {Context as MiddlewareContext} from "../../ooda/middleware";
 
 export class KeepMessageHistory implements Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>>
 {
-    async process(context: MiddlewareContext<Record<string, any>, ChatCompletionData>): Promise<void>
+    async process(context: MiddlewareContext<Record<string, any>, ChatCompletionData>, next: () => Promise<void>): Promise<void>
     {
         context.payload.thread.addMessage(context.payload.chatCompletion.choices.at(0)!.message);
+        await next();
     }
 }
