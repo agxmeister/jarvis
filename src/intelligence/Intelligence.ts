@@ -13,7 +13,7 @@ import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "../tools/types";
 import {Thread, Narration} from "./index";
 import {ChatCompletionData} from "./types";
-import {Middleware} from "../middleware";
+import {Middleware} from "../ooda/middleware";
 import {Context as MiddlewareContext, getMiddlewareRunner} from "../ooda/middleware";
 
 @injectable()
@@ -21,7 +21,7 @@ export default class Intelligence
 {
     constructor(
         @inject(dependencies.OpenAi) readonly client: OpenAI,
-        @multiInject(dependencies.Middleware) readonly middlewares: Middleware<ChatCompletionData>[],
+        @multiInject(dependencies.Middleware) readonly middlewares: Middleware<ChatCompletionData, ChatCompletionData>[],
     )
     {
     }
