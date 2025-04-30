@@ -1,4 +1,4 @@
-export type Middleware<State extends Record<string, any>, Payload> = (
+export type Handler<State extends Record<string, any>, Payload> = (
     context: Context<State, Payload>,
     next: () => Promise<void>,
 ) => Promise<void>

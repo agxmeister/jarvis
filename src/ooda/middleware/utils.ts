@@ -1,7 +1,7 @@
-import {Middleware, Context} from "./index";
+import {Handler, Context} from "./index";
 
 export const getMiddlewareRunner = <State extends Record<string, any>, Data>(
-    middlewares: Middleware<State, Data>[],
+    middlewares: Handler<State, Data>[],
     context: Context<State, Data>,
     indent = 0,
 ) => async () => middlewares[indent](

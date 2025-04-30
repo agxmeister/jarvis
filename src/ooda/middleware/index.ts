@@ -1,2 +1,2 @@
-export {Middleware, Context} from './types';
+export {Handler, Context} from './types';
 export {getMiddlewareRunner} from './utils';

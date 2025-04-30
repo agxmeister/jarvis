@@ -1,7 +1,7 @@
 import {Context, Observation, Orientation, Decision} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checkpoint} from "../checklist";
-import {Middleware} from "./middleware";
+import {Handler} from "./middleware";
 
 export type Handlers = {
     preface?: (parameters: PrefaceParameters<Record<string, any>, Record<string, any>>) => Promise<void>,
@@ -13,7 +13,7 @@ export type Handlers = {
 }
 
 export type Middlewares = {
-    orient: Middleware<State, Orientation<Record<string, any>>>[],
+    orient: Handler<State, Orientation<Record<string, any>>>[],
 }
 
 export type State = {
