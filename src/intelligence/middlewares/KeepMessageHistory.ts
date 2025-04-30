@@ -1,6 +1,6 @@
-import {Middleware} from "../../ooda/middleware";
+import {Middleware} from "../../middleware";
 import {ChatCompletionData} from "../types";
-import {Context as MiddlewareContext} from "../../ooda/middleware";
+import {Context as MiddlewareContext} from "../../middleware";
 
 export class KeepMessageHistory implements Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>, ChatCompletionData>
 {

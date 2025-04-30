@@ -1,4 +1,4 @@
-import {Context as MiddlewareContext, getMiddlewareRunner} from "./middleware";
+import {Context as MiddlewareContext, getMiddlewareRunner} from "../middleware";
 import {Context, Orientation, Handlers, Middlewares, State} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checklist, Checkpoint} from "../checklist";

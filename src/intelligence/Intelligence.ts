@@ -13,8 +13,8 @@ import {zodToJsonSchema} from "zod-to-json-schema";
 import {Runtime} from "../tools/types";
 import {Thread, Narration} from "./index";
 import {ChatCompletionData} from "./types";
-import {Middleware} from "../ooda/middleware";
-import {Context as MiddlewareContext, getMiddlewareRunner} from "../ooda/middleware";
+import {Middleware} from "../middleware";
+import {Context as MiddlewareContext, getMiddlewareRunner} from "../middleware";
 
 @injectable()
 export default class Intelligence

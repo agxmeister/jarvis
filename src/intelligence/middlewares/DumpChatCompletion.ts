@@ -1,9 +1,9 @@
-import {Middleware} from "../../ooda/middleware";
+import {Middleware} from "../../middleware";
 import {ChatCompletionData} from "../types";
 import {inject} from "inversify";
 import {dependencies} from "../../dependencies";
 import Dumper from "../../Dumper";
-import {Context as MiddlewareContext} from "../../ooda/middleware";
+import {Context as MiddlewareContext} from "../../middleware";
 
 export class DumpChatCompletion implements Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>, ChatCompletionData>
 {

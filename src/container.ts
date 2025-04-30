@@ -9,10 +9,10 @@ import {Builder} from "selenium-webdriver";
 import OpenAI from "openai";
 import Dumper from "./Dumper";
 import Browser from "./Browser";
-import {Middleware} from "./ooda/middleware";
+import {Middleware} from "./middleware";
 import {ChatCompletionData} from "./intelligence";
 import {KeepMessageHistory, DumpChatCompletion, LogChatCompletionMessage} from "./intelligence/middlewares";
-import {Context as MiddlewareContext} from "./ooda/middleware";
+import {Context as MiddlewareContext} from "./middleware";
 
 const container = new Container();
 
