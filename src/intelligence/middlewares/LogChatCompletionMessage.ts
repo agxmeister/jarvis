@@ -10,7 +10,7 @@ export class LogChatCompletionMessage implements Middleware<MiddlewareContext<Re
     constructor(@inject(dependencies.Logger) readonly logger: Logger) {
     }
 
-    async process(context: MiddlewareContext<Record<string, any>, ChatCompletionData>, next: () => Promise<void>): Promise<void> {
+    async handler(context: MiddlewareContext<Record<string, any>, ChatCompletionData>, next: () => Promise<void>): Promise<void> {
         const message = context.payload.chatCompletion.choices.at(0)!.message;
         this.logger.debug({
             ...message,

@@ -15,6 +15,7 @@ import {Thread, Narration} from "./index";
 import {ChatCompletionData} from "./types";
 import {Middleware} from "../middleware";
 import {Context as MiddlewareContext, getMiddlewareRunner} from "../middleware";
+import {getMiddlewareHandlers} from "../middleware/utils";
 
 @injectable()
 export default class Intelligence
@@ -81,10 +82,7 @@ export default class Intelligence
                 chatCompletion: (await this.client.chat.completions.create(chatCompletionRequest)) as ChatCompletion,
             },
         };
-        await getMiddlewareRunner(
-            this.middlewares.map(middleware => middleware.process.bind(middleware)),
-            context,
-        )();
+        await getMiddlewareRunner(getMiddlewareHandlers(this.middlewares), context)();
         return context.payload;
     }
 
