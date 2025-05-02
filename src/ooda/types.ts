@@ -13,7 +13,7 @@ export type Handlers = {
 }
 
 export type Middlewares = {
-    orient: Handler<State, Orientation<Record<string, any>>>[],
+    orient: Handler<Orientation<Record<string, any>>, State>[],
 }
 
 export type State = {

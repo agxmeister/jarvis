@@ -73,9 +73,7 @@ export default class Intelligence
         chatCompletionRequest: ChatCompletionCreateParamsBase,
     ): Promise<ChatCompletionData>
     {
-        const context: MiddlewareContext<Record<string, any>, ChatCompletionData> = {
-            state: {
-            },
+        const context: MiddlewareContext<ChatCompletionData, Record<string, any>> = {
             payload: {
                 thread: thread,
                 chatCompletionRequest: chatCompletionRequest,

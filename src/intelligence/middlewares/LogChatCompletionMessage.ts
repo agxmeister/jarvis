@@ -5,12 +5,12 @@ import {dependencies} from "../../dependencies";
 import {Logger} from "pino";
 import {Context as MiddlewareContext} from "../../middleware";
 
-export class LogChatCompletionMessage implements Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>, ChatCompletionData>
+export class LogChatCompletionMessage implements Middleware<ChatCompletionData, Record<string, any>>
 {
     constructor(@inject(dependencies.Logger) readonly logger: Logger) {
     }
 
-    async handler(context: MiddlewareContext<Record<string, any>, ChatCompletionData>, next: () => Promise<void>): Promise<void> {
+    async handler(context: MiddlewareContext<ChatCompletionData, Record<string, any>>, next: () => Promise<void>): Promise<void> {
         const message = context.payload.chatCompletion.choices.at(0)!.message;
         this.logger.debug({
             ...message,

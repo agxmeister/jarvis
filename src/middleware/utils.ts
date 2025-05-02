@@ -1,8 +1,8 @@
 import {Handler, Context, Middleware} from "./index";
 
-export const getMiddlewareRunner = <State extends Record<string, any>, Data>(
-    handlers: Handler<State, Data>[],
-    context: Context<State, Data>,
+export const getMiddlewareRunner = <Data, State extends Record<string, any>>(
+    handlers: Handler<Data, State>[],
+    context: Context<Data, State>,
     indent = 0,
 ) => async () => handlers[indent](
     context,
@@ -13,6 +13,6 @@ export const getMiddlewareRunner = <State extends Record<string, any>, Data>(
         },
 );
 
-export const getMiddlewareHandlers = <State extends Record<string, any>, Data>(
-    middlewares: Middleware<State, Data>[]
+export const getMiddlewareHandlers = <Data, State extends Record<string, any>>(
+    middlewares: Middleware<Data, State>[]
 ) => middlewares.map(middleware => middleware.handler.bind(middleware));

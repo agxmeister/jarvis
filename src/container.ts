@@ -12,7 +12,6 @@ import Browser from "./Browser";
 import {Middleware} from "./middleware";
 import {ChatCompletionData} from "./intelligence";
 import {KeepMessageHistory, DumpChatCompletion, LogChatCompletionMessage} from "./intelligence/middlewares";
-import {Context as MiddlewareContext} from "./middleware";
 
 const container = new Container();
 
@@ -32,7 +31,6 @@ container.bind<string>(dependencies.DumperStoragePath).toConstantValue(process.e
 container.bind<Breadcrumbs>(dependencies.Breadcrumbs).to(Breadcrumbs);
 container.bind<string>(dependencies.BreadcrumbsBaseUrl).toConstantValue(process.env.BREADCRUMBS_BASE_URL ?? "");
 
-const now = Date.now()
 container.bind<Logger>(dependencies.Logger).toDynamicValue(
     () => pino({
         level: "debug",
@@ -44,8 +42,8 @@ container.bind<Logger>(dependencies.Logger).toDynamicValue(
     })),
 );
 
-container.bind<Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>, ChatCompletionData>>(dependencies.Middleware).to(KeepMessageHistory).inSingletonScope();
-container.bind<Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>, ChatCompletionData>>(dependencies.Middleware).to(DumpChatCompletion).inSingletonScope();
-container.bind<Middleware<MiddlewareContext<Record<string, any>, ChatCompletionData>, ChatCompletionData>>(dependencies.Middleware).to(LogChatCompletionMessage).inSingletonScope();
+container.bind<Middleware<ChatCompletionData, Record<string, any>>>(dependencies.Middleware).to(KeepMessageHistory).inSingletonScope();
+container.bind<Middleware<ChatCompletionData, Record<string, any>>>(dependencies.Middleware).to(DumpChatCompletion).inSingletonScope();
+container.bind<Middleware<ChatCompletionData, Record<string, any>>>(dependencies.Middleware).to(LogChatCompletionMessage).inSingletonScope();
 
 export {container};

@@ -47,14 +47,14 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 observation: observation,
             });
 
-            const orientContext: MiddlewareContext<State, Orientation<Record<string, any>>> = {
+            const orientContext: MiddlewareContext<Orientation<Record<string, any>>, State> = {
+                payload: orientation,
                 state: {
                     restart: false,
                 },
-                payload: orientation,
             };
             await getMiddlewareRunner(this.middlewares.orient, orientContext)();
-            if (orientContext.state.restart) {
+            if (orientContext.state!.restart) {
                 return true;
             }
 
