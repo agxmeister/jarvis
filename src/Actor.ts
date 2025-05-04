@@ -17,7 +17,7 @@ import {Open} from "./tools/Open";
 import {Click} from "./tools/Click";
 import {Close} from "./tools/Close";
 import {Wait} from "./tools/Wait";
-import {Act, Conclude, Decide, Observe, Orient, Gatekeeper, Preface} from "./handlers";
+import {Act, Conclude, Decide, Observe, Orient, Gatekeeper, Preface} from "./frame";
 import {getChecklist} from "./utils";
 import {Runtime} from "./tools/types";
 
