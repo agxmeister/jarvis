@@ -1,5 +1,5 @@
 import {Context as MiddlewareContext, getMiddlewareRunner} from "../middleware";
-import {Context, Orientation, Handlers, Middlewares, State} from "./index";
+import {Context, Observation, Orientation, Decision, Handlers, Middlewares, State} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checklist, Checkpoint} from "../checklist";
 
@@ -40,22 +40,30 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 toolbox: toolbox,
                 checkpoint: checkpoint,
             });
+            if (this.middlewares.observe) {
+                const observeContext: MiddlewareContext<Observation<Record<string, any>>, State> = {
+                    payload: observation,
+                };
+                await getMiddlewareRunner(this.middlewares.observe, observeContext)();
+            }
+
             const orientation = await this.handlers.orient({
                 context: context,
                 toolbox: toolbox,
                 checkpoint: checkpoint,
                 observation: observation,
             });
-
-            const orientContext: MiddlewareContext<Orientation<Record<string, any>>, State> = {
-                payload: orientation,
-                state: {
-                    restart: false,
-                },
-            };
-            await getMiddlewareRunner(this.middlewares.orient, orientContext)();
-            if (orientContext.state!.restart) {
-                return true;
+            if (this.middlewares.orient) {
+                const orientContext: MiddlewareContext<Orientation<Record<string, any>>, State> = {
+                    payload: orientation,
+                    state: {
+                        restart: false,
+                    },
+                };
+                await getMiddlewareRunner(this.middlewares.orient, orientContext)();
+                if (orientContext.state!.restart) {
+                    return true;
+                }
             }
 
             const decision = await this.handlers.decide({
@@ -65,6 +73,13 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 observation: observation,
                 orientation: orientation,
             });
+            if (this.middlewares.decide) {
+                const decideContext: MiddlewareContext<Decision<Record<string, any>>, State> = {
+                    payload: decision,
+                };
+                await getMiddlewareRunner(this.middlewares.decide, decideContext)();
+            }
+
             await this.handlers.act({
                 context: context,
                 toolbox: toolbox,
