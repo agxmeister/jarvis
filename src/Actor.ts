@@ -65,7 +65,9 @@ export default class Actor
             act: Act,
             conclude: Conclude
         }, {
+            observe: [],
             orient: [Gatekeeper],
+            decide: [],
         });
     }
 }

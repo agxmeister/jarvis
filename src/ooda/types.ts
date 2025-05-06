@@ -13,9 +13,9 @@ export type Handlers = {
 }
 
 export type Middlewares = {
-    observe?: Handler<Observation<Record<string, any>>, State>[],
-    orient?: Handler<Orientation<Record<string, any>>, State>[],
-    decide?: Handler<Decision<Record<string, any>>, State>[],
+    observe: Handler<Observation<Record<string, any>>, State>[],
+    orient: Handler<Orientation<Record<string, any>>, State>[],
+    decide: Handler<Decision<Record<string, any>>, State>[],
 }
 
 export type State = {

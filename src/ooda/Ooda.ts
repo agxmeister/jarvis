@@ -40,12 +40,10 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 toolbox: toolbox,
                 checkpoint: checkpoint,
             });
-            if (this.middlewares.observe) {
-                const observeContext: MiddlewareContext<Observation<Record<string, any>>, State> = {
-                    payload: observation,
-                };
-                await getMiddlewareRunner(this.middlewares.observe, observeContext)();
-            }
+            const observeContext: MiddlewareContext<Observation<Record<string, any>>, State> = {
+                payload: observation,
+            };
+            await getMiddlewareRunner(this.middlewares.observe, observeContext)();
 
             const orientation = await this.handlers.orient({
                 context: context,
@@ -53,17 +51,15 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 checkpoint: checkpoint,
                 observation: observation,
             });
-            if (this.middlewares.orient) {
-                const orientContext: MiddlewareContext<Orientation<Record<string, any>>, State> = {
-                    payload: orientation,
-                    state: {
-                        restart: false,
-                    },
-                };
-                await getMiddlewareRunner(this.middlewares.orient, orientContext)();
-                if (orientContext.state!.restart) {
-                    return true;
-                }
+            const orientContext: MiddlewareContext<Orientation<Record<string, any>>, State> = {
+                payload: orientation,
+                state: {
+                    restart: false,
+                },
+            };
+            await getMiddlewareRunner(this.middlewares.orient, orientContext)();
+            if (orientContext.state!.restart) {
+                return true;
             }
 
             const decision = await this.handlers.decide({
@@ -73,12 +69,10 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                 observation: observation,
                 orientation: orientation,
             });
-            if (this.middlewares.decide) {
-                const decideContext: MiddlewareContext<Decision<Record<string, any>>, State> = {
-                    payload: decision,
-                };
-                await getMiddlewareRunner(this.middlewares.decide, decideContext)();
-            }
+            const decideContext: MiddlewareContext<Decision<Record<string, any>>, State> = {
+                payload: decision,
+            };
+            await getMiddlewareRunner(this.middlewares.decide, decideContext)();
 
             await this.handlers.act({
                 context: context,
