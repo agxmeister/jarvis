@@ -5,6 +5,8 @@ import {Checklist, Checkpoint} from "../checklist";
 
 export default class Ooda<ContextProperties extends Record<string, any>, CheckpointProperties extends Record<string, any>, Runtime extends Record<string, any>>
 {
+    static readonly CHECKPOINT_ATTEMPT_LIMIT = 5;
+
     constructor(readonly handlers: Handlers, readonly middlewares: Middlewares)
     {
     }
@@ -34,7 +36,7 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
 
     private async processCheckpoint(context: Context<ContextProperties>, toolbox: Toolbox<Runtime>, checkpoint: Checkpoint<CheckpointProperties>): Promise<boolean>
     {
-        for (let j = 0; j < 5; j++) {
+        for (let j = 0; j < Ooda.CHECKPOINT_ATTEMPT_LIMIT; j++) {
             const observation = await this.handlers.observe({
                 context: context,
                 toolbox: toolbox,
