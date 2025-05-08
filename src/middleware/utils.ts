@@ -1,8 +1,22 @@
 import {Handler, Context, Middleware} from "./index";
 
-export const getMiddlewareRunner = <Data, State extends Record<string, any>>(
-    handlers: Handler<Data, State>[],
-    context: Context<Data, State>,
+export const runMiddleware = async <Payload, State extends Record<string, any>>(
+    handlers: Handler<Payload, State>[],
+    payload: Payload,
+    state?: State,
+) =>
+{
+    const context: Context<Payload, State> = {
+        payload: payload,
+        state: state,
+    }
+    await getMiddlewareRunner(handlers, context)();
+    return context;
+}
+
+export const getMiddlewareRunner = <Payload, State extends Record<string, any>>(
+    handlers: Handler<Payload, State>[],
+    context: Context<Payload, State>,
     indent = 0,
 ) =>
     handlers.length > indent
