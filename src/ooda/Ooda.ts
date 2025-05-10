@@ -1,5 +1,4 @@
-import {Context as MiddlewareContext, getMiddlewareRunner} from "../middleware";
-import {Context, Observation, Orientation, Decision, Handlers, Middlewares, State} from "./index";
+import {Context, Handlers, Middlewares} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checklist, Checkpoint} from "../checklist";
 import {runMiddleware} from "../middleware/utils";
@@ -59,10 +58,10 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                     observation: observation,
                 }),
                 {
-                    restart: false,
+                    checkpointCompleted: false,
                 }
             );
-            if (orientationState!.restart) {
+            if (orientationState!.checkpointCompleted) {
                 return true;
             }
 

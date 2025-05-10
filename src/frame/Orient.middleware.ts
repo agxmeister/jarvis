@@ -5,7 +5,7 @@ import {OrientationProperties} from "../types";
 export const Gatekeeper = async (context: Context<Orientation<OrientationProperties>, State>, next: () => Promise<void>): Promise<void> =>
 {
     if (context.payload.completed) {
-        context.state!.restart = true;
+        context.state!.checkpointCompleted = true;
         return;
     }
     await next();

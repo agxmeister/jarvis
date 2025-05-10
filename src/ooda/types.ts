@@ -19,7 +19,7 @@ export type Middlewares = {
 }
 
 export type State = {
-    restart: boolean,
+    checkpointCompleted: boolean,
 }
 
 export type PrefaceParameters<ContextProperties extends Record<string, any>, Runtime extends Record<string, any>> = {
