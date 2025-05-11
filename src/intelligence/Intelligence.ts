@@ -14,8 +14,7 @@ import {Runtime} from "../tools/types";
 import {Thread, Narration} from "./index";
 import {ChatCompletionData} from "./types";
 import {Middleware} from "../middleware";
-import {Context as MiddlewareContext, getMiddlewareRunner} from "../middleware";
-import {getMiddlewareHandlers} from "../middleware/utils";
+import {getMiddlewareHandlers, runMiddleware} from "../middleware/utils";
 
 @injectable()
 export default class Intelligence
@@ -73,15 +72,15 @@ export default class Intelligence
         chatCompletionRequest: ChatCompletionCreateParamsBase,
     ): Promise<ChatCompletionData>
     {
-        const context: MiddlewareContext<ChatCompletionData, Record<string, any>> = {
-            payload: {
+        const {payload} = await runMiddleware(
+            getMiddlewareHandlers(this.middlewares),
+            {
                 thread: thread,
                 chatCompletionRequest: chatCompletionRequest,
                 chatCompletion: (await this.client.chat.completions.create(chatCompletionRequest)) as ChatCompletion,
             },
-        };
-        await getMiddlewareRunner(getMiddlewareHandlers(this.middlewares), context)();
-        return context.payload;
+        );
+        return payload;
     }
 
     private getChatCompletionRequest(
