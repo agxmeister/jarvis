@@ -1,7 +1,7 @@
 import {Context, Handlers, Middlewares} from "./index";
 import {Toolbox} from "../toolbox";
 import {Checklist, Checkpoint} from "../checklist";
-import {runMiddleware} from "../middleware/utils";
+import {runMiddleware} from "../middleware";
 
 export default class Ooda<ContextProperties extends Record<string, any>, CheckpointProperties extends Record<string, any>, Runtime extends Record<string, any>>
 {
