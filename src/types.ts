@@ -52,6 +52,7 @@ export type OrientationProperties = {
     observation: string,
     completed: boolean,
     comment: string,
+    page: PageProperties,
 }
 
 export type DecisionProperties = {

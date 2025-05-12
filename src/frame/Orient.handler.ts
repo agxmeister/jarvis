@@ -10,13 +10,16 @@ export const Orient = async ({
     checkpoint,
     observation,
 }: OrientParameters<ContextProperties, CheckpointProperties, ObservationProperties, Runtime>): Promise<Orientation<OrientationProperties>> => {
-    return await getData(
-        (await intelligence.getDataMessage(
-            thread,
-            getNarration(checkpoint, observation.page),
+    return {
+        ...((await getData(
+            (await intelligence.getDataMessage(
+                thread,
+                getNarration(checkpoint, observation.page),
+                followChecklistResponseSchema,
+                toolbox,
+            )),
             followChecklistResponseSchema,
-            toolbox,
-        )),
-        followChecklistResponseSchema,
-    );
+        ))),
+        page: observation.page
+    };
 };
