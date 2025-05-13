@@ -71,7 +71,6 @@ export default class Ooda<ContextProperties extends Record<string, any>, Checkpo
                     context: context,
                     toolbox: toolbox,
                     checkpoint: checkpoint,
-                    observation: observation,
                     orientation: orientation,
                 }),
             );
